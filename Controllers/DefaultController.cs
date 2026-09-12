@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APICeleiroCriativo.Controllers;
 
-public class DefaultController : Controller
+[ApiController]
+[Route("")]
+public class DefaultController : ControllerBase
 {
-    public IActionResult Index()
-    {
-        return View();
-    }
+    [HttpGet]
+    public IActionResult Index() => Ok(new { status = "ok", api = "APICeleiroCriativo" });
 }

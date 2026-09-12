@@ -32,6 +32,10 @@ bld/
 # ASP.NET
 wwwroot/lib/
 
+# Documentos enviados pelos usuários (upload de tarefas) — dados, não código
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
 # NuGet
 *.nupkg
 *.snupkg
