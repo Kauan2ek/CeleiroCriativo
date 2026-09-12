@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APICeleiroCriativo.Controllers;
 
-public class DefaultController : Controller
+public class CategoriaController : Controller
 {
     public IActionResult Index()
     {

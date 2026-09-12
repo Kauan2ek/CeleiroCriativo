@@ -5,6 +5,6 @@ builder.Services.AddControllersWithViews(); // Retorna page web
 
 var app = builder.Build();
 
-app.MapControllerRoute("default", "{controller}/{action}");
+app.MapControllerRoute("default", "{controller=Default}/{action=Index}");
 
 app.Run();
