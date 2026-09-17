@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Faz a página se adaptar a celulares -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Home - Celeiro Criativo</title>
+    <link rel="icon" type="image/png" href="~/imagens/logo.png">
+
+    <!-- Arquivo responsável pela aparência da página -->
+    <link rel="stylesheet" href="~/css/style.css">
+</head>
+
+<body>
+
+    <!-- Página principal -->
+    <div class="pagina">
+
+        <!-- ==================== CABEÇALHO ==================== -->
+
+        <header class="cabecalho">
+
+            <!-- Logo -->
+            <div class="logo">
+                <img src="~/imagens/logo.png" alt="Logo da empresa">
+            </div>
+
+            <!-- Menu principal -->
+            <nav class="menu">
+
+                <a href="#equipe">Equipe</a>
+
+                <a href="#eventos">Eventos</a>
+
+                <a href="#parcerias">Parcerias - Serviços</a>
+
+                <!-- WhatsApp -->
+
+                <a href="https://wa.me/5517991714887?text=Olá!%20Acessei%20o%20site%20Celeiro%20Criativo%20e%20gostaria%20de%20conversar%20sobre%20estratégias%20de%20marketing%20para%20minha%20empresa.%20Podemos%20falar%20sobre%20isso?" class="icone">
+                    <img src="~/imagens/whats.png" alt="WhatsApp">
+                </a>
+
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/celeirocriativo/" class="icone">
+                    <img src="~/imagens/instagram.png" alt="Instagram">
+
+                </a>
+
+            </nav>
+
+            <!-- Área de login -->
+             <div class="entrar">
+                 <a href="entrar.html">Entrar</a>
+                 <img src="~/imagens/Entrar.png" alt="Entrar">
+
+            </div>
+
+        </header>
+
+    <!-- ==================== CHAMADA PARA PROJETO ==================== -->
+
+        <section class="chamada-projeto">
+
+            <div class="balao-projeto">
+
+                <h2>Já tem uma ideia?</h2>
+
+                <p>
+                    Quer começar um projeto? Conte sua ideia para a gente
+                    e vamos transformar seus planos em realidade.
+                </p>
+
+                <a href="#cadastro" class="botao-projeto">
+                    Começar meu projeto
+                </a>
+
+            </div>
+
+        </section>
+
+            <!-- ==================== BANNER ==================== -->
+
+        <section class="banner">
+
+            <div class="banner-conteudo">
+
+                <!-- Imagem de fundo -->
+                <img
+                    src="~/imagens/fundo_celeiro.png"
+                    alt="Imagem da empresa"
+                >
+
+                <!-- Texto com efeito de digitação -->
+                <div class="texto-banner">
+                    <h2 id="textoDigitando"></h2>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== EQUIPE ==================== -->
+
+        <section class="secao" id="equipe">
+
+        <h2 class="titulo-secao">Equipe</h2>
+
+        <div class="cards-equipe">
+
+            <!-- Membro 1 -->
+            <div class="card-equipe">
+                <img src="~/imagens/membro1_design.jpg" alt="Ana Martins">
+
+                <h3>Ana Martins</h3>
+                <span>Designer</span>
+
+                <p>
+                    Responsável pela criação de layouts, identidade visual e materiais gráficos.
+                </p>
+            </div>
+
+            <!-- Membro 2 -->
+            <div class="card-equipe">
+                <img src="~/imagens/membro2_video.jpg" alt="Lucas Ferreira">
+
+                <h3>Lucas Ferreira</h3>
+                <span>Video Maker</span>
+
+                <p>
+                    Responsável pela produção e edição de vídeos para apresentar nossas ideias.
+                </p>
+            </div>
+
+            <!-- Membro 3 -->
+            <div class="card-equipe">
+                <img src="~/imagens/membro3_avaliacao.jpg" alt="Mariana Costa">
+
+                <h3>Mariana Costa</h3>
+                <span>Avaliação e Finanças</span>
+
+                <p>
+                    Analisa projetos, custos e resultados para garantir decisões financeiras.
+                </p>
+            </div>
+
+            <!-- Membro 4 -->
+            <div class="card-equipe">
+                <img src="~/imagens/membro4_design.jpg" alt="Rafael Lima">
+
+                <h3>Rafael Lima</h3>
+                <span>Designer</span>
+
+                <p>
+                    Cuida dos elementos visuais, artes e detalhes que tornam nossos projetos únicos.
+                </p>
+            </div>
+
+        </div>
+        </section>
+
+<!-- ==================== EVENTOS ==================== -->
+
+        <section id="eventos" class="secao">
+
+        <h2 class="titulo-secao">Eventos</h2>
+
+        <div class="cards-eventos">
+
+            <!-- Evento 1 -->
+            <div class="card-evento">
+                <img src="~/imagens/evento_flores.jpg" alt="Festival Primavera de Aromas">
+
+                <div class="evento-info">
+                    <span class="evento-data">12 OUT 2026</span>
+                    <h3>Festival Primavera de Aromas</h3>
+                    <span class="evento-empresa">Flor & Essência</span>
+
+                    <p>
+                        Evento criado para apresentar uma nova coleção
+                        de perfumes e cosméticos naturais.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Evento 2 -->
+            <div class="card-evento">
+                <img src="~/imagens/evento_tec.jpg" alt="Tech Experience 2026">
+
+                <div class="evento-info">
+                    <span class="evento-data">24 OUT 2026</span>
+                    <h3>Tech Experience 2026</h3>
+                    <span class="evento-empresa">ByteHouse</span>
+
+                    <p>
+                        Feira de tecnologia e games com demonstrações
+                        de computadores e equipamentos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Evento 3 -->
+            <div class="card-evento">
+                <img src="~/imagens/evento_cafe.jpg" alt="Café & Arte">
+
+                <div class="evento-info">
+                    <span class="evento-data">07 NOV 2026</span>
+                    <h3>Café & Arte</h3>
+                    <span class="evento-empresa">Café Aurora</span>
+
+                    <p>
+                        Uma tarde reunindo cafés artesanais,
+                        música ao vivo e artistas locais.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Evento 4 -->
+            <div class="card-evento">
+                <img src="~/imagens/evento_eco.jpg" alt="Casa do Futuro">
+
+                <div class="evento-info">
+                    <span class="evento-data">21 NOV 2026</span>
+                    <h3>Casa do Futuro</h3>
+                    <span class="evento-empresa">EcoLar</span>
+
+                    <p>
+                        Exposição com soluções sustentáveis para
+                        residências, tecnologia e conforto.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        </section>
+
+
+
+        <!-- ==================== PARCERIAS ==================== -->
+
+        <section id="parcerias" class="secao">
+
+        <h2 class="titulo-secao">Parcerias - Serviços</h2>
+
+        <div class="cards">
+
+            <!-- Parceria 1 -->
+            <div class="card">
+                <img src="~/imagens/empresa_fic1.jpg" alt="Logo Flor & Essência">
+
+                <h3>Flor & Essência</h3>
+
+                <p>
+                    Cosméticos naturais e perfumes artesanais.
+                </p>
+            </div>
+
+            <!-- Parceria 2 -->
+            <div class="card">
+                <img src="~/imagens/empresa_fic2.jpg" alt="Logo ByteHouse">
+
+                <h3>ByteHouse</h3>
+
+                <p>
+                    Tecnologia, computadores e equipamentos gamers.
+                </p>
+            </div>
+
+            <!-- Parceria 3 -->
+            <div class="card">
+                <img src="~/imagens/empresa_fic3.jpg" alt="Logo Café Aurora">
+
+                <h3>Café Aurora</h3>
+
+                <p>
+                    Cafeteria especializada em cafés artesanais e experiências culturais.
+                </p>
+            </div>
+
+            <!-- Parceria 4 -->
+            <div class="card">
+                <img src="~/imagens/empresa_fic4.jpg" alt="Logo EcoLar">
+
+                <h3>EcoLar</h3>
+
+                <p>
+                    Soluções sustentáveis e tecnologia para residências.
+                </p>
+            </div>
+
+        </div>
+
+        </section>
+
+        <!-- ==================== CADASTRO ==================== -->
+
+        <section class="cadastro" id="cadastro">
+
+            <!-- Espaço reservado para o banner do cadastro -->
+            <div class="banner-cadastro">
+
+                <img src="~/imagens/banner_cad.png"
+                     alt="Banner de cadastro">
+
+            </div>
+
+
+            <!-- Formulário -->
+            <div class="formulario">
+
+                <h2>Cadastre-se</h2>
+
+                <!-- Nome -->
+                <label for="nome">Nome:</label>
+                <input type="text"
+                       id="nome"
+                       placeholder="Digite seu nome">
+
+
+                <!-- Telefone -->
+                <label for="telefone">Telefone:</label>
+                <input type="tel"
+                       id="telefone"
+                       placeholder="(99) 99999-9999">
+
+
+                <!-- E-mail -->
+                <label for="email">Email:</label>
+                <input type="email"
+                       id="email"
+                       placeholder="exemplo@email.com">
+
+
+                <!-- CPF ou CNPJ -->
+                <label for="documento">CPF ou CNPJ:</label>
+                <input type="text"
+                       id="documento"
+                       placeholder="Digite seu CPF ou CNPJ">
+
+
+                <!-- Senha -->
+                <label for="senha">Senha:</label>
+                <input type="password"
+                       id="senha"
+                       placeholder="Digite sua senha">
+
+
+                <!-- Ideia -->
+                <label for="ideia">Ideia:</label>
+                <textarea id="ideia"
+                          placeholder="Conte sua ideia..."></textarea>
+
+
+                <!-- Botão -->
+                <button type="button" onclick="cadastrar()">
+                    Cadastrar
+                </button>
+
+                <div class="cadastroentrar">
+                     <p>Já tem cadastro?</p>
+                     <a href="entrar.html">Entrar</a>
+                </div>
+                
+            </div>
+
+        </section>
+
+
+        <!-- ==================== RODAPÉ ==================== -->
+
+        <footer class="rodape">
+
+            <p>© 2026 - Celeiro Criativo</p>
+
+        </footer>
+
+    </div>
+
+
+    <!-- Arquivo responsável pelos comportamentos da página -->
+    <script src="~/js/script.js"></script>
+
+</body>
+
+</html>
