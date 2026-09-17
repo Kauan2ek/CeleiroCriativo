@@ -6,4 +6,9 @@ public class Home : Controller
     {
         return View();
     }
+
+    public ActionResult Entrar()
+    {
+        return View();
+    }
 }
