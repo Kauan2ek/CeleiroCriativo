@@ -6,5 +6,5 @@ public class Projeto
     public DateTime DataInicio { get; set; }
     public DateTime DataFim { get; set; }
     public DateTime DataPrevista { get; set; }
-    public Status Status {get; }
+    public Status Status { get; set; }
 }
