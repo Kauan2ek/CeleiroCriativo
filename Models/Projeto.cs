@@ -7,4 +7,5 @@ public class Projeto
     public DateTime DataFim { get; set; }
     public DateTime DataPrevista { get; set; }
     public Status Status { get; set; }
+    public List<Tarefa> tarefas {get; set; }
 }

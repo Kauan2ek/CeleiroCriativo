@@ -10,5 +10,6 @@ public class Home : Controller
     public ActionResult Entrar()
     {
         return View();
+        //return RedirectToAction();
     }
 }
