@@ -1,19 +1,11 @@
-
 using Microsoft.AspNetCore.Mvc;
 
 public class StatusController : Controller
 {
-     // GET: /Status/Create
-    [HttpGet]
-    public ActionResult Create()
+    private static List<Status> lista = new List<Status>();
+     // http://localhost:1234/Status/index
+    public ActionResult Index()
     {
-        return View(); // retorna a view com um formulário vazio
-    }
-
-    // POST: /Status/Create
-    [HttpPost]
-    public ActionResult Create(Status status)
-    {
-        return View(status); // devolve o form preenchido, com os erros
+        return View(lista);
     }
 }
