@@ -106,3 +106,123 @@ body.claude-form-page {
 .claude-back-link:hover {
     text-decoration: underline;
 }
+
+body.claude-list-page {
+    margin: 0;
+    min-height: 100vh;
+    background: #f2f4f0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    padding: 32px;
+}
+
+.claude-list-card {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+}
+
+.claude-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.claude-btn-link {
+    background: #8bc34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.claude-btn-link:hover {
+    background: #7cb342;
+}
+
+.claude-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.claude-table th,
+.claude-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e6e9e2;
+}
+
+.claude-table th {
+    background: #f7f9f5;
+    color: #3d4a33;
+    font-weight: 600;
+}
+
+.claude-table tr:hover td {
+    background: #fbfcfa;
+}
+
+.claude-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #d7dcd1;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.claude-empty {
+    color: #8a8a8a;
+    font-size: 0.9rem;
+    padding: 16px 0;
+}
+
+.claude-group {
+    margin-bottom: 28px;
+}
+
+.claude-group:last-child {
+    margin-bottom: 0;
+}
+
+.claude-group h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: #3d4a33;
+    border-bottom: 2px solid #e6e9e2;
+    padding-bottom: 6px;
+}
+
+.claude-file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.claude-file-list li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+}
+
+.claude-file-link {
+    color: #556b2f;
+    text-decoration: none;
+}
+
+.claude-file-link:hover {
+    text-decoration: underline;
+}
+
+.claude-file-disabled {
+    color: #aaaaaa;
+    font-style: italic;
+}

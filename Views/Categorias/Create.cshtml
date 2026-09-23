@@ -1,16 +1,34 @@
+@model Categoria
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Nova Categoria</title>
+    <link rel="stylesheet" href="/claude/style.css">
 </head>
-<body>
-    <form action="/Categoria/Create/" method="POST">
-        <input type="text" name="Descricao" id="Descricao"> Descricao
-        <input type="text" name="Cor" id="Cor"> Cor
-        
-        <button>Salvar</button>
-    </form>
+<body class="claude-form-page">
+    <div class="claude-card">
+        <h1>Nova Categoria</h1>
+        <p class="claude-subtitle">Preencha os dados da categoria</p>
+
+        <form method="post" action="/Categorias/Create">
+            <div class="claude-field">
+                <label for="descricao">Descrição</label>
+                <input type="text" id="descricao" name="Descricao" value="@Model?.Descricao">
+            </div>
+
+            <div class="claude-field">
+                <label for="cor">Cor</label>
+                <input type="text" id="cor" name="Cor" value="@Model?.Cor">
+            </div>
+
+            <div class="claude-actions">
+                <a class="claude-back-link" href="/Categorias/Index">&larr; Voltar</a>
+                <button type="submit" class="claude-btn">Salvar</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

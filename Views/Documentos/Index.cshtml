@@ -1,39 +1,39 @@
-@model List<Categoria>
+@model List<Documento>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categorias</title>
+    <title>Documentos</title>
     <link rel="stylesheet" href="/claude/style.css">
 </head>
 <body class="claude-list-page">
     <div class="claude-list-card">
         <div class="claude-toolbar">
-            <h1>Categorias</h1>
-            <a class="claude-btn-link" href="/Categorias/Create">+ Nova Categoria</a>
+            <h1>Documentos</h1>
+            <a class="claude-btn-link" href="/Documentos/Create">+ Novo Documento</a>
         </div>
 
         <table class="claude-table">
             <thead>
                 <tr>
-                    <th>Código</th>
-                    <th>Descrição</th>
-                    <th>Cor</th>
+                    <th>#</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (Categoria t in Model)
+                @for (int i = 0; i < Model.Count; i++)
                 {
                     <tr>
-                        <td>@t.Codigo</td>
-                        <td>@t.Descricao</td>
-                        <td><span class="claude-swatch" style="background-color: @t.Cor"></span>@t.Cor</td>
+                        <td>Documento @(i + 1)</td>
                     </tr>
                 }
             </tbody>
         </table>
+        <p class="claude-empty">
+            Obs.: as propriedades de Documento (Descricao, Extensao, Diretorio, Codigo) estão como <code>private</code> no model,
+            por isso não é possível exibir os detalhes aqui sem alterar Models/Documento.cs.
+        </p>
     </div>
 </body>
 </html>

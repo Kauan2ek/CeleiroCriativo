@@ -1,0 +1,51 @@
+@model List<Tarefa>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas</title>
+    <link rel="stylesheet" href="/claude/style.css">
+</head>
+<body class="claude-list-page">
+    <div class="claude-list-card">
+        <div class="claude-toolbar">
+            <h1>Tarefas</h1>
+            <a class="claude-btn-link" href="/Tarefas/Create">+ Nova Tarefa</a>
+        </div>
+
+        <table class="claude-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Prevista</th>
+                    <th>Visibilidade</th>
+                    <th>Status</th>
+                    <th>Funcionários</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Tarefa t in Model)
+                {
+                    <tr>
+                        <td>@t.Codigo</td>
+                        <td>@t.Titulo</td>
+                        <td>@t.Descricao</td>
+                        <td>@t.DataHoraInicio</td>
+                        <td>@t.DataHoraFim</td>
+                        <td>@t.DataHoraPrevista</td>
+                        <td>@t.Visibilidade</td>
+                        <td>@(t.Status?.Descricao ?? "-")</td>
+                        <td>@(t.Funcionarios?.Count ?? 0)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,35 +1,41 @@
-@model List<Categoria>
+@model List<Funcionario>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categorias</title>
+    <title>Funcionários</title>
     <link rel="stylesheet" href="/claude/style.css">
 </head>
 <body class="claude-list-page">
     <div class="claude-list-card">
         <div class="claude-toolbar">
-            <h1>Categorias</h1>
-            <a class="claude-btn-link" href="/Categorias/Create">+ Nova Categoria</a>
+            <h1>Funcionários</h1>
+            <a class="claude-btn-link" href="/Funcionarios/Create">+ Novo Funcionário</a>
         </div>
 
         <table class="claude-table">
             <thead>
                 <tr>
                     <th>Código</th>
-                    <th>Descrição</th>
-                    <th>Cor</th>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Documento</th>
+                    <th>Email</th>
+                    <th>Ativo</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (Categoria t in Model)
+                @foreach (Funcionario t in Model)
                 {
                     <tr>
                         <td>@t.Codigo</td>
-                        <td>@t.Descricao</td>
-                        <td><span class="claude-swatch" style="background-color: @t.Cor"></span>@t.Cor</td>
+                        <td>@t.Nome</td>
+                        <td>@t.Telefone</td>
+                        <td>@t.TipoDocumento: @t.Documento</td>
+                        <td>@t.Email</td>
+                        <td>@(t.Ativo ? "Sim" : "Não")</td>
                     </tr>
                 }
             </tbody>

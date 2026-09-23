@@ -1,0 +1,54 @@
+@model Tarefa
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Tarefa</title>
+    <link rel="stylesheet" href="/claude/style.css">
+</head>
+<body class="claude-form-page">
+    <div class="claude-card">
+        <h1>Nova Tarefa</h1>
+        <p class="claude-subtitle">Preencha os dados da tarefa</p>
+
+        <form method="post" action="/Tarefas/Create">
+            <div class="claude-field">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="Titulo" value="@Model?.Titulo">
+            </div>
+
+            <div class="claude-field">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="Descricao">@Model?.Descricao</textarea>
+            </div>
+
+            <div class="claude-field">
+                <label for="dataHoraInicio">Data/Hora de Início</label>
+                <input type="datetime-local" id="dataHoraInicio" name="DataHoraInicio">
+            </div>
+
+            <div class="claude-field">
+                <label for="dataHoraFim">Data/Hora de Fim</label>
+                <input type="datetime-local" id="dataHoraFim" name="DataHoraFim">
+            </div>
+
+            <div class="claude-field">
+                <label for="dataHoraPrevista">Data/Hora Prevista</label>
+                <input type="datetime-local" id="dataHoraPrevista" name="DataHoraPrevista">
+            </div>
+
+            <div class="claude-field">
+                <label for="visibilidade">Visibilidade</label>
+                <input type="text" id="visibilidade" name="Visibilidade" value="@Model?.Visibilidade">
+            </div>
+
+            <div class="claude-actions">
+                <a class="claude-back-link" href="/Tarefas/Index">&larr; Voltar</a>
+                <button type="submit" class="claude-btn">Salvar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
