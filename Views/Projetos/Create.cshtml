@@ -39,6 +39,16 @@
                 <input type="date" id="dataPrevista" name="DataPrevista">
             </div>
 
+            <div class="claude-field">
+                <label for="status">Status</label>
+                <select id="status" name="Status.Codigo">
+                    @foreach (var status in StatusController.Lista)
+                    {
+                        <option value="@status.Codigo">@status.Descricao</option>
+                    }
+                </select>
+            </div>
+
             <div class="claude-actions">
                 <a class="claude-back-link" href="/Projetos/Index">&larr; Voltar</a>
                 <button type="submit" class="claude-btn">Salvar</button>
