@@ -1,0 +1,27 @@
+
+@model List<Categoria>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+        @foreach(Categoria categoria in Model)
+        {
+        <tr>
+            <td>@categoria.Codigo</td>
+            <td>@categoria.Descricao</td>
+            <td>@categoria.Cor</td>
+            <td><a href="/categorias/update/@categoria.Codigo">Editar</a></td>
+            <td><a href="/categorias/delete/@categoria.Codigo">Deletar</a></td>
+        </tr>
+        }
+    </table>
+
+    <a href="/Categorias/create">Adicionar</a>
+</body>
+</html>

@@ -24,4 +24,45 @@ public class CategoriasController : Controller
         lista.Add(model);
         return RedirectToAction("Index");
     }
+
+    // GET: /Categorias/Update
+    [HttpGet]
+    public ActionResult Update(int id) 
+    {
+        foreach (var categoria in lista)
+        {
+            if (categoria.Codigo == id)
+                return View(categoria);
+        }
+        return NotFound();
+    }
+
+    [HttpPost]
+    public ActionResult Update(int id, Categoria model)
+    {
+        foreach (var categoria in lista)
+        {
+            if (categoria.Codigo == id)
+            {
+                categoria.Descricao = model.Descricao;
+                categoria.Cor = model.Cor;
+            }
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpDelete]
+    public ActionResult Delete(int id)
+    {
+        foreach (var categoria in lista)
+        {
+            if(categoria.Codigo == id)
+            {
+                lista.Remove(categoria);
+                break;
+            }
+        }
+
+        return RedirectToAction("Index");
+    }
 }

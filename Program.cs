@@ -10,6 +10,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapControllerRoute("default", "{controller}/{action}");
+app.MapControllerRoute("default", "{controller}/{action}/{id?}");
 
 app.Run();
