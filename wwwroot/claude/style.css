@@ -1,0 +1,108 @@
+/* Estilos temporários para as telas de Create geradas pelo Claude.
+   Mantido separado de /css/style.css (CSS "oficial" do projeto). */
+
+* {
+    box-sizing: border-box;
+}
+
+body.claude-form-page {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f2f4f0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    padding: 24px;
+}
+
+.claude-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+}
+
+.claude-card h1 {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+    color: #2f3a25;
+}
+
+.claude-card .claude-subtitle {
+    margin: 0 0 24px;
+    font-size: 0.85rem;
+    color: #7a7a7a;
+}
+
+.claude-field {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.claude-field label {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #3d4a33;
+}
+
+.claude-field input,
+.claude-field textarea,
+.claude-field select {
+    padding: 10px 12px;
+    border: 1px solid #d7dcd1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.claude-field input:focus,
+.claude-field textarea:focus,
+.claude-field select:focus {
+    border-color: #8bc34a;
+    box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.2);
+}
+
+.claude-field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.claude-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+}
+
+.claude-btn {
+    background: #8bc34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 22px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.claude-btn:hover {
+    background: #7cb342;
+}
+
+.claude-back-link {
+    font-size: 0.85rem;
+    color: #556b2f;
+    text-decoration: none;
+}
+
+.claude-back-link:hover {
+    text-decoration: underline;
+}

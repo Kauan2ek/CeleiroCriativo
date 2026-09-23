@@ -1,15 +1,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-public class CategoriaController : Controller
+public class CategoriasController : Controller
 {
     private static List<Categoria> lista = new List<Categoria>();
-     // http://localhost:1234/tarefa/index
+     // http://localhost:1234/Categorias/index
     public ActionResult Index()
     {
-        //lista.Add(new Categoria {Descricao= "Teste 21", Cor="Sim"});
-        //lista.Add(new Categoria {Descricao= "Teste 4", Cor="Azul"});
-
         return View(lista);
     }
 
