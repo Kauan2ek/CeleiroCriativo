@@ -49,9 +49,10 @@ public class DocumentosController : Controller
                 documento.Descricao = model.Descricao;
                 documento.Extensao = model.Descricao;
                 documento.Diretorio = model.Diretorio;
+                return RedirectToAction("Index");
             }
         }
-        return RedirectToAction("Index");
+        return NotFound();
     }
 
     // DELETE: /documentos/delete
@@ -62,9 +63,9 @@ public class DocumentosController : Controller
             if (documento.Codigo == id)
             {
                 lista.Remove(documento);
-                break;
+                return View("Index");
             }
         }
-        return View("Index");
+        return NotFound();
     }
 }

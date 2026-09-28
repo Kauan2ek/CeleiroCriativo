@@ -43,14 +43,18 @@ public class ClientesController : Controller
     {
         foreach (var cliente in lista)
         {
-            cliente.Nome = model.Nome;
-            cliente.Telefone = model.Telefone;
-            cliente.TipoDocumento = model.TipoDocumento;
-            cliente.Documento = model.Documento;
-            cliente.Email = model.Email;
-            cliente.Senha = model.Senha;
+            if (cliente.Codigo == id)
+            {
+                cliente.Nome = model.Nome;
+                cliente.Telefone = model.Telefone;
+                cliente.TipoDocumento = model.TipoDocumento;
+                cliente.Documento = model.Documento;
+                cliente.Email = model.Email;
+                cliente.Senha = model.Senha;
+            }
+            return RedirectToAction("Index");
         }
-        return RedirectToAction("Index");
+        return NotFound();
     }
 
     // GET: /clientes/delete
@@ -63,5 +67,11 @@ public class ClientesController : Controller
             break;
         }
         return RedirectToAction("Index");
+    }
+
+    //[HttpPost]
+    public ActionResult AtualizaCodigoVerificacao(int id)
+    {
+        return View(); // Implementar lógica aqui
     }
 }

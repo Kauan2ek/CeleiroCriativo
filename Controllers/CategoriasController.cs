@@ -46,9 +46,10 @@ public class CategoriasController : Controller
             {
                 categoria.Descricao = model.Descricao;
                 categoria.Cor = model.Cor;
+                return RedirectToAction("Index");
             }
         }
-        return RedirectToAction("Index");
+        return NotFound();
     }
 
     [HttpPost]

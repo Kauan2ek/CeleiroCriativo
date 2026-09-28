@@ -46,9 +46,10 @@ public class CargosController : Controller
             if (cargo.Codigo == id)
             {
                 cargo.Descricao = model.Descricao;
+                return RedirectToAction("Index");
             }
         }
-        return RedirectToAction("Index");
+        return NotFound();
     }
 
     // POST: /cargos/delete

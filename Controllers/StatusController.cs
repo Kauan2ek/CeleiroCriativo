@@ -13,4 +13,7 @@ public class StatusController : Controller
     {
         return View(Lista);
     }
+
+
+    // Status é apenas lido, não é criado, atualizado ou deletado
 }

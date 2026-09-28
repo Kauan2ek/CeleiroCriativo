@@ -50,9 +50,10 @@ public class ComentariosController : Controller
                 comentario.Titulo = model.Titulo;
                 comentario.Descricao = model.Descricao;
                 comentario.DataHora = model.DataHora;
+                return RedirectToAction("Index");
             }
         }
-        return RedirectToAction("Index");
+        return NotFound();
     }
 
     [HttpPost]
