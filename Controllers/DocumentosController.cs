@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Mvc;
 
 public class DocumentosController : Controller
@@ -22,5 +23,48 @@ public class DocumentosController : Controller
     {
         lista.Add(model);
         return RedirectToAction("Index");
+    }
+
+    // GET: /documentos/update
+    [HttpGet]
+    public ActionResult Update(int id)
+    {
+        foreach (var documento in lista)
+        {
+            if (documento.Codigo == id)
+            {
+                return View(documento);
+            }
+        }
+        return NotFound();
+    }
+
+    // POST: /documentos/update
+    public ActionResult Update(int id, Documento model)
+    {
+        foreach (var documento in lista)
+        {
+            if (documento.Codigo == id)
+            {
+                documento.Descricao = model.Descricao;
+                documento.Extensao = model.Descricao;
+                documento.Diretorio = model.Diretorio;
+            }
+        }
+        return RedirectToAction("Index");
+    }
+
+    // DELETE: /documentos/delete
+    public ActionResult Delete(int id)
+    {
+        foreach (var documento in lista)
+        {
+            if (documento.Codigo == id)
+            {
+                lista.Remove(documento);
+                break;
+            }
+        }
+        return View("Index");
     }
 }
