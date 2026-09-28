@@ -24,4 +24,44 @@ public class ClientesController : Controller
         lista.Add(model);
         return RedirectToAction("Index");
     }
+
+    // GET: /clientes/update
+    [HttpGet]
+    public ActionResult Update(int id)
+    {
+        foreach (var cliente in lista)
+        {
+            if (cliente.Codigo == id)
+                return View(cliente);
+        }
+        return NotFound();
+    }
+
+    // POST: /clientes/update
+    [HttpPost]
+    public ActionResult Update(int id, Cliente model)
+    {
+        foreach (var cliente in lista)
+        {
+            cliente.Nome = model.Nome;
+            cliente.Telefone = model.Telefone;
+            cliente.TipoDocumento = model.TipoDocumento;
+            cliente.Documento = model.Documento;
+            cliente.Email = model.Email;
+            cliente.Senha = model.Senha;
+        }
+        return RedirectToAction("Index");
+    }
+
+    // GET: /clientes/delete
+    [HttpPost]
+    public ActionResult Delete(int id)
+    {
+        foreach (var cliente in lista)
+        {
+            lista.Remove(cliente);
+            break;
+        }
+        return RedirectToAction("Index");
+    }
 }

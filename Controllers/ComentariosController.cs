@@ -24,4 +24,48 @@ public class ComentariosController : Controller
         lista.Add(model);
         return RedirectToAction("Index");
     }
+
+    // GET: /comentarios/update
+    [HttpGet]
+    public ActionResult Update(int id)
+    {
+        foreach(var comentario in lista)
+        {
+            if (comentario.Codigo == id)
+            {
+                return View(comentario);
+            }
+        }
+        return NotFound();
+    }
+
+    // POST: /comentarios/update
+    [HttpPost]
+    public ActionResult Update(int id, Comentario model)
+    {
+        foreach (var comentario in lista)
+        {
+            if (comentario.Codigo == id)
+            {
+                comentario.Titulo = model.Titulo;
+                comentario.Descricao = model.Descricao;
+                comentario.DataHora = model.DataHora;
+            }
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public ActionResult Delete(int id, Comentario model)
+    {
+        foreach (var comentario in lista)
+        {
+            if (comentario.Codigo == id)
+            {
+                lista.Remove(comentario);
+                break;
+            }
+        }
+        return RedirectToAction("Index");
+    }
 }
