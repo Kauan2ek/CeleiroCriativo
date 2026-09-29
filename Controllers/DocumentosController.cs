@@ -21,6 +21,10 @@ public class DocumentosController : Controller
     [HttpPost]
     public ActionResult Create(Documento model)
     {
+        if (lista.Count == 0)
+            model.Codigo = 1; 
+        else
+            model.Codigo = lista[^1].Codigo + 1; // Pega o último ID cadastrado e incrementa 1
         lista.Add(model);
         return RedirectToAction("Index");
     }

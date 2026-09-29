@@ -1,6 +1,6 @@
 public abstract class Pessoa
 {
-    public int Codigo { get; } // Código não é alterado via código
+    public int Codigo { get; set; } // Código não é alterado via código
     public string Nome { get; set; } 
     public string Telefone { get; set; }
     public string TipoDocumento { get; set; } 
