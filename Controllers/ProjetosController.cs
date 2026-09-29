@@ -50,7 +50,6 @@ public class ProjetosController : Controller
                 projeto.DataFim = model.DataFim;
                 projeto.DataPrevista = model.DataPrevista;
                 projeto.Status = model.Status;
-                projeto.tarefas = model.tarefas;
                 return RedirectToAction("Index");
             }
         }
