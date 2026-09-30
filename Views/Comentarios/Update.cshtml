@@ -1,0 +1,39 @@
+@model Comentario
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Comentário</title>
+    <link rel="stylesheet" href="/claude/style.css">
+</head>
+<body class="claude-form-page">
+    <div class="claude-card">
+        <h1>Editar Comentário</h1>
+        <p class="claude-subtitle">Atualize os dados do comentário</p>
+
+        <form method="post" action="/Comentarios/Update/@Model.Codigo">
+            <div class="claude-field">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="Titulo" value="@Model.Titulo">
+            </div>
+
+            <div class="claude-field">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="Descricao">@Model.Descricao</textarea>
+            </div>
+
+            <div class="claude-field">
+                <label for="dataHora">Data/Hora</label>
+                <input type="datetime-local" id="dataHora" name="DataHora" value="@Model.DataHora.ToString("yyyy-MM-ddTHH:mm")">
+            </div>
+
+            <div class="claude-actions">
+                <a class="claude-back-link" href="/Comentarios/Index">&larr; Voltar</a>
+                <button type="submit" class="claude-btn">Salvar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

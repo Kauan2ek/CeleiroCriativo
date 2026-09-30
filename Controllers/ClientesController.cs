@@ -67,8 +67,11 @@ public class ClientesController : Controller
     {
         foreach (var cliente in lista)
         {
-            lista.Remove(cliente);
-            break;
+            if (cliente.Codigo == id)
+            {
+                lista.Remove(cliente);
+                break;
+            }
         }
         return RedirectToAction("Index");
     }

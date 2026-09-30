@@ -22,6 +22,7 @@
                     <th>Título</th>
                     <th>Descrição</th>
                     <th>Data/Hora</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +33,14 @@
                         <td>@t.Titulo</td>
                         <td>@t.Descricao</td>
                         <td>@t.DataHora</td>
+                        <td>
+                            <div class="claude-row-actions">
+                                <a class="claude-link-btn" href="/Comentarios/Update/@t.Codigo">Editar</a>
+                                <form class="claude-inline-form" method="post" action="/Comentarios/Delete/@t.Codigo">
+                                    <button type="submit" class="claude-link-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>

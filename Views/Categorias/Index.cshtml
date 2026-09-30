@@ -21,6 +21,7 @@
                     <th>Código</th>
                     <th>Descrição</th>
                     <th>Cor</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +31,14 @@
                         <td>@t.Codigo</td>
                         <td>@t.Descricao</td>
                         <td><span class="claude-swatch" style="background-color: @t.Cor"></span>@t.Cor</td>
+                        <td>
+                            <div class="claude-row-actions">
+                                <a class="claude-link-btn" href="/Categorias/Update/@t.Codigo">Editar</a>
+                                <form class="claude-inline-form" method="post" action="/Categorias/Delete/@t.Codigo">
+                                    <button type="submit" class="claude-link-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>

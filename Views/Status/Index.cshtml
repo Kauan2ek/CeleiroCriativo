@@ -1,0 +1,40 @@
+@model List<Status>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status</title>
+    <link rel="stylesheet" href="/claude/style.css">
+</head>
+<body class="claude-list-page">
+    <div class="claude-list-card">
+        <div class="claude-toolbar">
+            <h1>Status</h1>
+        </div>
+
+        <table class="claude-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Status t in Model)
+                {
+                    <tr>
+                        <td>@t.Codigo</td>
+                        <td>@t.Descricao</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p class="claude-note">
+            Status é só leitura — os valores são fixos em <code>StatusController.Lista</code>, sem Create/Update/Delete.
+        </p>
+    </div>
+</body>
+</html>

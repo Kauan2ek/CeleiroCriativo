@@ -1,18 +1,17 @@
-@model List<Funcionario>
+@model List<Pessoa>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funcionários</title>
+    <title>Pessoas</title>
     <link rel="stylesheet" href="/claude/style.css">
 </head>
 <body class="claude-list-page">
     <div class="claude-list-card">
         <div class="claude-toolbar">
-            <h1>Funcionários</h1>
-            <a class="claude-btn-link" href="/Funcionarios/Create">+ Novo Funcionário</a>
+            <h1>Pessoas</h1>
         </div>
 
         <table class="claude-table">
@@ -21,32 +20,30 @@
                     <th>Código</th>
                     <th>Nome</th>
                     <th>Telefone</th>
+                    <th>Tipo de Documento</th>
                     <th>Documento</th>
-                    <th>Email</th>
-                    <th>Ativo</th>
-                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (Funcionario t in Model)
+                @foreach (Pessoa t in Model)
                 {
                     <tr>
                         <td>@t.Codigo</td>
                         <td>@t.Nome</td>
                         <td>@t.Telefone</td>
-                        <td>@t.TipoDocumento: @t.Documento</td>
-                        <td>@t.Email</td>
-                        <td>@(t.Ativo ? "Sim" : "Não")</td>
-                        <td>
-                            <div class="claude-row-actions">
-                                <a class="claude-link-btn" href="/Funcionarios/Update/@t.Codigo">Editar</a>
-                                <a class="claude-link-danger" href="/Funcionarios/Delete/@t.Codigo">Excluir</a>
-                            </div>
-                        </td>
+                        <td>@t.TipoDocumento</td>
+                        <td>@t.Documento</td>
                     </tr>
                 }
             </tbody>
         </table>
+
+        <p class="claude-note">
+            Não criei os formulários de Create/Update de Pessoas: o model <code>Pessoa</code> é <code>abstract</code>,
+            então o model binder do ASP.NET não consegue instanciar um <code>new Pessoa()</code> ao receber o POST
+            (só dá pra instanciar <code>Cliente</code> ou <code>Funcionario</code>). Um formulário aqui nunca
+            conseguiria salvar nada — por isso essa lista também fica sempre vazia.
+        </p>
     </div>
 </body>
 </html>

@@ -23,6 +23,7 @@
                     <th>Telefone</th>
                     <th>Documento</th>
                     <th>Email</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,6 +35,14 @@
                         <td>@t.Telefone</td>
                         <td>@t.TipoDocumento: @t.Documento</td>
                         <td>@t.Email</td>
+                        <td>
+                            <div class="claude-row-actions">
+                                <a class="claude-link-btn" href="/Clientes/Update/@t.Codigo">Editar</a>
+                                <form class="claude-inline-form" method="post" action="/Clientes/Delete/@t.Codigo">
+                                    <button type="submit" class="claude-link-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>

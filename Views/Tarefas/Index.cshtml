@@ -27,6 +27,7 @@
                     <th>Visibilidade</th>
                     <th>Status</th>
                     <th>Funcionários</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +43,11 @@
                         <td>@t.Visibilidade</td>
                         <td>@(t.Status?.Descricao ?? "-")</td>
                         <td>@(t.Funcionarios?.Count ?? 0)</td>
+                        <td>
+                            <div class="claude-row-actions">
+                                <a class="claude-link-btn" href="/Tarefas/Update/@t.Codigo">Editar</a>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>
