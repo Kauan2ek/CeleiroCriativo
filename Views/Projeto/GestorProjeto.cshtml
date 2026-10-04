@@ -1,0 +1,173 @@
+@{
+    // título que aparece na aba do navegador
+    ViewData["Title"] = "Projetos";
+}
+
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Projetos - Gestor</title>
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet"
+          href="/css/projeto.css">
+
+</head>
+
+<body>
+
+    <!-- ==================== CABEÇALHO ==================== -->
+
+    <header class="cabecalho-projeto">
+
+        <!-- logo que volta pra home -->
+
+        <a href="/" class="logo-projeto">
+
+            <img src="/imagens/logo.png"
+                 alt="Logo">
+
+        </a>
+
+
+        <!-- informações do gestor logado -->
+
+        <div class="informacoes-gestor">
+
+            <!-- atalho pra cadastrar um funcionário novo -->
+
+            <a href="/CadastroFuncionario/CadastroFuncionario"
+               class="cadastrar-funcionario">
+
+                Cadastrar Funcionário
+
+            </a>
+
+
+            <!-- ícone do cadastro de funcionário -->
+
+            <img src="/imagens/criar_funcionario.png"
+                 alt="Perfil"
+                 class="icone-perfil">
+
+
+            <span>
+
+                Nome do Gestor
+
+            </span>
+
+
+            <!-- link pro perfil do gestor -->
+
+            <a href="/Perfil/GestorPerfil"
+               class="link-perfil">
+
+                <img src="/imagens/Entrar.png"
+                     alt="Usuário"
+                     class="icone-usuario">
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==================== CONTEÚDO ==================== -->
+
+    <main class="conteudo-projeto">
+
+        <section class="lista-projetos">
+
+
+            <!-- cabeçalho da lista, com título e rótulo do status -->
+
+            <div class="titulo-lista">
+
+                <h1>
+
+                    Exibição de Projetos
+
+                </h1>
+
+                <span>
+
+                    Status do Projeto
+
+                </span>
+
+            </div>
+
+
+            <!-- ==================== CRIAR PROJETO ==================== -->
+
+            <!-- item especial que serve pra criar um projeto novo -->
+
+            <!-- em vez de abrir, tem um botão "criar" -->
+
+            <div class="projeto novo-projeto">
+
+                <span class="titulo">
+
+                    Título do Projeto
+
+                </span>
+
+
+                <span class="cliente">
+
+                    <img src="/imagens/Entrar.png"
+                         alt="Cliente">
+
+                    Nome Cliente
+
+                </span>
+
+
+                <span class="data">
+
+                    Data: ??/??/??
+
+                </span>
+
+
+                <!-- leva pra tela de exibição em modo de criação -->
+
+                <a href="/ExibicaoProjeto/ExProjetoGestor?modo=criar"
+                   class="botao-criar">
+
+                    Criar
+
+                </a>
+
+            </div>
+
+
+            <!-- ==================== PROJETOS CRIADOS ==================== -->
+
+            <!-- os projetos salvos pelo formulário aparecem aqui -->
+
+            <div id="projetosCriados"></div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- js que cuida dos comportamentos dessa tela -->
+
+    <script src="/js/projeto.js"></script>
+
+</body>
+
+</html>

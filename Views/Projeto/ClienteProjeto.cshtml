@@ -1,0 +1,121 @@
+@{
+    // título que aparece na aba do navegador
+    ViewData["Title"] = "Projetos";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projetos - Cliente</title>
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="/css/projeto.css">
+</head>
+
+<body>
+
+    <!-- ==================== CABEÇALHO ==================== -->
+
+    <header class="cabecalho-projeto">
+
+        <!-- logo que volta pra home -->
+        <a href="/" class="logo-projeto">
+            <img src="/imagens/logo.png" alt="Logo">
+        </a>
+
+        <!-- informações do cliente logado -->
+        <div class="informacoes-funcionario">
+
+            <span>
+                Nome do Cliente
+            </span>
+
+            <!-- link pro perfil do cliente -->
+            <a href="/Perfil/ClientePerfil" class="link-perfil">
+                <img src="/imagens/Entrar.png"
+                     alt="Usuário"
+                     class="icone-usuario">
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==================== CONTEÚDO ==================== -->
+
+    <main class="conteudo-projeto">
+
+        <section class="lista-projetos">
+
+            <!-- cabeçalho da lista, com título e rótulo do status -->
+
+            <div class="titulo-lista">
+
+                <h1>
+                    Exibição de Projetos
+                </h1>
+
+                <span>
+                    Status do Projeto
+                </span>
+
+            </div>
+
+
+            <!-- ==================== PROJETO 1 ==================== -->
+
+            <!-- item de projeto (por enquanto só um de exemplo) -->
+
+            <div class="projeto">
+
+                <span class="titulo">
+                    Título do Projeto
+                </span>
+
+                <span class="cliente">
+
+                    <img src="/imagens/Entrar.png"
+                         alt="Cliente">
+
+                    Nome do Cliente
+
+                </span>
+
+                <span class="data">
+                    Data: ??/??/??
+                </span>
+
+                <!-- status do projeto, a classe muda conforme o estado -->
+                <span class="status andamento"
+                      id="statusProjeto">
+
+                    Em andamento
+
+                </span>
+
+                <!-- link que abre o projeto na visão do cliente -->
+                <a href="/ExibicaoProjeto/ExProjetoCliente"
+                   class="abrir-projeto">
+
+                    <img src="/imagens/abrir.png"
+                         alt="Abrir projeto">
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- js que cuida dos comportamentos dessa tela -->
+    <script src="/js/projeto.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1029 @@
+/* ==========================================================
+   CONFIGURAÇÃO GERAL
+   ========================================================== */
+
+/* reseta margens, paddings e box-sizing em tudo */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e9ebed;
+    color: #333333;
+}
+
+
+/* ==========================================================
+   CABEÇALHO
+   ========================================================== */
+
+/* cabeçalho com 3 colunas iguais */
+.cabecalho-tarefa {
+    height: 70px;
+    background-color: #b6ff32;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0 25px;
+}
+
+
+/* Logo */
+
+.logo-tarefa img {
+    width: 130px;
+    height: 65px;
+    object-fit: contain;
+}
+
+
+/* Cadastrar funcionário */
+
+.cadastrar-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #222222;
+    text-decoration: none;
+}
+
+.cadastrar-funcionario img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+
+/* ==================== PERFIL DO GESTOR ==================== */
+
+.informacoes-gestor {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    margin-left: auto;
+}
+
+.link-perfil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.link-perfil img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    transition: 0.2s;
+}
+
+/* leve zoom no hover da foto de perfil */
+.link-perfil img:hover {
+    transform: scale(1.05);
+}
+
+
+/* ==================== PERFIL DO FUNCIONÁRIO ==================== */
+
+.informacoes-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+
+/* ==================== PERFIL DO CLIENTE ==================== */
+
+.informacoes-cliente {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+
+/* ==========================================================
+   CONTEÚDO PRINCIPAL
+   ========================================================== */
+
+/* caixa branca central que envolve o conteúdo */
+.conteudo-exibicao-tarefa {
+    width: calc(100% - 40px);
+    max-width: 1250px;
+    margin: 25px auto;
+    background-color: #f7f7f7;
+    border: 1px solid #d2d2d2;
+    border-top: 4px solid #b6ff32;
+    border-radius: 8px;
+    padding: 25px 30px 30px;
+}
+
+
+/* Linha superior */
+
+.linha-superior-tarefa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+
+/* Título */
+
+.titulo-exibicao-tarefa {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.voltar-tarefa {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.voltar-tarefa img {
+    width: 23px;
+    height: 23px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.titulo-exibicao-tarefa h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+}
+
+
+/* ==========================================================
+   STATUS DA TAREFA
+   ========================================================== */
+
+.situacao-tarefa {
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* select transparente dentro da caixinha de status */
+.situacao-tarefa select {
+    border: none;
+    background-color: transparent;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: inherit;
+    outline: none;
+    cursor: pointer;
+}
+
+.situacao-tarefa select option {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.situacao-tarefa select.status-cliente {
+    appearance: none;
+}
+
+/* Cores dos status */
+
+.situacao-tarefa.a-fazer {
+    background-color: #ffd6d6;
+    border: 1px solid #e5a5a5;
+    color: #a80000;
+}
+
+.situacao-tarefa.andamento {
+    background-color: #d6eaff;
+    border: 1px solid #a5c9e5;
+    color: #1769aa;
+}
+
+.situacao-tarefa.finalizada {
+    background-color: #d6f5c8;
+    border: 1px solid #a6d995;
+    color: #276b13;
+}
+
+
+/* ==========================================================
+   COLUNAS
+   ========================================================== */
+
+/* 3 colunas: info, prazos e arquivos */
+.colunas-tarefa {
+    display: grid;
+    grid-template-columns: 1.15fr 0.9fr 1fr;
+    gap: 25px;
+}
+
+.coluna-info-tarefa {
+    background-color: #f1f2f1;
+    border: 1px solid #d9dada;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+.coluna-prazos-tarefa {
+    background-color: #f1f3f4;
+    border: 1px solid #d8dcdf;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+.coluna-arquivos-tarefa {
+    background-color: #eef1f3;
+    border: 1px solid #d3d9dd;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+.coluna-arquivos-tarefa h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+
+/* ==========================================================
+   CAMPOS
+   ========================================================== */
+
+.campo-tarefa {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 20px;
+}
+
+.campo-tarefa label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444444;
+}
+
+
+/* Campos com ícone */
+
+.campo-com-icone-tarefa {
+    position: relative;
+}
+
+.campo-com-icone-tarefa input {
+    width: 100%;
+    height: 40px;
+    background-color: #e6e8e9;
+    border: 1px solid #c9cdcf;
+    border-radius: 5px;
+    padding: 0 40px 0 12px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333333;
+    outline: none;
+}
+
+.campo-com-icone-tarefa input::placeholder {
+    color: #888888;
+}
+
+.campo-com-icone-tarefa input:focus {
+    background-color: #ffffff;
+    border-color: #aeb4b8;
+}
+
+/* ícone que fica no canto direito do input */
+.campo-com-icone-tarefa img {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* Campos de data */
+
+.campo-com-icone-tarefa input[type="date"] {
+    padding-right: 10px;
+    color: #555555;
+    cursor: pointer;
+}
+
+.campo-com-icone-tarefa input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+
+/* ==========================================================
+   TEXTAREA
+   ========================================================== */
+
+.campo-texto-tarefa {
+    position: relative;
+}
+
+.campo-texto-tarefa textarea {
+    width: 100%;
+    height: 115px;
+    resize: none;
+    background-color: #e6e8e9;
+    border: 1px solid #c9cdcf;
+    border-radius: 5px;
+    padding: 10px 40px 10px 12px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333333;
+    outline: none;
+}
+
+.campo-texto-tarefa textarea::placeholder {
+    color: #888888;
+}
+
+.campo-texto-tarefa textarea:focus {
+    background-color: #ffffff;
+    border-color: #aeb4b8;
+}
+
+.campo-texto-tarefa img {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* ==========================================================
+   FUNCIONÁRIOS
+   ========================================================== */
+
+.titulo-funcionarios {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444444;
+    margin-top: 3px;
+    margin-bottom: 10px;
+}
+
+.area-funcionarios {
+    min-height: 115px;
+    background-color: #e3e8eb;
+    border: 1px solid #cbd2d6;
+    border-radius: 5px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* cada funcionário aparece como uma linha com ícone e nome */
+.funcionario {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background-color: #f8f8f8;
+    border: 1px solid #d2d6d8;
+    border-radius: 5px;
+    padding: 5px 8px;
+    margin-bottom: 8px;
+}
+
+.funcionario:last-child {
+    margin-bottom: 0;
+}
+
+.icone-funcionario {
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.funcionario span {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #444444;
+}
+
+
+/* Botões dos funcionários */
+
+.acoes-funcionarios {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.botao-download-funcionario {
+    width: 34px;
+    height: 34px;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-download-funcionario img {
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+}
+
+
+/* Botão para adicionar funcionário */
+
+.botao-adicionar-funcionario {
+    width: 35px;
+    height: 35px;
+    background-color: #b0f72d;
+    border: none;
+    border-radius: 50%;
+    color: #5b5b5b;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-adicionar-funcionario:hover {
+    background-color: #59c900;
+}
+
+
+/* ==========================================================
+   ARQUIVOS
+   ========================================================== */
+
+.area-arquivos {
+    height: 235px;
+    background-color: #e3e8eb;
+    border: 1px solid #cbd2d6;
+    border-radius: 5px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+
+/* Barra de rolagem */
+
+.area-arquivos::-webkit-scrollbar {
+    width: 7px;
+}
+
+.area-arquivos::-webkit-scrollbar-track {
+    background-color: #d8dde0;
+    border-radius: 5px;
+}
+
+.area-arquivos::-webkit-scrollbar-thumb {
+    background-color: #aeb6bb;
+    border-radius: 5px;
+}
+
+
+/* Arquivo */
+
+.arquivo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background-color: #f8f8f8;
+    border: 1px solid #d2d6d8;
+    border-radius: 5px;
+    padding: 5px 8px;
+    margin-bottom: 8px;
+}
+
+.arquivo:last-child {
+    margin-bottom: 0;
+}
+
+.icone-arquivo {
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+/* nome do arquivo corta com "..." se for muito longo */
+.nome-arquivo {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: #444444;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.botao-abrir-arquivo {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-abrir-arquivo img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* Botão para adicionar arquivo */
+
+.acoes-arquivos {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.botao-adicionar-arquivo {
+    width: 35px;
+    height: 35px;
+    background-color: #b0f72d;
+    border: none;
+    border-radius: 50%;
+    color: #5b5b5b;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-adicionar-arquivo:hover {
+    background-color: #59c900;
+}
+
+
+/* ==========================================================
+   BOTÃO SALVAR
+   ========================================================== */
+
+.botao-salvar-tarefa {
+    height: 38px;
+    padding: 0 28px;
+    background-color: #59c900;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.botao-salvar-tarefa:hover {
+    background-color: #48ad00;
+}
+
+
+/* Ações da tarefa */
+
+.acoes-exibicao-tarefa {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top:50px;
+}
+
+.botao-excluir-tarefa {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 25px;
+}
+
+.botao-excluir-tarefa:hover {
+    background-color: #c9302c;
+}
+
+/* ==========================================================
+   RESPONSIVIDADE
+   ========================================================== */
+
+/* telas médias: colunas viram uma só e logo some */
+@media (max-width: 900px) {
+
+    .colunas-tarefa {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho-tarefa {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .logo-tarefa {
+        display: none;
+    }
+
+    .cadastrar-funcionario {
+        justify-content: flex-start;
+    }
+
+    .informacoes-gestor {
+        justify-content: flex-end;
+    }
+}
+
+
+/* Celular */
+
+@media (max-width: 600px) {
+
+    .conteudo-exibicao-tarefa {
+        width: calc(100% - 20px);
+        padding: 18px 15px;
+    }
+
+    .linha-superior-tarefa {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cabecalho-tarefa {
+        height: auto;
+        padding: 12px 15px;
+        gap: 10px;
+    }
+
+    /* esconde o texto do cadastrar, só fica o ícone */
+    .cadastrar-funcionario span {
+        display: none;
+    }
+
+    /* mesma ideia pro nome do gestor */
+    .informacoes-gestor span {
+        display: none;
+    }
+}
+
+
+/* ==========================================================
+   CATEGORIA
+   ========================================================== */
+
+/* select customizado com seta no canto direito */
+#categoriaTarefa {
+    width: 100%;
+    height: 45px;
+    padding: 0 45px 0 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    color: #5b5b5b;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("/imagens/seta.png");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 14px;
+}
+
+/* cor cinza enquanto não selecionou nada */
+#categoriaTarefa:invalid {
+    color: #999999;
+}
+
+#categoriaTarefa option {
+    color: #5b5b5b;
+    background-color: #ffffff;
+}
+
+#categoriaTarefa:focus {
+    outline: none;
+}
+
+
+/* ==========================================================
+   MODAL DE FUNCIONÁRIOS
+   ========================================================== */
+
+/* fundo escuro que cobre a tela toda */
+.modal-funcionarios {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* caixa branca do modal */
+.caixa-modal-funcionarios {
+    width: 600px;
+    max-width: 90%;
+    background-color: white;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+
+/* Cabeçalho do modal */
+
+.cabecalho-modal {
+    margin-bottom: 20px;
+}
+
+.cabecalho-modal h2 {
+    margin-bottom: 8px;
+    font-size: 19px;
+    font-weight: normal;
+    color: #222;
+}
+
+.cabecalho-modal p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+
+/* Lista de funcionários */
+
+.lista-funcionarios {
+    border: 1px solid #c7d1dc;
+    border-radius: 7px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.funcionario-item {
+    min-height: 65px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+.funcionario-item:last-child {
+    border-bottom: none;
+}
+
+
+/* Informações do funcionário */
+
+.informacoes-funcionario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.informacoes-funcionario img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.informacoes-funcionario div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.informacoes-funcionario strong {
+    font-size: 14px;
+    color: #333;
+}
+
+.informacoes-funcionario span {
+    font-size: 12px;
+    color: #333;
+}
+
+
+/* Botão + do funcionário */
+
+.botao-selecionar-funcionario {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background-color: #59c900;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.botao-selecionar-funcionario:hover {
+    background-color: #48ad00;
+}
+
+
+/* Funcionário selecionado */
+
+/* fundo verde claro e o + vira um check */
+.funcionario-item.selecionado {
+    background-color: #eefbdd;
+}
+
+.funcionario-item.selecionado .botao-selecionar-funcionario {
+    background-color: #59c900;
+    font-size: 0;
+}
+
+.funcionario-item.selecionado .botao-selecionar-funcionario::after {
+    content: "✓";
+    font-size: 20px;
+}
+
+
+/* Botões do modal */
+
+.botoes-modal-funcionarios {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+
+/* Cancelar */
+
+.botao-cancelar-funcionario {
+    width: 100px;
+    height: 36px;
+    border: 1px solid #b9c7d5;
+    border-radius: 6px;
+    background-color: #d0dce9;
+    color: #555;
+    cursor: pointer;
+}
+
+
+/* Confirmar */
+
+.botao-confirmar-funcionario {
+    width: 100px;
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    background-color: #59c900;
+    color: white;
+    cursor: pointer;
+}
+
+.botao-confirmar-funcionario:hover {
+    background-color: #48ad00;
+}
+
+
+/* Fechar modal */
+
+/* botão vermelho no canto superior direito do modal */
+.fechar-modal-funcionarios {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background-color: red !important;
+    border: 2px solid black !important;
+    border-radius: 5px;
+    color: white !important;
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 26px;
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-exclusao {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.caixa-exclusao {
+    background-color: white;
+    width: 420px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.caixa-exclusao h2 {
+    margin: 0 0 12px;
+    color: #333333;
+}
+
+.caixa-exclusao p {
+    margin-bottom: 25px;
+    color: #666666;
+}
+
+.acoes-exclusao {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.botao-voltar-tarefa,
+.botao-confirmar-exclusao {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.botao-voltar-tarefa {
+    background-color: #5b5b5b;
+    color: white;
+}
+
+.botao-voltar-tarefa:hover {
+    background-color: #444444;
+}
+
+.botao-confirmar-exclusao {
+    background-color: #d9534f;
+    color: white;
+}
+
+.botao-confirmar-exclusao:hover {
+    background-color: #c9302c;
+}

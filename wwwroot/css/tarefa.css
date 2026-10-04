@@ -1,0 +1,524 @@
+/* ==================== CONFIGURAÇÃO GERAL ==================== */
+
+/* remove margens e espaçamentos padrão dos elementos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* configurações gerais da página */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f6;
+    color: #333333;
+}
+
+
+/* ==================== CABEÇALHO ==================== */
+
+/* cabeçalho com 3 colunas iguais */
+.cabecalho-tarefas {
+    height: 70px;
+    background-color: #b6ff32;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.10);
+}
+
+.logo-tarefas img {
+    width: 130px;
+    height: 65px;
+    object-fit: contain;
+}
+
+/* link de cadastrar funcionário */
+.cadastrar-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #222222;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+/* fica meio transparente no hover */
+.cadastrar-funcionario:hover {
+    opacity: 0.7;
+}
+
+.cadastrar-funcionario img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+
+/* ==================== PERFIL DO GESTOR ==================== */
+
+.informacoes-gestor {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    margin-left: auto;
+}
+
+
+/* ==================== PERFIL DO FUNCIONÁRIO ==================== */
+
+.informacoes-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+
+/* ==================== PERFIL DO CLIENTE ==================== */
+
+.informacoes-cliente {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+.link-perfil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.link-perfil img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    transition: 0.2s;
+}
+
+/* ícone cresce um pouquinho no hover */
+.link-perfil img:hover {
+    transform: scale(1.05);
+}
+
+
+/* ==================== CONTEÚDO ==================== */
+
+/* área principal, com largura máxima pra não esticar demais */
+.conteudo-tarefas {
+    width: calc(100% - 60px);
+    max-width: 1500px;
+    margin: 25px auto 30px;
+}
+
+
+/* ==================== TÍTULO ==================== */
+
+.titulo-tarefas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.titulo-tarefas h1 {
+    font-size: 21px;
+    font-weight: 600;
+    color: #303030;
+}
+
+/* botão de voltar quadradinho */
+.voltar-tarefas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.voltar-tarefas:hover {
+    background-color: #ededed;
+}
+
+.voltar-tarefas img {
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+
+/* ==================== KANBAN ==================== */
+
+/* três colunas iguais, esticadas na altura */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    align-items: stretch;
+}
+
+
+/* ==================== COLUNAS ==================== */
+
+.coluna-tarefas {
+    min-width: 0;
+    height: 650px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ==================== CABEÇALHOS ==================== */
+
+.cabecalho-coluna {
+    padding: 15px 17px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.cabecalho-coluna h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #353535;
+    letter-spacing: 0.1px;
+}
+
+
+/* ==================== CORES DOS TÍTULOS ==================== */
+
+.coluna-analise .cabecalho-coluna h2 {
+    color: #9f5b57;
+}
+
+.coluna-andamento .cabecalho-coluna h2 {
+    color: #5575a6;
+}
+
+.coluna-finalizadas .cabecalho-coluna h2 {
+    color: #5d7d55;
+}
+
+
+/* ==================== ANÁLISE ==================== */
+
+/* fundo rosado pra coluna a fazer */
+.coluna-analise {
+    background-color: #f8e1df;
+}
+
+.coluna-analise .cabecalho-coluna {
+    background-color: #f4d8d6;
+}
+
+
+/* ==================== ANDAMENTO ==================== */
+
+/* fundo azulado pra coluna em andamento */
+.coluna-andamento {
+    background-color: #e1eafa;
+}
+
+.coluna-andamento .cabecalho-coluna {
+    background-color: #d8e4f8;
+}
+
+
+/* ==================== FINALIZADAS ==================== */
+
+/* fundo esverdeado pra coluna finalizadas */
+.coluna-finalizadas {
+    background-color: #e2eedf;
+}
+
+.coluna-finalizadas .cabecalho-coluna {
+    background-color: #dbe9d7;
+}
+
+
+/* ==================== CORPO DA COLUNA ==================== */
+
+/* área rolável onde os cards ficam */
+.corpo-coluna {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+}
+
+
+/* ==================== BARRA DE ROLAGEM ==================== */
+
+/* barra fininha e discreta */
+.corpo-coluna::-webkit-scrollbar {
+    width: 5px;
+}
+
+.corpo-coluna::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.18);
+    border-radius: 10px;
+}
+
+.corpo-coluna::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+
+/* ==================== CARD ==================== */
+
+.card-tarefa {
+    border-radius: 8px;
+    padding: 11px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: 0.2s;
+}
+
+
+/* ==================== CORES DOS CARDS ==================== */
+
+.coluna-analise .card-tarefa {
+    background-color: #efd0ce;
+}
+
+.coluna-andamento .card-tarefa {
+    background-color: #cbd9f0;
+}
+
+.coluna-finalizadas .card-tarefa {
+    background-color: #cbdcc6;
+}
+
+/* card sobe um pouquinho no hover */
+.card-tarefa:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==================== CONTEÚDO DO CARD ==================== */
+
+/* texto de um lado, botão de abrir do outro */
+.conteudo-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.conteudo-card p {
+    flex: 1;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #3b3b3b;
+    line-height: 1.4;
+}
+
+
+/* ==================== CORES DOS TEXTOS ==================== */
+
+.coluna-analise .conteudo-card p {
+    background-color: #e5c1bf;
+}
+
+.coluna-andamento .conteudo-card p {
+    background-color: #bdcde7;
+}
+
+.coluna-finalizadas .conteudo-card p {
+    background-color: #bdd1b8;
+}
+
+
+/* ==================== BOTÃO EXPANDIR ==================== */
+
+.botao-expandir-tarefa {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+/* fica mais branco no hover */
+.botao-expandir-tarefa:hover {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.botao-expandir-tarefa img {
+    width: 17px;
+    height: 17px;
+    object-fit: contain;
+    transition: 0.2s;
+}
+
+.botao-expandir-tarefa:hover img {
+    transform: scale(1.08);
+}
+
+
+/* ==================== AÇÕES ==================== */
+
+.acoes-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+
+/* ==================== BOTÃO COMPARTILHAR ==================== */
+
+.botao-compartilhar {
+    border: none;
+    border-radius: 5px;
+    padding: 7px 13px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    background-color: #628fc9;
+}
+
+.botao-compartilhar:hover {
+    background-color: #527eb6;
+}
+
+
+/* ==================== ESCONDER SETA ==================== */
+
+/* rodapé das colunas não aparece */
+.rodape-coluna {
+    display: none;
+}
+
+
+/* ==================== BOTÃO CRIAR TAREFA ==================== */
+
+/* cabeçalho da coluna com título de um lado e botão do outro */
+.cabecalho-coluna {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.botao-criar-tarefa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    background-color: #09c825;
+    color: #ffffff;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.botao-criar-tarefa:hover {
+    background-color: #108521;
+}
+
+
+/* ==================== RESPONSIVIDADE ==================== */
+
+/* telas até 900px */
+@media (max-width: 900px) {
+
+    .conteudo-tarefas {
+        width: calc(100% - 30px);
+    }
+
+    /* colunas ficam uma embaixo da outra */
+    .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .coluna-tarefas {
+        height: 500px;
+    }
+
+    .cabecalho-tarefas {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* logo some */
+    .logo-tarefas {
+        display: none;
+    }
+
+    .cadastrar-funcionario {
+        justify-content: flex-start;
+    }
+
+    .informacoes-gestor {
+        justify-content: flex-end;
+    }
+}
+
+
+/* ==================== CELULAR ==================== */
+
+/* telas até 600px */
+@media (max-width: 600px) {
+
+    .conteudo-tarefas {
+        width: calc(100% - 20px);
+        margin-top: 20px;
+    }
+
+    .cabecalho-tarefas {
+        height: auto;
+        padding: 12px 15px;
+        gap: 10px;
+    }
+
+    /* esconde o texto do cadastrar, só fica o ícone */
+    .cadastrar-funcionario span {
+        display: none;
+    }
+
+    /* mesma ideia pro nome do gestor */
+    .informacoes-gestor span {
+        display: none;
+    }
+
+    .coluna-tarefas {
+        height: 430px;
+    }
+}

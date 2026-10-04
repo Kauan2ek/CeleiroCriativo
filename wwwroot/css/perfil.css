@@ -1,0 +1,189 @@
+/* ==================== CONFIGURAÇÕES GERAIS ==================== */
+
+/* reseta margens, paddings e box-sizing em tudo */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+
+/* ==================== CARD DO PERFIL ==================== */
+
+/* card branco central que envolve toda a tela de perfil */
+.pagina-perfil {
+    width: calc(100% - 40px);
+    max-width: 900px;
+    margin: 35px auto;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-top: 5px solid #b6ff32;
+    border-radius: 8px;
+    padding: 30px 40px 35px;
+}
+
+
+/* ==================== BOTÃO VOLTAR ==================== */
+
+.voltar-projetos {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    margin-bottom: 25px;
+    color: #333333;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.voltar-projetos img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+}
+
+/* sublinha quando passa o mouse */
+.voltar-projetos:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+
+/* ==================== CABEÇALHO ==================== */
+
+/* faixa verde com o título e a foto de perfil */
+.cabecalho-perfil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    background-color: #b6ff32;
+
+    padding: 20px;
+
+    border-radius: 6px;
+
+    margin-bottom: 25px;
+}
+
+.cabecalho-perfil img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+}
+
+.cabecalho-perfil h1 {
+    color: #222222;
+    font-size: 23px;
+    font-weight: 600;
+    margin: 0;
+}
+
+
+/* ==================== CAMPOS ==================== */
+
+/* grid de duas colunas pra dividir os campos do perfil */
+.dados-perfil {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 35px;
+}
+
+/* cada coluna tem seus campos empilhados */
+.coluna-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.campo-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.campo-perfil label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333333;
+}
+
+.campo-perfil input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    background-color: #ffffff;
+    border: 1px solid #cfcfcf;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333333;
+    outline: none;
+}
+
+.campo-perfil input::placeholder {
+    color: #999999;
+}
+
+.campo-perfil input:focus {
+    border-color: #777777;
+}
+
+
+/* ==================== BOTÕES ==================== */
+
+/* área dos botões alinhada à direita, com uma linha em cima */
+.botoes-perfil {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e1e1;
+}
+
+.botao-perfil {
+    min-width: 120px;
+    height: 38px;
+    padding: 0 18px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.botao-perfil:hover {
+    background-color: #333333;
+}
+
+
+/* ==================== RESPONSIVO ==================== */
+
+/* telas pequenas: colunas viram uma só e botões centralizam */
+@media (max-width: 650px) {
+
+    .pagina-perfil {
+        width: calc(100% - 20px);
+        padding: 25px 20px 30px;
+    }
+
+    .dados-perfil {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .botoes-perfil {
+        justify-content: center;
+    }
+}

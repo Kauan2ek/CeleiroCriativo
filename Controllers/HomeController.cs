@@ -1,15 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 
-public class HomeController  : Controller
+// controller responsável pelas telas principais do site
+// cada action só devolve uma view, sem lógica de negócio
+public class HomeController : Controller
 {
-    public ActionResult Index()
+    // Página inicial
+    // primeira tela que o usuário vê ao acessar o site
+    public IActionResult Index()
     {
         return View();
     }
 
-    public ActionResult Entrar()
+    // Página de entrar
+    // renderiza o formulário de login
+    public IActionResult Entrar()
     {
         return View();
-        //return RedirectToAction();
     }
+
+    // Página de cadastro
+    // renderiza o formulário de cadastro de usuário
+    public IActionResult Cadastro()
+    {
+        return View();
+    }
+
 }

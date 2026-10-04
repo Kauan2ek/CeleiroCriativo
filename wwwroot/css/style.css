@@ -1,24 +1,25 @@
 /* ==================== CONFIGURAÇÕES GERAIS ==================== */
 
-/* Remove margens e espaçamentos padrão */
+/* remove margens e espaçamentos padrão */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Configura o corpo da página */
+/* configura o corpo da página */
 body {
     font-family: Arial, sans-serif;
     background-color: white;
 }
 
-/* Página principal */
+/* página principal */
 .pagina {
     width: 100%;
     min-height: 100vh;
     background-color: white;
 }
+
 
 /* ==================== CABEÇALHO ==================== */
 
@@ -29,6 +30,7 @@ body {
     align-items: center;
     padding: 0 30px;
 }
+
 
 /* ==================== LOGO ==================== */
 
@@ -44,6 +46,7 @@ body {
     margin-top: 5px;
 }
 
+
 /* ==================== MENU ==================== */
 
 .menu {
@@ -53,8 +56,7 @@ body {
     margin-left: 25px;
 }
 
-/* Links do menu */
-
+/* links do menu */
 .menu a {
     color: #222;
     text-decoration: none;
@@ -63,11 +65,11 @@ body {
     padding: 8px 0;
 }
 
-/* Tracinho quando passar o mouse */
-
+/* tracinho quando passa o mouse */
 .menu a:hover {
     border-bottom: 2px solid #222;
 }
+
 
 /* ==================== ÍCONES ==================== */
 
@@ -85,10 +87,12 @@ body {
     transition: 0.2s;
 }
 
+/* ícone cresce e fica mais transparente no hover */
 .icone img:hover {
     opacity: 0.7;
     transform: scale(1.08);
 }
+
 
 /* ==================== ENTRAR ==================== */
 
@@ -99,8 +103,6 @@ body {
     margin-left: auto;
 }
 
-/* Link entrar */
-
 .entrar a {
     color: #222;
     text-decoration: none;
@@ -108,15 +110,15 @@ body {
     font-weight: 500;
 }
 
-/* Ícone de entrar */
-
 .entrar img {
     width: 38px;
     height: 38px;
     object-fit: contain;
 }
 
+
 /* ==================== CHAMADA PARA PROJETO ==================== */
+
 .chamada-projeto {
     width: 100%;
     padding: 8px 5px;
@@ -125,6 +127,7 @@ body {
     background-color: #fff;
 }
 
+/* balão cinza com o convite pra começar um projeto */
 .balao-projeto {
     width: 98%;
     max-width: none;
@@ -159,37 +162,32 @@ body {
     border-radius: 6px;
 }
 
+/* rolagem suave pros links âncora */
 html {
     scroll-behavior: smooth;
 }
+
+
 /* ==================== BANNER ==================== */
 
 .banner {
     width: 100%;
-    height: 500px;
     position: relative;
     overflow: hidden;
 }
 
-/* Imagem do banner */
-
 .banner-conteudo {
     width: 100%;
-    height: 100%;
     position: relative;
 }
 
-/* Imagem de fundo */
-
 .banner-conteudo img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     display: block;
 }
 
-/* Escurece levemente a imagem */
-
+/* escurece levemente a imagem pra dar contraste no texto */
 .banner-conteudo::after {
     content: "";
     position: absolute;
@@ -197,53 +195,35 @@ html {
     background: rgba(0, 0, 0, 0.35);
 }
 
-/* Área do texto */
-
+/* área do texto centralizada em cima da imagem */
 .texto-banner {
     position: absolute;
     z-index: 2;
-
     top: 50%;
     left: 50%;
-
     transform: translate(-50%, -50%);
-
     width: 80%;
-
     text-align: center;
 }
 
-/* Texto digitado */
-
 .texto-banner h2 {
     color: #ffd83d;
-
     font-size: 38px;
     font-weight: bold;
-
     line-height: 1.3;
-
     margin: 0;
-
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
 }
 
-/* Cursor piscando */
-
+/* cursor piscando no fim do texto digitado */
 .texto-banner h2::after {
     content: "|";
-
     color: #ffd83d;
-
     margin-left: 4px;
-
     animation: piscar 0.7s infinite;
 }
 
-/* Animação do cursor */
-
 @keyframes piscar {
-
     0%, 50% {
         opacity: 1;
     }
@@ -251,22 +231,17 @@ html {
     51%, 100% {
         opacity: 0;
     }
-
 }
 
-/* Celular */
-
+/* celular */
 @media (max-width: 600px) {
-
-    .banner {
-        height: 300px;
-    }
 
     .texto-banner h2 {
         font-size: 25px;
     }
-
 }
+
+
 /* ==================== SEÇÕES ==================== */
 
 .secao {
@@ -274,16 +249,16 @@ html {
 }
 
 .titulo-secao {
-text-align: left;
-font-size: 27px;
-font-weight: 600;
-color: #17d714;
-margin-bottom: 45px;
-position: relative;
-padding-bottom: 14px;
+    text-align: left;
+    font-size: 27px;
+    font-weight: 600;
+    color: #17d714;
+    margin-bottom: 45px;
+    position: relative;
+    padding-bottom: 14px;
 }
 
-/* Tracinho amarelo abaixo do título */
+/* tracinho amarelo abaixo do título */
 .titulo-secao::after {
     content: "";
     display: block;
@@ -298,187 +273,135 @@ padding-bottom: 14px;
 /* ==================== EQUIPE ==================== */
 
 #equipe {
-padding: 70px 7%;
-background: #f8f9f7;
+    padding: 70px 7%;
+    background: #f8f9f7;
 }
 
-/* Cards da equipe */
-
+/* grade com 4 cards */
 .cards-equipe {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-gap: 25px;
-max-width: 1300px;
-margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    max-width: 1300px;
+    margin: 0 auto;
 }
-
-/* Card */
 
 .card-equipe {
-background: #ffffff;
-border-radius: 20px;
-padding: 65px 50px;
-
-text-align: center;
-
-box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
-
-transition: 0.3s ease;
-
-
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 65px 50px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+    transition: 0.3s ease;
 }
 
+/* card sobe um pouco no hover */
 .card-equipe:hover {
-transform: translateY(-6px);
-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
-/* Foto */
-
+/* foto do membro em formato circular */
 .card-equipe img {
-width: 170px;
-height: 170px;
-
-object-fit: cover;
-
-border-radius: 50%;
-
-margin-bottom: 18px;
-
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 18px;
 }
-
-/* Nome */
 
 .card-equipe h3 {
-position: relative;
-
-margin: 0 0 15px;
-padding-bottom: 12px;
-
-font-size: 20px;
-font-weight: 600;
-
-color: #222;
-
+    position: relative;
+    margin: 0 0 15px;
+    padding-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
 }
 
-/* Risquinho verde */
-
+/* risquinho verde embaixo do nome */
 .card-equipe h3::after {
-content: "";
-
-position: absolute;
-
-left: 50%;
-bottom: 0;
-
-transform: translateX(-50%);
-
-width: 30px;
-height: 2px;
-
-background: #6d8f73;
-
-border-radius: 2px;
-
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: #6d8f73;
+    border-radius: 2px;
 }
-
-/* Função */
 
 .card-equipe span {
-display: block;
-
-margin-bottom: 12px;
-
-color: #6d8f73;
-
-font-size: 15px;
-font-weight: 600;
-
+    display: block;
+    margin-bottom: 12px;
+    color: #6d8f73;
+    font-size: 15px;
+    font-weight: 600;
 }
-
-/* Descrição */
 
 .card-equipe p {
-margin: 0;
-
-color: #666;
-
-font-size: 15px;
-line-height: 1.6;
-
+    margin: 0;
+    color: #666;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
-/* ==================== TABLET ==================== */
-
+/* tablet */
 @media (max-width: 950px) {
 
-.cards-equipe {
-    grid-template-columns: repeat(2, 1fr);
-}
+    .cards-equipe {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
 }
 
-/* ==================== CELULAR ==================== */
-
+/* celular */
 @media (max-width: 550px) {
 
-#equipe {
-    padding: 50px 6%;
+    #equipe {
+        padding: 50px 6%;
+    }
+
+    .cards-equipe {
+        grid-template-columns: 1fr;
+    }
+
 }
 
-.cards-equipe {
-    grid-template-columns: 1fr;
-}
-
-}
 
 /* ==================== CADASTRO ==================== */
 
 .cadastro {
     margin: 20px;
-
     background-color: #b0f72d;
-
     padding: 12px;
-
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
     gap: 15px;
-
     align-items: center;
 }
 
-/* Banner do cadastro */
+/* banner do cadastro */
 .banner-cadastro {
     height: 450px;
-
     background-color: #e2f2f8;
-
     border-radius: 5px;
-
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
-
     text-align: center;
 }
 
-/* Imagem do banner */
 .banner-cadastro img {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
     border-radius: 5px;
 }
 
-/* Texto padrão caso não tenha imagem */
+/* texto padrão caso não tenha imagem */
 .banner-cadastro p {
     position: absolute;
 }
@@ -492,7 +415,6 @@ line-height: 1.6;
     padding: 10px 20px;
 }
 
-/* Título */
 .formulario h2 {
     text-align: center;
     font-size: 20px;
@@ -500,7 +422,7 @@ line-height: 1.6;
     margin-bottom: 5px;
 }
 
-/* Tracinho abaixo do título */
+/* tracinho embaixo do título */
 .formulario h2::after {
     content: "";
     display: block;
@@ -510,7 +432,6 @@ line-height: 1.6;
     margin: 6px auto 15px;
 }
 
-/* Labels */
 .formulario label {
     font-size: 15px;
     font-weight: bold;
@@ -519,35 +440,29 @@ line-height: 1.6;
     margin-bottom: 4px;
 }
 
-/* Campos */
 .formulario input,
 .formulario textarea {
     width: 100%;
     box-sizing: border-box;
-
     border: 1px solid #ccc;
     border-radius: 5px;
-
     padding: 8px;
-
     font-family: Arial, sans-serif;
     font-size: 12px;
-
     background-color: white;
 }
 
-/* Altura dos campos */
 .formulario input {
     height: 32px;
 }
 
-/* Campo Ideia */
+/* campo ideia, mais alto */
 .formulario textarea {
     height: 75px;
     resize: vertical;
 }
 
-/* Quando clicar no campo */
+/* destaque verde quando o campo tá em foco */
 .formulario input:focus,
 .formulario textarea:focus {
     outline: none;
@@ -555,224 +470,189 @@ line-height: 1.6;
     box-shadow: 0 0 0 2px rgba(182, 255, 50, 0.2);
 }
 
-/* Texto de exemplo dos campos */
 .formulario input::placeholder,
 .formulario textarea::placeholder {
     color: #999;
 }
 
-/* Botão */
+/* botão do formulário */
 .formulario button {
     width: 100px;
-
     margin: 12px auto 0;
     padding: 8px;
-
     border: none;
     border-radius: 5px;
-
     background-color: #333;
     color: white;
-
     font-size: 12px;
     font-weight: bold;
-
     cursor: pointer;
 }
 
-/* Efeito ao passar o mouse */
 .formulario button:hover {
     background-color: #555;
 }
+
 
 /* ==================== RODAPÉ ==================== */
 
 .rodape {
     background-color: #262723;
-
     text-align: center;
-    color:#ccc;
+    color: #ccc;
     padding: 15px;
-
     font-size: 12px;
 }
+
 
 /* ==================== EVENTOS ==================== */
 
 #eventos {
-padding: 70px 7%;
+    padding: 70px 7%;
 }
 
-/* Grade dos eventos */
-
+/* grade com 2 cards por linha */
 .cards-eventos {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 25px;
-max-width: 1200px;
-margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Card horizontal */
-
+/* card horizontal, imagem do lado do texto */
 .card-evento {
-display: flex;
-min-height: 210px;
-background: #fff;
-border-radius: 16px;
-overflow: hidden;
-box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-transition: 0.3s ease;
+    display: flex;
+    min-height: 210px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
 }
 
 .card-evento:hover {
-transform: translateY(-4px);
-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
-
-/* Imagem */
 
 .card-evento img {
-width: 45%;
-height: 100%;
-min-height: 210px;
-object-fit: cover;
-display: block;
+    width: 45%;
+    height: 100%;
+    min-height: 210px;
+    object-fit: cover;
+    display: block;
 }
-
-/* Informações */
 
 .evento-info {
-width: 55%;
-padding: 22px;
-display: flex;
-flex-direction: column;
-justify-content: center;
+    width: 55%;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
-
-/* Data */
 
 .evento-data {
-font-size: 11px;
-font-weight: bold;
-letter-spacing: 1px;
-color: #6d8f73;
-margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #6d8f73;
+    margin-bottom: 8px;
 }
-
-/* Título */
 
 .evento-info h3 {
-margin: 0 0 8px;
-font-size: 19px;
-line-height: 1.2;
-color: #222;
+    margin: 0 0 8px;
+    font-size: 19px;
+    line-height: 1.2;
+    color: #222;
 }
-
-/* Empresa */
 
 .evento-empresa {
-font-size: 13px;
-font-weight: 600;
-color: #6d8f73;
-margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6d8f73;
+    margin-bottom: 12px;
 }
 
-/* Risquinho verde */
-
+/* risquinho verde antes do nome da empresa */
 .evento-empresa::before {
-content: "";
-display: inline-block;
-width: 20px;
-height: 2px;
-background: #6d8f73;
-margin-right: 7px;
-vertical-align: middle;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: #6d8f73;
+    margin-right: 7px;
+    vertical-align: middle;
 }
-
-/* Descrição */
 
 .evento-info p {
-margin: 0;
-color: #666;
-font-size: 13px;
-line-height: 1.5;
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-/* ==================== CELULAR ==================== */
-
+/* celular */
 @media (max-width: 800px) {
 
-.cards-eventos {
-    grid-template-columns: 1fr;
-}
+    .cards-eventos {
+        grid-template-columns: 1fr;
+    }
 
 }
 
 @media (max-width: 500px) {
 
-.card-evento {
-    flex-direction: column;
+    .card-evento {
+        flex-direction: column;
+    }
+
+    .card-evento img {
+        width: 100%;
+        height: 180px;
+        min-height: 180px;
+    }
+
+    .evento-info {
+        width: auto;
+    }
+
 }
 
-.card-evento img {
-    width: 100%;
-    height: 180px;
-    min-height: 180px;
-}
-
-.evento-info {
-    width: auto;
-}
-
-}
 
 /* ==================== PARCERIAS ==================== */
 
 #parcerias {
-padding: 70px 7%;
-background: #f8f9f7;
+    padding: 70px 7%;
+    background: #f8f9f7;
 }
-
-
-/* Organização dos cards */
 
 #parcerias .cards {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-gap: 25px;
-max-width: 1200px;
-margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
-
-/* Card */
 
 #parcerias .card {
-background: #ffffff;
-border-radius: 16px;
-padding: 30px 22px;
-min-height: 250px;
-
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-text-align: center;
-
-box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
-
-transition: transform 0.3s ease, box-shadow 0.3s ease;
-
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 22px;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-/* Efeito ao passar o mouse */
 
 #parcerias .card:hover {
-transform: translateY(-6px);
-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
-
-/* Logo */
 
 #parcerias .card img {
     width: 130px;
@@ -782,137 +662,111 @@ box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
     background: transparent;
 }
 
-/* Nome da empresa */
-
 #parcerias .card h3 {
-position: relative;
-
-margin: 0 0 15px;
-padding-bottom: 12px;
-
-font-size: 19px;
-font-weight: 600;
-color: #222;
-
+    position: relative;
+    margin: 0 0 15px;
+    padding-bottom: 12px;
+    font-size: 19px;
+    font-weight: 600;
+    color: #222;
 }
 
-/* Risquinho verde abaixo do nome */
-
+/* risquinho verde abaixo do nome */
 #parcerias .card h3::after {
-content: "";
-
-position: absolute;
-bottom: 0;
-left: 50%;
-transform: translateX(-50%);
-
-width: 30px;
-height: 2px;
-
-background: #6d8f73;
-
-
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: #6d8f73;
 }
-
-/* Descrição */
 
 #parcerias .card p {
-margin: 0;
-
-
-color: #666;
-font-size: 13px;
-line-height: 1.6;
-
-
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
-/* ==================== TABLET ==================== */
-
+/* tablet */
 @media (max-width: 950px) {
 
-#parcerias .cards {
-    grid-template-columns: repeat(2, 1fr);
-}
+    #parcerias .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
 }
 
-/* ==================== CELULAR ==================== */
-
+/* celular */
 @media (max-width: 550px) {
 
-#parcerias {
-    padding: 50px 6%;
-}
+    #parcerias {
+        padding: 50px 6%;
+    }
 
-#parcerias .cards {
-    grid-template-columns: 1fr;
-}
+    #parcerias .cards {
+        grid-template-columns: 1fr;
+    }
 
-#parcerias .card {
-    min-height: 230px;
-}
+    #parcerias .card {
+        min-height: 230px;
+    }
 
 }
-
 
 
 /* ==================== RESPONSIVIDADE ==================== */
 
-/* Configuração para telas menores */
+/* telas menores */
 @media (max-width: 700px) {
 
-    /* Menu passa para baixo */
+    /* cabeçalho empilha */
     .cabecalho {
         height: auto;
-
         flex-direction: column;
-
         gap: 10px;
-
         padding: 10px;
     }
 
-    /* Cards ficam com duas colunas */
+    /* cards ficam com duas colunas */
     .cards,
     .cards-equipe {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    /* Cadastro fica em uma coluna */
+    /* cadastro vira uma coluna só */
     .cadastro {
         grid-template-columns: 1fr;
     }
 
 }
 
+
 /* =================================================================================== */
-/*              outra tela - ENTRAR 
+/*              outra tela - ENTRAR
 /* ====================================================================================*/
+
 
 /* ==================== TELA DE ENTRAR ==================== */
 
 .tela-entrar {
     min-height: 100vh;
     background-color: #f5f5f5;
-
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Quadrado verde */
-
+/* quadrado verde do login */
 .caixa-login {
     width: 380px;
     background-color: #b0f72d;
     border-radius: 20px;
     padding: 40px 45px;
-
     box-sizing: border-box;
 }
-
-/* Título */
 
 .caixa-login h1 {
     color: #222;
@@ -921,24 +775,18 @@ line-height: 1.6;
     margin: 0;
 }
 
-/* Risquinho abaixo do título */
-
+/* risquinho abaixo do título */
 .linha-titulo {
     width: 100%;
     height: 2px;
     background-color: #222;
-
     margin: 12px 0 30px;
 }
-
-/* Formulário */
 
 .caixa-login form {
     display: flex;
     flex-direction: column;
 }
-
-/* Textos dos campos */
 
 .caixa-login label {
     color: #222;
@@ -946,36 +794,28 @@ line-height: 1.6;
     margin-bottom: 7px;
 }
 
-/* Campos */
-
+/* campos com borda bem arredondada */
 .caixa-login input {
     height: 42px;
-
     border: none;
     border-radius: 20px;
     outline: none;
-
     padding: 0 12px;
     margin-bottom: 20px;
-
     font-size: 15px;
     box-sizing: border-box;
 }
 
-/* Botão */
-
+/* botão principal escuro */
 .caixa-login button {
     height: 44px;
-
     background-color: #222;
     color: white;
-
     border: none;
     cursor: pointer;
     border-radius: 20px;
     font-size: 16px;
     margin-top: 5px;
-
     transition: 0.2s;
 }
 
@@ -983,7 +823,8 @@ line-height: 1.6;
     background-color: #111;
 }
 
-/* Área de cadastro */
+
+/* ==================== ÁREA DE CADASTRO ==================== */
 
 .entrarcadastro {
     text-align: center;
@@ -1006,7 +847,7 @@ line-height: 1.6;
     text-decoration: underline;
 }
 
-/* ==================== VOLTAR PARA HOME ==================== */
+
 /* ==================== VOLTAR ==================== */
 
 .voltar-home {
@@ -1025,21 +866,57 @@ line-height: 1.6;
     transition: 0.2s;
 }
 
+/* ícone dá uma leve crescida no hover */
 .voltar-home img:hover {
     transform: scale(1.1);
 }
 
-/* entrar no cadastrar*/
+
+/* entrar no cadastrar */
+
 .cadastroentrar {
     text-align: center;
     margin-top: 15px;
 }
 
 .cadastroentrar a {
-    color: #222;
+    color: #000000;
     text-decoration: none;
 }
 
 .cadastroentrar a:hover {
     text-decoration: underline;
+}
+
+
+/* ========= LOGIN TESTES ======== */
+
+/* bloco só pra testar os tipos de usuário */
+.entrar-como {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #000000;
+    text-align: center;
+}
+
+.entrar-como p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.entrar-como button {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 8px;
+    border: none;
+    border-radius: 6px;
+    background-color: #000000;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.entrar-como button:hover {
+    background-color: #000000;
 }

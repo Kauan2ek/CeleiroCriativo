@@ -1,0 +1,680 @@
+/* ==================== CONFIGURAÇÃO GERAL ==================== */
+
+/* reseta margens, paddings e box-sizing em tudo */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e9ebed;
+    color: #333333;
+}
+
+
+/* ==================== CABEÇALHO ==================== */
+
+/* cabeçalho dividido em 3 colunas iguais */
+.cabecalho-projeto {
+    height: 70px;
+    background-color: #b6ff32;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0 25px;
+}
+
+.cabecalho-esquerda {
+    width: 100%;
+}
+
+
+/* ==================== CADASTRAR FUNCIONÁRIO ==================== */
+
+.cadastrar-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #222222;
+}
+
+.cadastrar-funcionario img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+
+/* Logo */
+
+.logo-projeto img {
+    width: 130px;
+    height: 65px;
+    object-fit: contain;
+}
+
+.link-perfil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.link-perfil img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+
+/* ==================== PERFIL DO GESTOR ==================== */
+
+.informacoes-gestor {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    margin-left: auto;
+}
+
+
+/* ==================== PERFIL DO FUNCIONÁRIO ==================== */
+
+.informacoes-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+
+/* ==================== PERFIL DO CLIENTE ==================== */
+
+.informacoes-cliente {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+}
+
+
+/* ==================== CONTEÚDO PRINCIPAL ==================== */
+
+/* caixa branca central que envolve o conteúdo */
+.conteudo-exibicao {
+    width: calc(100% - 40px);
+    max-width: 1250px;
+    margin: 25px auto;
+    background-color: #f7f7f7;
+    border: 1px solid #d2d2d2;
+    border-top: 4px solid #b6ff32;
+    border-radius: 8px;
+    padding: 25px 30px 30px;
+}
+
+
+/* ==================== LINHA SUPERIOR ==================== */
+
+.linha-superior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+.titulo-exibicao {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.titulo-exibicao img {
+    width: 23px;
+    height: 23px;
+    object-fit: contain;
+}
+
+.titulo-exibicao h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+}
+
+
+/* ==================== SITUAÇÃO ==================== */
+
+/* caixinha colorida que mostra o status do projeto */
+.situacao {
+    background-color: #fff0b3;
+    border: 1px solid #e2cc70;
+    color: #806000;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* o select fica transparente dentro da caixinha */
+.situacao select {
+    background: transparent !important;
+    border: none;
+    outline: none;
+    color: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+/* EM ANÁLISE */
+
+.situacao.analise {
+    background-color: #ffd6d6;
+    border: 1px solid #e5a5a5;
+    color: #a80000;
+}
+
+
+/* EM ANDAMENTO */
+
+.situacao.andamento {
+    background-color: #fff0b3;
+    border: 1px solid #e2cc70;
+    color: #806000;
+}
+
+
+/* FINALIZADO */
+
+.situacao.finalizado {
+    background-color: #c9f7b0;
+    border: 1px solid #a6d995;
+    color: #276b13;
+}
+
+/* ===SITUAÇÂO STATUS SOME SETA CLIENTE ===*/
+.situacao select.status-cliente-funcionario {
+    appearance: none;
+}
+
+/* ==================== COLUNAS ==================== */
+
+/* três colunas com larguras diferentes */
+.colunas-projeto {
+    display: grid;
+    grid-template-columns: 1.15fr 0.9fr 1fr;
+    gap: 25px;
+}
+
+
+/* ==================== COLUNA ESQUERDA ==================== */
+
+.coluna-esquerda {
+    background-color: #f1f2f1;
+    border: 1px solid #d9dada;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+
+/* ==================== COLUNA DO MEIO ==================== */
+
+.coluna-meio {
+    background-color: #f1f3f4;
+    border: 1px solid #d8dcdf;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+
+/* ==================== CAMPOS ==================== */
+
+.campo-projeto {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 20px;
+}
+
+.campo-projeto label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444444;
+}
+
+
+/* ==================== INPUT COM ÍCONE ==================== */
+
+.campo-com-icone {
+    position: relative;
+}
+
+.campo-com-icone input {
+    width: 100%;
+    height: 40px;
+    background-color: #e6e8e9;
+    border: 1px solid #c9cdcf;
+    border-radius: 5px;
+    padding: 0 40px 0 12px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333333;
+    outline: none;
+}
+
+.campo-com-icone input::placeholder {
+    color: #888888;
+}
+
+.campo-com-icone input:focus {
+    background-color: #ffffff;
+    border-color: #aeb4b8;
+}
+
+/* ícone que fica sobreposto no canto direito do input */
+.campo-com-icone img {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* ==================== CAMPOS DE DATA ==================== */
+
+.campo-com-icone input[type="date"] {
+    padding-right: 10px;
+    color: #555555;
+    cursor: pointer;
+}
+
+/* indicador do calendário nativo do navegador */
+.campo-com-icone input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+
+/* ==================== TEXTAREA ==================== */
+
+.campo-texto {
+    position: relative;
+}
+
+.campo-texto textarea {
+    width: 100%;
+    height: 115px;
+    resize: none;
+    background-color: #e6e8e9;
+    border: 1px solid #c9cdcf;
+    border-radius: 5px;
+    padding: 10px 40px 10px 12px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333333;
+    outline: none;
+}
+
+.campo-texto textarea::placeholder {
+    color: #888888;
+}
+
+.campo-texto textarea:focus {
+    background-color: #ffffff;
+    border-color: #aeb4b8;
+}
+
+.campo-texto img {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* ==================== AÇÕES DO PROJETO ==================== */
+
+.acoes-projeto {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+
+/* ==================== BOTÃO SALVAR ==================== */
+
+.botao-salvar {
+    height: 38px;
+    padding: 0 28px;
+    background-color: #3b82c4;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.botao-salvar:hover {
+    background-color: #3272ad;
+}
+
+
+/* ==================== BOTÕES APROVAÇÃO ==================== */
+
+.botoes-aprovacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.botao-aprovar,
+.botao-negar {
+    height: 38px;
+    padding: 0 23px;
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.botao-aprovar {
+    background-color: #59c900;
+}
+
+.botao-aprovar:hover {
+    background-color: #48ad00;
+}
+
+.botao-negar {
+    background-color: #d9534f;
+}
+
+.botao-negar:hover {
+    background-color: #c43f3b;
+}
+
+
+/* ==================== COLUNA DE TAREFAS ==================== */
+
+.coluna-tarefas {
+    background-color: #eef1f3;
+    border: 1px solid #d3d9dd;
+    border-radius: 7px;
+    padding: 18px;
+}
+
+.coluna-tarefas h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+
+/* ==================== ÁREA DE TAREFAS ==================== */
+
+.area-tarefas {
+    height: 235px;
+    background-color: #e3e8eb;
+    border: 1px solid #cbd2d6;
+    border-radius: 5px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+
+/* ==================== BARRA DE ROLAGEM ==================== */
+
+/* barra de rolagem customizada pra ficar mais discreta */
+.area-tarefas::-webkit-scrollbar {
+    width: 7px;
+}
+
+.area-tarefas::-webkit-scrollbar-track {
+    background-color: #d8dde0;
+    border-radius: 5px;
+}
+
+.area-tarefas::-webkit-scrollbar-thumb {
+    background-color: #aeb6bb;
+    border-radius: 5px;
+}
+
+
+/* ==================== TAREFA ==================== */
+
+.tarefa {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    background-color: #f8f8f8;
+    border: 1px solid #d2d6d8;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+
+/* ==================== ÍCONE RESPONSÁVEL ==================== */
+
+.icone-responsavel {
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+
+/* ==================== BOTÃO ADICIONAR ==================== */
+
+.botao-adicionar {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    background-color: #8dbde5;
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.botao-adicionar:hover {
+    background-color: #76a9d2;
+}
+
+
+/* ==================== INPUT DA TAREFA ==================== */
+
+.tarefa input {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    outline: none;
+}
+
+.tarefa input:focus {
+    border-color: #8dbde5;
+}
+
+
+/* ==================== BOTÃO VOLTAR ==================== */
+
+.voltar-projetos {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.voltar-projetos img {
+    width: 23px;
+    height: 23px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+
+/* ==================== BOTÃO EXPANDIR ==================== */
+
+.botao-expandir {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-expandir img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* ==================== DOCUMENTO ==================== */
+
+.acoes-tarefas {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.botao-documento {
+    width: 34px;
+    height: 34px;
+    background-color: #e1e6e9;
+    border: 1px solid #cbd2d6;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.botao-documento img {
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+}
+
+.botao-documento:hover {
+    background-color: #d6dde1;
+}
+
+
+/* ==================== RESPONSIVIDADE ==================== */
+
+/* telas médias: colunas viram uma só */
+@media (max-width: 900px) {
+
+    .colunas-projeto {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho-projeto {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .cabecalho-esquerda {
+        display: none;
+    }
+
+    .cadastrar-funcionario {
+        justify-content: flex-start;
+    }
+
+    .informacoes-gestor {
+        justify-content: flex-end;
+    }
+}
+
+
+/* telas pequenas: ajustes de espaçamento e escondendo textos */
+@media (max-width: 600px) {
+
+    .conteudo-exibicao {
+        width: calc(100% - 20px);
+        padding: 18px 15px;
+    }
+
+    .linha-superior {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cabecalho-projeto {
+        height: auto;
+        padding: 12px 15px;
+        gap: 10px;
+    }
+
+    /* esconde o texto do cadastrar funcionário, só fica o ícone */
+    .cadastrar-funcionario span {
+        display: none;
+    }
+
+    /* mesma ideia pro nome do gestor */
+    .informacoes-gestor span {
+        display: none;
+    }
+}
+
+/* ==================== BOTÃO EXCLUIR PROJETO ==================== */
+
+.botao-excluir {
+    height: 38px;
+    padding: 0 28px;
+    background-color: #d9534f;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.botao-excluir:hover {
+    background-color: #c43f3b;
+}
