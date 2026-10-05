@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 public class PerfilController : Controller
 {
     // exibe o perfil do gestor
-    public IActionResult GestorPerfil()
+    public ActionResult GestorPerfil()
     {
         return View();
     }
 
     // exibe o perfil do funcionário
-    public IActionResult FuncionarioPerfil()
+    public ActionResult FuncionarioPerfil()
     {
         return View();
     }
 
     // exibe o perfil do cliente
-    public IActionResult ClientePerfil()
+    public ActionResult ClientePerfil()
     {
         return View();
     }

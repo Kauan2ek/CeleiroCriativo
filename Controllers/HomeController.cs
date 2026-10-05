@@ -6,21 +6,21 @@ public class HomeController : Controller
 {
     // Página inicial
     // primeira tela que o usuário vê ao acessar o site
-    public IActionResult Index()
+    public ActionResult Index()
     {
         return View();
     }
 
     // Página de entrar
     // renderiza o formulário de login
-    public IActionResult Entrar()
+    public ActionResult Entrar()
     {
         return View();
     }
 
     // Página de cadastro
     // renderiza o formulário de cadastro de usuário
-    public IActionResult Cadastro()
+    public ActionResult Cadastro()
     {
         return View();
     }

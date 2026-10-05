@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 public class CadastroFuncionarioController : Controller
 {
     // método que apenas retorna a view de cadastro
-    public IActionResult CadastroFuncionario()
+    public ActionResult CadastroFuncionario()
     {
         return View();
     }
@@ -12,7 +12,7 @@ public class CadastroFuncionarioController : Controller
     // ação chamada no post do formulário, quando o usuário clica em salvar
     // recebe a TelaAnterior para saber para onde voltar depois
     [HttpPost]
-    public IActionResult Salvar(string TelaAnterior)
+    public ActionResult Salvar(string TelaAnterior)
     {
         // Aqui fica o código para salvar o funcionário
 

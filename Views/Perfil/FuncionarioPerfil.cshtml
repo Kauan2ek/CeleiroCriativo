@@ -1,124 +1,110 @@
-@{
-    // título que aparece na aba do navegador
-    ViewData["Title"] = "Perfil";
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-<!-- css específico dessa tela -->
-<link rel="stylesheet" href="~/css/perfil.css" />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil - Funcionário</title>
 
-<div class="pagina-perfil">
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="~/css/perfil.css" />
+</head>
 
-      <!-- link que volta pra tela de projetos do funcionário -->
-      <a href="/Projeto/FuncionarioProjeto" class="voltar-projetos">
-       <img src="/imagens/voltar.png" alt="Voltar">
-         Voltar para projetos
-      </a>
+<body>
 
-    <!-- ==================== CABEÇALHO VERDE ==================== -->
+    <div class="pagina-perfil">
 
-    <!-- faixa com o título e a foto de perfil -->
-    <div class="cabecalho-perfil">
+        <!-- link que volta pra tela de projetos do funcionário -->
+        <a href="/Projeto/FuncionarioProjeto" class="voltar-projetos">
+            <img src="/imagens/voltar.png" alt="Voltar">
+            Voltar para projetos
+        </a>
 
-        <h1>Perfil - Funcionário</h1>
+        <!-- ==================== CABEÇALHO VERDE ==================== -->
 
-        <img src="/imagens/Entrar.png" alt="Perfil do funcionario">
+        <!-- faixa com o título e a foto de perfil -->
+        <div class="cabecalho-perfil">
 
-    </div>
+            <h1>Perfil - Funcionário</h1>
+
+            <img src="/imagens/Entrar.png" alt="Perfil do funcionario">
+
+        </div>
 
 
-    <!-- ==================== CAMPOS ==================== -->
+        <!-- ==================== CAMPOS ==================== -->
 
-    <!-- dados do perfil divididos em duas colunas -->
-    <div class="dados-perfil">
+        <!-- dados do perfil divididos em duas colunas -->
+        <div class="dados-perfil">
 
-        <!-- coluna esquerda -->
+            <!-- coluna esquerda -->
 
-        <div class="coluna-perfil">
+            <div class="coluna-perfil">
 
-            <div class="campo-perfil">
-                <label for="nome">Nome</label>
-                <input type="text"
-                       id="nome"
-                       name="nome"
-                       placeholder="Digite seu nome">
+                <div class="campo-perfil">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" placeholder="Digite seu nome">
+                </div>
+
+                <div class="campo-perfil">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Digite seu email">
+                </div>
+
+                <div class="campo-perfil">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" name="cpf" placeholder="Digite seu CPF">
+
+                </div>
+
             </div>
 
-            <div class="campo-perfil">
-                <label for="email">Email</label>
-                <input type="email"
-                       id="email"
-                       name="email"
-                       placeholder="Digite seu email">
-            </div>
 
-            <div class="campo-perfil">
-                <label for="cpf">CPF</label>
-                <input type="text"
-                       id="cpf"
-                       name="cpf"
-                       placeholder="Digite seu CPF">
+            <!-- coluna direita -->
+
+            <div class="coluna-perfil">
+
+                <div class="campo-perfil">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" name="telefone" placeholder="Digite seu telefone">
+                </div>
+
+                <div class="campo-perfil">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Digite sua senha">
+                </div>
+
+                <div class="campo-perfil">
+                    <label for="cnpj">CNPJ</label>
+                    <input type="text" id="cnpj" name="cnpj" placeholder="Digite seu CNPJ">
+                </div>
+
+                <!-- esse campo a mais é o cargo, só tem no perfil do funcionário -->
+                <div class="campo-perfil">
+                    <label for="cargo">Cargo</label>
+                    <input type="text" id="cargo" name="cargo" placeholder="Digite seu Cargo">
+                </div>
 
             </div>
 
         </div>
 
 
-        <!-- coluna direita -->
+        <!-- ==================== BOTÕES ==================== -->
 
-        <div class="coluna-perfil">
+        <div class="botoes-perfil">
 
-            <div class="campo-perfil">
-                <label for="telefone">Telefone</label>
-                <input type="text"
-                       id="telefone"
-                       name="telefone"
-                       placeholder="Digite seu telefone">
-            </div>
+            <!-- botão de editar (ainda sem função) -->
+            <button type="button" class="botao-perfil">
+                Editar perfil
+            </button>
 
-            <div class="campo-perfil">
-                <label for="senha">Senha</label>
-                <input type="password"
-                       id="senha"
-                       name="senha"
-                       placeholder="Digite sua senha">
-            </div>
-
-            <div class="campo-perfil">
-                <label for="cnpj">CNPJ</label>
-                <input type="text"
-                       id="cnpj"
-                       name="cnpj"
-                       placeholder="Digite seu CNPJ">
-            </div>
-
-            <!-- esse campo a mais é o cargo, só tem no perfil do funcionário -->
-            <div class="campo-perfil">
-                <label for="cargo">Cargo</label>
-                <input type="text"
-                       id="cargo"
-                       name="cargo"
-                       placeholder="Digite seu Cargo">
-            </div>
+            <!-- botão salvar, por enquanto só volta pra tela anterior -->
+            <button type="button" class="botao-perfil" onclick="history.back()">
+                Salvar
+            </button>
 
         </div>
 
     </div>
-
-
-    <!-- ==================== BOTÕES ==================== -->
-
-    <div class="botoes-perfil">
-
-        <!-- botão de editar (ainda sem função) -->
-        <button type="button" class="botao-perfil">
-            Editar perfil
-        </button>
-
-        <!-- botão salvar, por enquanto só volta pra tela anterior -->
-        <button type="button" class="botao-perfil" onclick="history.back()">
-            Salvar
-        </button>
-
-    </div>
-
-</div>
+</body>

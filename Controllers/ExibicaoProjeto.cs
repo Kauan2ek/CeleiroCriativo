@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 public class ExibicaoProjetoController : Controller
 {
     // exibe o projeto na visão do gestor
-    public IActionResult ExProjetoGestor()
+    public ActionResult ExProjetoGestor()
     {
         return View();
     }
 
     // exibe o projeto na visão do funcionário
-    public IActionResult ExProjetoFuncionario()
+    public ActionResult ExProjetoFuncionario()
     {
         return View();
     }
 
     // exibe o projeto na visão do cliente
-    public IActionResult ExProjetoCliente()
+    public ActionResult ExProjetoCliente()
     {
         return View();
     }

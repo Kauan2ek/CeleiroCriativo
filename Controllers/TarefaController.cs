@@ -6,14 +6,14 @@ public class TarefaController : Controller
 {
     // abre a tela de tarefas do gestor
     // segue a convenção: views/tarefa/gestortarefa.cshtml
-    public IActionResult GestorTarefa()
+    public ActionResult GestorTarefa()
     {
         return View();
     }
 
     // abre a tela de exibição de uma tarefa para o gestor
     // recebe o status e o nome da tarefa pela url
-    public IActionResult ExTarefaGestor(string status, string tarefa)
+    public ActionResult ExTarefaGestor(string status, string tarefa)
     {
         // guarda o status da tarefa pra usar na view
         ViewBag.Status = status;
@@ -27,7 +27,7 @@ public class TarefaController : Controller
     }
 
     // abre a tela de tarefas do funcionário
-    public IActionResult FuncionarioTarefa()
+    public ActionResult FuncionarioTarefa()
     {
         // caminho completo, sem depender da convenção de pastas
         return View("~/Views/Tarefa/FuncionarioTarefa.cshtml");
@@ -35,7 +35,7 @@ public class TarefaController : Controller
 
     // abre a tela de exibição de uma tarefa para o funcionário
     // recebe o status e o nome da tarefa pela url
-    public IActionResult ExTarefaFuncionario(string status, string tarefa)
+    public ActionResult ExTarefaFuncionario(string status, string tarefa)
     {
         // guarda o status da tarefa pra usar na view
         ViewBag.Status = status;
@@ -48,7 +48,7 @@ public class TarefaController : Controller
     }
 
     // abre a tela de tarefas do cliente
-    public IActionResult ClienteTarefa()
+    public ActionResult ClienteTarefa()
     {
         // retorna a view específica do cliente
         return View("~/Views/Tarefa/ClienteTarefa.cshtml");
@@ -56,7 +56,7 @@ public class TarefaController : Controller
 
     // abre a tela de exibição de uma tarefa para o cliente
     // recebe o status e o nome da tarefa pela url
-    public IActionResult ExTarefaCliente(string status, string tarefa)
+    public ActionResult ExTarefaCliente(string status, string tarefa)
     {
         // guarda o status da tarefa pra usar na view
         ViewBag.Status = status;

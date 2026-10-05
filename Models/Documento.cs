@@ -1,7 +1,7 @@
 public class Documento
 {
-    public int Codigo { get; set; } // Código não é alterado via código
-    public string Descricao { get; set; }
-    public string Extensao { get; set; }
-    public string Diretorio { get; set; }
+    private int Codigo { get; }
+    private string Descricao { get; set; }
+    private string Extensao { get; set; }
+    private string Diretorio { get; set; }
 }

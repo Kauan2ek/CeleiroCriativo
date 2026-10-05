@@ -6,7 +6,7 @@ public class ProjetoController : Controller
 {
     // exibe a tela de projeto na visão do gestor
     // usa o caminho padrão, ou seja, procura em Views/Projeto/GestorProjeto.cshtml
-    public IActionResult GestorProjeto()
+    public ActionResult GestorProjeto()
     {
         return View();
     }
@@ -14,7 +14,7 @@ public class ProjetoController : Controller
     // reaproveita a view que já existe no controller ExibicaoProjeto
     // em vez de duplicar a tela, só aponta pro caminho dela
     // por isso o "~/Views/ExibicaoProjeto/ExProjetoGestor.cshtml"
-    public IActionResult ExProjetoGestor()
+    public ActionResult ExProjetoGestor()
     {
         return View("~/Views/ExibicaoProjeto/ExProjetoGestor.cshtml");
     }
@@ -24,14 +24,14 @@ public class ProjetoController : Controller
     // [HttpGet] garante que só responde a requisições GET
     // e a view é passada com caminho completo, ignorando a convenção
     [HttpGet("/Projeto/FuncionarioProjeto")]
-    public IActionResult FuncionarioProjeto()
+    public ActionResult FuncionarioProjeto()
     {
         return View("~/Views/Projeto/FuncionarioProjeto.cshtml");
     }
 
     // mesma ideia das outras, só aponta o caminho completo da view
     // serve pra deixar explícito onde está o arquivo, sem depender da convenção de pastas
-    public IActionResult ClienteProjeto()
+    public ActionResult ClienteProjeto()
     {
         return View("~/Views/Projeto/ClienteProjeto.cshtml");
     }
