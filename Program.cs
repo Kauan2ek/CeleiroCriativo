@@ -2,7 +2,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // adiciona o suporte a MVC (controllers + views)
-// sem isso os controllers com IActionResult e as views não funcionam
+// sem isso os controllers com ActionResult e as views não funcionam
 builder.Services.AddControllersWithViews();
 
 // constrói a aplicação com as configurações que foram passadas
