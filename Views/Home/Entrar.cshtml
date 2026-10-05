@@ -2,57 +2,135 @@
 <html lang="pt-br">
 
 <head>
+
+    <!-- codificação de caracteres, pra acentos funcionarem -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- garante que a página se adapte ao tamanho da tela -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- título que aparece na aba do navegador -->
     <title>Entrar</title>
-    <link rel="icon" type="image/png" href="/imagens/logo.png">
 
+    <!-- ícone que aparece na aba -->
+    <link rel="icon"
+          type="image/png"
+          href="/imagens/logo.png">
 
-    <link rel="stylesheet" href="/css/style.css">
+    <!-- css principal do site -->
+    <link rel="stylesheet"
+          href="/css/style.css">
+
 </head>
+
 
 <body>
 
+    <!-- container principal da tela de login -->
     <main class="tela-entrar">
 
         <div class="caixa-login">
-          
+
+
+            <!-- botão de voltar pra home -->
+
             <div class="voltar-home">
-              <a href="index.html">
-                  <img src="/imagens/voltar.png" alt="Voltar">
-              </a>
-        </div>
+
+                <a href="/Home/Index">
+
+                    <img src="/imagens/voltar.png"
+                         alt="Voltar para a página inicial">
+
+                </a>
+
+            </div>
+
 
             <h1>Entrar</h1>
 
+            <!-- linha decorativa embaixo do título -->
             <div class="linha-titulo"></div>
 
+
+            <!-- form de login -->
             <form>
 
-                <label for="email">E-mail</label>
-                <input 
-                    type="email" 
-                    id="email" 
+                <label for="email">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
                     placeholder="Digite seu e-mail"
                 >
 
-                <label for="senha">Senha</label>
-                <input 
-                    type="password" 
-                    id="senha" 
+
+                <label for="senha">
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    id="senha"
                     placeholder="Digite sua senha"
                 >
 
-                <button type="submit">Entrar</button>
+
+                <!-- botão entrar, por enquanto só redireciona pro gestor -->
+                <!-- ainda não tem validação de login de verdade -->
+                <button type="button"
+                        onclick="window.location.href='/Projeto/GestorProjeto'">
+
+                    Entrar
+
+                </button>
 
             </form>
 
-            <div class="entrarcadastro">
 
-                <p>Ainda não tem cadastro?</p>
-                <a href="index.html#cadastro">Cadastre-se</a>
+            <!-- ==================== TESTE DE USUÁRIOS ==================== -->
+
+            <!-- atalhos só pra testar as telas de cada tipo de usuário -->
+          <div class="entrar-como">
+
+                <p>Entrar como:</p>
+
+                <!-- botão que entra direto como gestor -->
+                <button type="button"
+                        onclick="window.location.href='/Projeto/GestorProjeto'">
+                    Gestor
+                </button>
+
+                <!-- botão que entra direto como funcionário -->
+                <button type="button"
+                        onclick="window.location.href='/Projeto/FuncionarioProjeto'">
+                    Funcionário
+                </button>
+
+                <!-- botão que entra direto como cliente -->
+                <button type="button"
+                        onclick="window.location.href='/Projeto/ClienteProjeto'">
+                    Cliente
+                </button>
 
             </div>
+
+            <!-- link pra quem ainda não tem conta -->
+            <div class="entrarcadastro">
+
+                <p>
+                    Ainda não tem cadastro?
+                </p>
+
+                <!-- manda pra seção de cadastro na home -->
+                <a href="/Home/Index#cadastro">
+                    Cadastre-se
+                </a>
+
+            </div>
+
 
         </div>
 
@@ -61,4 +139,3 @@
 </body>
 
 </html>
-

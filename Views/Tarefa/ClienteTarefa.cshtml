@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tarefa</title>
+
+    <!-- ícone da aba -->
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="~/css/tarefa.css" />
+</head>
+<body>
+
+
+<!-- ==================== CABEÇALHO ==================== -->
+
+<header class="cabecalho-tarefas">
+
+    <!-- logo que volta pra home -->
+      <a href="/" class="logo-tarefas">
+        <img src="/imagens/logo.png" alt="Logo">
+     </a>
+
+    <!-- informações do cliente logado -->
+    <div class="informacoes-funcionario">
+
+        <span>Nome do Cliente</span>
+
+        <!-- link pro perfil do cliente -->
+        <a href="/Perfil/ClientePerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do cliente">
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ==================== CONTEÚDO ==================== -->
+
+<main class="conteudo-tarefas">
+
+    <!-- título da página com botão de voltar -->
+
+    <div class="titulo-tarefas">
+
+        <!-- volta pra tela de projetos do cliente -->
+        <a href="/Projeto/ClienteProjeto"
+           class="voltar-tarefas">
+
+            <img src="/imagens/voltar.png"
+                 alt="Voltar">
+
+        </a>
+
+        <h1>Tarefas do Projeto</h1>
+
+    </div>
+
+
+    <!-- ==================== KANBAN ==================== -->
+
+    <!-- quadro kanban com três colunas de status -->
+    <div class="kanban-board">
+
+
+        <!-- ==================== A FAZER ==================== -->
+
+        <section class="coluna-tarefas coluna-analise">
+
+            <div class="cabecalho-coluna">
+
+                <h2>Tarefas a Fazer</h2>
+
+            </div>
+
+
+            <!-- corpo da coluna, o data-status indica o status das tarefas -->
+            <div class="corpo-coluna"
+                 data-status="a_fazer">
+
+
+                <!-- card de tarefa -->
+                <!-- draggable=false porque o cliente não pode arrastar -->
+                <div class="card-tarefa"
+                     draggable="false"
+                     data-tarefa="Texto da empresa...">
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Texto da empresa...
+                        </p>
+
+
+                        <!-- link que abre a tarefa na visão do cliente -->
+                        <!-- passa o status e o nome da tarefa pela url -->
+
+                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "a_fazer", tarefa = "Texto da empresa..." })"
+                           class="botao-expandir-tarefa">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir tarefa">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== EM ANDAMENTO ==================== -->
+
+        <section class="coluna-tarefas coluna-andamento">
+
+            <div class="cabecalho-coluna">
+
+                <h2>Tarefas em Andamento</h2>
+
+            </div>
+
+
+            <div class="corpo-coluna"
+                 data-status="andamento">
+
+
+                <div class="card-tarefa"
+                     draggable="false"
+                     data-tarefa="Documentação da Equipe">
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Documentação da Equipe
+                        </p>
+
+
+                        <!-- abre a tarefa na visão do cliente -->
+
+                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "andamento", tarefa = "Documentação da Equipe" })"
+                           class="botao-expandir-tarefa">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir tarefa">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== FINALIZADAS ==================== -->
+
+        <section class="coluna-tarefas coluna-finalizadas">
+
+            <div class="cabecalho-coluna">
+
+                <h2>Tarefas Finalizadas</h2>
+
+            </div>
+
+
+            <div class="corpo-coluna"
+                 data-status="finalizada">
+
+
+                <div class="card-tarefa"
+                     draggable="false"
+                     data-tarefa="Tarefa da Equipe - Análise">
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Tarefa da Equipe - Análise
+                        </p>
+
+
+                        <!-- abre a tarefa na visão do cliente -->
+
+                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "finalizada", tarefa = "Tarefa da Equipe - Análise" })"
+                           class="botao-expandir-tarefa">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir tarefa">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<!-- js que cuida dos comportamentos dessa tela -->
+<script src="/js/tarefa.js"></script>
+</body>

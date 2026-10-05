@@ -1,20 +1,24 @@
-window.onload = function() {
+// quando a página termina de carregar, sobe pro topo
+// útil pra quando o usuário recarrega numa âncora tipo #cadastro
+window.onload = function () {
     window.scrollTo(0, 0);
 };
+
+
 /* ==================== CARROSSEL ==================== */
 
-/* Lista com as imagens dos banners */
+// lista com as imagens dos banners que vão rodar
 const banners = [
     "imagens/banner1.png",
     "imagens/banner2.png",
     "imagens/banner3.png"
 ];
 
-/* Índice do banner atual */
+// guarda qual banner tá sendo mostrado no momento
 let bannerAtual = 0;
 
 
-/* Função para mostrar o banner */
+// troca o src da imagem pelo banner atual da lista
 function mostrarBanner() {
 
     document.getElementById("imagemBanner").src =
@@ -23,12 +27,12 @@ function mostrarBanner() {
 }
 
 
-/* Função para passar para o próximo banner */
+// avança pro próximo banner
 function proximoBanner() {
 
     bannerAtual++;
 
-    /* Volta para o primeiro banner */
+    // se passou do último, volta pro primeiro
     if (bannerAtual >= banners.length) {
         bannerAtual = 0;
     }
@@ -37,12 +41,12 @@ function proximoBanner() {
 }
 
 
-/* Função para voltar ao banner anterior */
+// volta pro banner anterior
 function anteriorBanner() {
 
     bannerAtual--;
 
-    /* Vai para o último banner */
+    // se foi antes do primeiro, vai pro último
     if (bannerAtual < 0) {
         bannerAtual = banners.length - 1;
     }
@@ -53,12 +57,12 @@ function anteriorBanner() {
 
 /* ==================== CADASTRO ==================== */
 
-/* Função chamada ao clicar no botão */
+// chamada quando clica no botão cadastrar
 function cadastrar() {
 
     const nome = document.getElementById("nome").value;
 
-    /* Verifica se o nome foi preenchido */
+    // se o nome tá vazio, avisa e para
     if (nome === "") {
 
         alert("Preencha o nome.");
@@ -66,13 +70,15 @@ function cadastrar() {
         return;
     }
 
-    /* Mensagem provisória */
+    // mensagem provisória, ainda não salva em lugar nenhum
     alert("Cadastro realizado!");
 
 }
 
+
 // ==================== TEXTO DIGITANDO ====================
 
+// frases que vão sendo digitadas e apagadas em sequência
 const frases = [
     "Transformamos ideias em experiências.",
     "Sua marca merece ser lembrada.",
@@ -82,22 +88,27 @@ const frases = [
     "Onde criatividade encontra estratégia."
 ];
 
+// controla qual frase tá rolando, qual caractere e se tá apagando
 let fraseAtual = 0;
 let caractereAtual = 0;
 let apagando = false;
 
+// elemento onde o texto é escrito
 const texto = document.getElementById("textoDigitando");
 
 function digitar() {
 
     const frase = frases[fraseAtual];
 
+    // modo digitando: vai adicionando caractere por caractere
     if (!apagando) {
 
         texto.textContent = frase.substring(0, caractereAtual + 1);
 
         caractereAtual++;
 
+        // quando termina de digitar a frase inteira, começa a apagar
+        // depois de uma pausa pra dar tempo de ler
         if (caractereAtual === frase.length) {
 
             apagando = true;
@@ -109,16 +120,19 @@ function digitar() {
 
     } else {
 
+        // modo apagando: vai removendo caractere por caractere
         texto.textContent = frase.substring(0, caractereAtual - 1);
 
         caractereAtual--;
 
+        // quando termina de apagar, passa pra próxima frase
         if (caractereAtual === 0) {
 
             apagando = false;
 
             fraseAtual++;
 
+            // se acabaram as frases, volta pra primeira
             if (fraseAtual === frases.length) {
                 fraseAtual = 0;
             }
@@ -127,7 +141,9 @@ function digitar() {
 
     }
 
+    // chama de novo: 45ms se tá apagando (mais rápido), 80ms se tá digitando
     setTimeout(digitar, apagando ? 45 : 80);
 }
 
+// dá o pontapé inicial no efeito
 digitar();

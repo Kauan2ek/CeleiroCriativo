@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- faz a página se adaptar a celulares -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- título que aparece na aba do navegador -->
+    <title>Projeto - Celeiro Criativo</title>
+
+    <!-- ícone da aba -->
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="/css/exibicao_projeto.css" />
+</head>
+<body>
+<!-- ==================== CABEÇALHO ==================== -->
+
+<header class="cabecalho-projeto">
+
+    <!-- Logo -->
+
+    <!-- clicar na logo volta pra home -->
+
+    <a href="/" class="logo-projeto">
+
+        <img src="/imagens/logo.png"
+             alt="Logo">
+
+    </a>
+
+
+    <!-- Cadastrar funcionário -->
+
+    <!-- atalho pra tela de cadastro de funcionário -->
+
+    <a href="/CadastroFuncionario/CadastroFuncionario"
+       class="cadastrar-funcionario">
+
+        <img src="/imagens/criar_funcionario.png"
+             alt="Cadastrar funcionário">
+
+        <span>
+
+            Cadastrar Funcionário
+
+        </span>
+
+    </a>
+
+
+    <!-- Informações do gestor -->
+
+    <div class="informacoes-gestor">
+
+        <span>
+
+            Nome do Gestor
+
+        </span>
+
+        <!-- link pro perfil do gestor -->
+
+        <a href="/Perfil/GestorPerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do gestor">
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ==================== CONTEÚDO ==================== -->
+
+<main class="conteudo-exibicao">
+
+
+    <!-- ==================== FORMULÁRIO ==================== -->
+
+    <!-- form sem action definida, o envio é controlado pelo js -->
+
+    <form id="formProjeto">
+
+
+        <!-- ==================== LINHA SUPERIOR ==================== -->
+
+        <div class="linha-superior">
+
+            <div class="titulo-exibicao">
+
+                <!-- botão de voltar pra tela de projetos do gestor -->
+
+                <a href="/Projeto/GestorProjeto"
+                   class="voltar-projetos">
+
+                    <img src="/imagens/voltar.png"
+                         alt="Voltar">
+
+                </a>
+
+                <h1>
+
+                    Exibição de Projeto
+
+                </h1>
+
+            </div>
+
+
+            <!-- Situação -->
+
+            <!-- container com id pra o js trocar a classe conforme o status -->
+
+            <div class="situacao analise"
+                 id="containerSituacao">
+
+                <span>
+
+                    Situação:
+
+                </span>
+
+                <!-- select com os status possíveis do projeto -->
+
+                <select id="situacaoProjeto"
+                        name="Situacao">
+
+                    <option value="analise">
+
+                        Em análise
+
+                    </option>
+
+                    <option value="andamento">
+
+                        Em andamento
+
+                    </option>
+
+                    <option value="finalizado">
+
+                        Finalizado
+
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================== COLUNAS ==================== -->
+
+        <div class="colunas-projeto">
+
+
+            <!-- ==================== COLUNA ESQUERDA ==================== -->
+
+            <section class="coluna-esquerda">
+
+
+                <!-- Título -->
+
+                <div class="campo-projeto">
+
+                    <label for="tituloProjeto">
+
+                        Título do Projeto
+
+                    </label>
+
+                    <div class="campo-com-icone">
+
+                        <input type="text"
+                               id="tituloProjeto"
+                               name="Titulo"
+                               placeholder="Título do Projeto">
+
+                        <!-- ícone de editar ao lado do campo -->
+
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Descrição -->
+
+                <div class="campo-projeto">
+
+                    <label for="descricaoProjeto">
+
+                        Descrição de Ideia:
+
+                    </label>
+
+                    <div class="campo-texto">
+
+                        <!-- textarea pra descrição, que costuma ser um texto maior -->
+
+                        <textarea id="descricaoProjeto"
+                                  name="Descricao"
+                                  placeholder="Texto.."></textarea>
+
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Comentários -->
+
+                <div class="campo-projeto">
+
+                    <label for="comentariosProjeto">
+
+                        Comentários
+
+                    </label>
+
+                    <div class="campo-com-icone">
+
+                        <input type="text"
+                               id="comentariosProjeto"
+                               name="Comentarios"
+                               placeholder="Digite um comentário">
+
+                        <img src="/imagens/editar.png"
+                             alt="Comentários">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================== COLUNA DO MEIO ==================== -->
+
+            <section class="coluna-meio">
+
+
+                <!-- Data de início -->
+
+                <div class="campo-projeto">
+
+                    <label for="dataInicio">
+
+                        Data de Início
+
+                    </label>
+
+                    <div class="campo-com-icone">
+
+                        <input type="date"
+                               id="dataInicio"
+                               name="DataInicio">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Previsão de término -->
+
+                <div class="campo-projeto">
+
+                    <label for="previsaoTermino">
+
+                        Previsão de Término
+
+                    </label>
+
+                    <div class="campo-com-icone">
+
+                        <input type="date"
+                               id="previsaoTermino"
+                               name="PrevisaoTermino">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Data de entrega -->
+
+                <div class="campo-projeto">
+
+                    <label for="dataEntrega">
+
+                        Data de Entrega
+
+                    </label>
+
+                    <div class="campo-com-icone">
+
+                        <input type="date"
+                               id="dataEntrega"
+                               name="DataEntrega">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================== COLUNA DIREITA ==================== -->
+
+            <section class="coluna-tarefas">
+
+                <h2>
+
+                    Tarefas:
+
+                </h2>
+
+
+                <div class="area-tarefas">
+
+
+                    <!-- Tarefa -->
+
+                    <div class="tarefa">
+
+                        <!-- ícone do responsável pela tarefa -->
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Responsável"
+                             class="icone-responsavel">
+
+
+                        <input type="text"
+                               id="tituloTarefa"
+                               name="Tarefa"
+                               placeholder="Título Tarefa">
+
+
+                        <!-- link que abre a tarefa na visão do gestor -->
+
+                        <a href="/Tarefa/GestorTarefa"
+                           class="botao-expandir">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Adicionar tarefa -->
+
+                <div class="acoes-tarefas">
+
+                    <!-- botão pra adicionar uma nova tarefa ao projeto -->
+
+                    <a href="/Tarefa/ExTarefaGestor"
+                       class="botao-documento"
+                       title="Adicionar tarefa">
+
+                        <img src="/imagens/adicionar_tarefa.png"
+                             alt="Adicionar tarefa">
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ==================== AÇÕES DO PROJETO ==================== -->
+
+        <div class="acoes-projeto">
+
+
+            <!-- Botão Salvar -->
+
+            <!-- agora é submit de verdade, o js que intercepta o envio -->
+
+            <button type="submit"
+                    class="botao-salvar">
+
+                Salvar
+
+            </button>
+
+
+            <!-- Botão Excluir Projeto -->
+
+            <!-- type button impede que o botão envie o formulário -->
+
+            <button type="button"
+                    id="btnExcluirProjeto"
+                    class="botao-excluir">
+
+                Excluir Projeto
+
+            </button>
+
+
+            <!-- Botões Aprovar e Negar -->
+
+            <div class="botoes-aprovacao"
+                 id="botoesAprovacao">
+
+                <button type="button"
+                        class="botao-aprovar">
+
+                    Aprovar
+
+                </button>
+
+                <button type="button"
+                        class="botao-negar">
+
+                    Negar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</main>
+
+
+<!-- ==================== JAVASCRIPT ==================== -->
+
+<script>
+
+    // guarda a rota do gestor numa variável global
+
+    // o js externo usa isso pra redirecionar sem precisar chumbar a url
+
+    window.rotaGestorProjeto =
+        '@Url.Action("GestorProjeto", "Projeto")';
+
+</script>
+
+<script src="/js/projeto.js"></script>
+
+</body>
+</html>

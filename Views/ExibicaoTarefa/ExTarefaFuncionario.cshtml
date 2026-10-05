@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exibição de Tarefa</title>
+
+    <!-- ícone da aba -->
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="/css/exibicao_tarefa.css" />
+</head>
+<body>
+<!-- ==========================================================
+     CABEÇALHO
+     ========================================================== -->
+
+<header class="cabecalho-tarefa">
+
+    <!-- logo que volta pra home -->
+    <a href="/" class="logo-tarefa">
+        <img src="/imagens/logo.png"
+             alt="Logo">
+    </a>
+
+    <!-- informações do funcionário logado -->
+    <div class="informacoes-funcionario">
+
+        <span>
+            Nome do Funcionário
+        </span>
+
+        <!-- link pro perfil do funcionário -->
+        <a href="/Perfil/FuncionarioPerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do funcionário">
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ==========================================================
+     CONTEÚDO PRINCIPAL
+     ========================================================== -->
+
+<main class="conteudo-exibicao-tarefa">
+
+
+    <!-- ======================================================
+         FORMULÁRIO DA TAREFA
+         ====================================================== -->
+
+    <!-- form que manda os dados da tarefa pro controller -->
+    <form method="post"
+          action="/Tarefa/SalvarFuncionario">
+
+
+        <!-- guarda o nome da tarefa que veio do controller -->
+        <input type="hidden"
+               id="nomeTarefa"
+               name="Tarefa"
+               value="@ViewBag.Tarefa">
+
+
+        <!-- ==================================================
+             LINHA SUPERIOR
+             ================================================== -->
+
+        <div class="linha-superior-tarefa">
+
+
+            <!-- título e botão voltar -->
+            <div class="titulo-exibicao-tarefa">
+
+                <!-- volta pra tela de tarefas do funcionário -->
+                <a href="/Tarefa/FuncionarioTarefa"
+                   class="voltar-tarefa">
+
+                    <img src="/imagens/voltar.png"
+                         alt="Voltar">
+
+                </a>
+
+                <h1>
+                    Exibição de Tarefa
+                </h1>
+
+            </div>
+
+
+            <!-- ==================================================
+                 SITUAÇÃO / STATUS
+                 ================================================== -->
+
+            <div class="situacao-tarefa"
+                 id="containerSituacao">
+
+                <span>
+                    Status:
+                </span>
+
+                <!-- funcionário pode alterar o status da tarefa -->
+                <select id="situacaoTarefa"
+                        name="Status">
+
+                    <option value="a_fazer">
+                        A Fazer
+                    </option>
+
+                    <option value="andamento">
+                        Em Andamento
+                    </option>
+
+                    <option value="finalizada">
+                        Finalizada
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             COLUNAS
+             ================================================== -->
+
+        <div class="colunas-tarefa">
+
+
+            <!-- ==================================================
+                 COLUNA ESQUERDA
+                 ================================================== -->
+
+            <section class="coluna-info-tarefa">
+
+
+                <!-- TÍTULO DA TAREFA -->
+                <div class="campo-tarefa">
+
+                    <label for="tituloTarefa">
+                        Título da Tarefa
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <!-- readonly, o funcionário não muda o título -->
+                        <input type="text"
+                               id="tituloTarefa"
+                               name="Titulo"
+                               placeholder="Título da Tarefa"
+                               readonly>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORIA -->
+                <div class="campo-tarefa">
+
+                    <label for="categoriaTarefa">
+                        Categoria
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <!-- disabled, só visualização -->
+                        <select id="categoriaTarefa"
+                                name="Categoria"
+                                disabled>
+
+                            <option value=""
+                                    selected
+                                    disabled>
+                                Selecione uma categoria
+                            </option>
+
+                            <option value="planejamento">
+                                Planejamento
+                            </option>
+
+                            <option value="reuniao">
+                                Reunião
+                            </option>
+
+                            <option value="criacao_conteudo">
+                                Criação de Conteúdo
+                            </option>
+
+                            <option value="design">
+                                Design
+                            </option>
+
+                            <option value="redacao">
+                                Redação / Copywriting
+                            </option>
+
+                            <option value="social_media">
+                                Social Media
+                            </option>
+
+                            <option value="gravacao">
+                                Gravação
+                            </option>
+
+                            <option value="edicao_video">
+                                Edição de Vídeo
+                            </option>
+
+                            <option value="fotografia">
+                                Fotografia
+                            </option>
+
+                            <option value="campanha">
+                                Publicidade / Campanha
+                            </option>
+
+                            <option value="desenvolvimento_projeto">
+                                Desenvolvimento de Projeto
+                            </option>
+
+                            <option value="revisao">
+                                Revisão
+                            </option>
+
+                            <option value="aprovacao">
+                                Aprovação
+                            </option>
+
+                            <option value="entrega">
+                                Entrega
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIÇÃO -->
+                <div class="campo-tarefa">
+
+                    <label for="descricaoTarefa">
+                        Descrição
+                    </label>
+
+                    <div class="campo-texto-tarefa">
+
+                        <!-- readonly, funcionário não edita a descrição -->
+                        <textarea id="descricaoTarefa"
+                                  name="Descricao"
+                                  placeholder="Texto.."
+                                  readonly></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMENTÁRIOS -->
+                <div class="campo-tarefa">
+
+                    <label for="comentariosTarefa">
+                        Comentários
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <!-- esse aqui o funcionário pode escrever -->
+                        <input type="text"
+                               id="comentariosTarefa"
+                               name="Comentarios"
+                               placeholder="Digite um comentário">
+
+                        <img src="/imagens/editar.png"
+                             alt="Comentários">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 COLUNA CENTRAL
+                 ================================================== -->
+
+            <section class="coluna-prazos-tarefa">
+
+
+                <!-- DATA DE INÍCIO -->
+                <div class="campo-tarefa">
+
+                    <label for="dataInicio">
+                        Data de Início
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <!-- disabled, só visualização -->
+                        <input type="date"
+                               id="dataInicio"
+                               name="DataInicio"
+                               disabled>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PREVISÃO DE TÉRMINO -->
+                <div class="campo-tarefa">
+
+                    <label for="previsaoTermino">
+                        Previsão de Término
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="date"
+                               id="previsaoTermino"
+                               name="PrevisaoTermino"
+                               disabled>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DATA DE ENTREGA -->
+                <div class="campo-tarefa">
+
+                    <label for="dataEntrega">
+                        Data de Entrega
+                    </label>
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="date"
+                               id="dataEntrega"
+                               name="DataEntrega"
+                               disabled>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==================================================
+                     EQUIPE
+                     ================================================== -->
+
+                <h2 class="titulo-funcionarios">
+                    Equipe:
+                </h2>
+
+
+                <div class="area-funcionarios">
+
+
+                    <!-- funcionário 1 (exemplo fixo) -->
+                    <div class="funcionario">
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Funcionário"
+                             class="icone-funcionario">
+
+                        <span>
+                            Nome - Função
+                        </span>
+
+                    </div>
+
+
+                    <!-- funcionário 2 (exemplo fixo) -->
+                    <div class="funcionario">
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Funcionário"
+                             class="icone-funcionario">
+
+                        <span>
+                            Nome - Função
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- botão de baixar a equipe -->
+                <div class="acoes-funcionarios">
+
+                    <button type="button"
+                            class="botao-download-funcionario"
+                            title="Baixar">
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 COLUNA DIREITA
+                 ================================================== -->
+
+            <section class="coluna-arquivos-tarefa">
+
+                <h2>
+                    Arquivos:
+                </h2>
+
+
+                <div class="area-arquivos">
+
+
+                    <!-- arquivo word -->
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+                        <span class="nome-arquivo">
+                            doc_proj.docx
+                        </span>
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- arquivo pdf -->
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+                        <span class="nome-arquivo">
+                            pdf_proj.pdf
+                        </span>
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- outro word -->
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+                        <span class="nome-arquivo">
+                            doc(1)_proj.docx
+                        </span>
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- outro pdf -->
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+                        <span class="nome-arquivo">
+                            pdf(1)_proj.pdf
+                        </span>
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- botão de adicionar arquivo -->
+                <div class="acoes-arquivos">
+
+                    <button type="button"
+                            class="botao-adicionar-arquivo"
+                            title="Adicionar arquivo">
+                        +
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ==================================================
+             BOTÃO SALVAR
+             ================================================== -->
+
+        <div class="acoes-exibicao-tarefa">
+
+            <!-- por enquanto só redireciona de volta pra lista de tarefas -->
+            <button type="button"
+                    class="botao-salvar-tarefa"
+                    onclick="window.location.href='/Tarefa/FuncionarioTarefa'">
+                Salvar
+            </button>
+        </div>
+
+    </form>
+
+</main>
+
+<!-- js específico dessa tela -->
+<script src="/js/exibicao_tarefa.js"></script>
+</body>

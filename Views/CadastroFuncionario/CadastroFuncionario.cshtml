@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- faz a página se adaptar a celulares -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- título que aparece na aba do navegador -->
+    <title>Cadastro Funcionário - Celeiro Criativo</title>
+
+    <!-- ícone da aba -->
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+
+    <!-- css principal do site -->
+    <link rel="stylesheet" href="~/css/cadastro_funcionario.css" />
+</head>
+
+<body>
+<header class="cabecalho-cadastro">
+
+    <!-- logo que leva pra home -->
+    <a href="/" class="logo-cadastro">
+        <img src="/imagens/logo.png" alt="Logo">
+    </a>
+
+    <div class="informacoes-gestor">
+
+        <!-- nome do gestor logado (fixo por enquanto) -->
+        <span>Nome do Gestor</span>
+
+        <!-- link pro perfil do gestor -->
+        <a href="/Perfil/GestorPerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do gestor">
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="conteudo-cadastro">
+
+    <div class="titulo-cadastro">
+
+        <!-- botão de voltar pra tela de projeto do gestor -->
+        <a href="/Projeto/GestorProjeto"
+           class="voltar-cadastro">
+
+            <img src="/imagens/voltar.png"
+                 alt="Voltar">
+
+        </a>
+
+        <h1>Cadastrar Funcionário</h1>
+
+        <!-- abre a sobreposição com a lista de funcionários -->
+        <button type="button"
+                class="botao-ver-funcionarios"
+                onclick="abrirFuncionarios()">
+
+            Ver Funcionários
+
+        </button>
+
+    </div>
+
+
+    <div class="caixa-cadastro">
+
+        <!-- formulário que manda os dados pro controller CadastroFuncionario -->
+        <form method="post"
+              action="/CadastroFuncionario/Salvar">
+
+            <!-- campo escondido que guarda de qual tela o usuário veio -->
+            <!-- é preenchido via js lá embaixo com o document.referrer -->
+            <input type="hidden"
+                   id="telaAnterior"
+                   name="TelaAnterior">
+
+
+            <div class="campo campo-nome">
+
+                <label for="Nome">
+                    Nome completo
+                </label>
+
+                <input type="text"
+                       id="Nome"
+                       name="Nome"
+                       placeholder="Digite o nome completo">
+
+            </div>
+
+
+            <div class="linha-campos">
+
+                <div class="campo">
+
+                    <label for="Cpf">
+                        CPF
+                    </label>
+
+                    <input type="text"
+                           id="Cpf"
+                           name="Cpf"
+                           placeholder="Digite o CPF">
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="Telefone">
+                        Telefone
+                    </label>
+
+                    <input type="text"
+                           id="Telefone"
+                           name="Telefone"
+                           placeholder="Digite o telefone">
+
+                </div>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="Email">
+                    E-mail
+                </label>
+
+                <input type="email"
+                       id="Email"
+                       name="Email"
+                       placeholder="Digite o e-mail">
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="Cargo">
+                    Cargo
+                </label>
+
+                <!-- select com as opções de cargo disponíveis -->
+                <select id="Cargo"
+                        name="Cargo">
+
+                    <option value="">
+                        Selecione o cargo
+                    </option>
+
+                    <option value="designer">
+                        Designer
+                    </option>
+
+                    <option value="redator">
+                        Redator
+                    </option>
+
+                    <option value="social_media">
+                        Social Media
+                    </option>
+
+                    <option value="fotografo">
+                        Fotógrafo
+                    </option>
+
+                    <option value="videomaker">
+                        Videomaker
+                    </option>
+
+                    <option value="editor_video">
+                        Editor de Vídeo
+                    </option>
+
+                    <option value="desenvolvedor">
+                        Desenvolvedor
+                    </option>
+
+                    <option value="outro">
+                        Outro
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="linha-campos">
+
+                <div class="campo">
+
+                    <label for="Senha">
+                        Senha
+                    </label>
+
+                    <input type="password"
+                           id="Senha"
+                           name="Senha"
+                           placeholder="Digite a senha">
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="ConfirmarSenha">
+                        Confirmar senha
+                    </label>
+
+                    <input type="password"
+                           id="ConfirmarSenha"
+                           name="ConfirmarSenha"
+                           placeholder="Confirme a senha">
+
+                </div>
+
+            </div>
+
+
+            <div class="botoes-cadastro">
+
+                <!-- botão cancelar que volta pro projeto do gestor -->
+                <a href="/Projeto/GestorProjeto"
+                   class="botao-cancelar">
+
+                    Cancelar
+
+                </a>
+
+                <!-- botão que envia o form -->
+                <button type="submit"
+                        class="botao-cadastrar">
+
+                    Cadastrar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <script>
+
+        // pega a url da tela anterior e joga no campo escondido
+        // assim o controller sabe pra onde redirecionar depois de salvar
+        document.getElementById("telaAnterior").value =
+            document.referrer;
+
+
+        // funcionários de exemplo só pra visualização
+
+        // se ainda não tem nada no localStorage, cria a lista de exemplo
+        if (!localStorage.getItem("funcionarios")) {
+
+            const funcionariosExemplo = [
+
+                {
+                    nome: "Ana Carolina Silva",
+                    cargo: "Designer"
+                },
+
+                {
+                    nome: "João Pedro Santos",
+                    cargo: "Desenvolvedor"
+                },
+
+                {
+                    nome: "Mariana Oliveira",
+                    cargo: "Social Media"
+                },
+
+                {
+                    nome: "Lucas Almeida",
+                    cargo: "Editor de Vídeo"
+                }
+
+            ];
+
+            localStorage.setItem(
+                "funcionarios",
+                JSON.stringify(funcionariosExemplo)
+            );
+        }
+
+
+        // abre a sobreposição com a lista de funcionários
+        function abrirFuncionarios() {
+
+            carregarFuncionarios();
+
+            document.getElementById(
+                "sobreposicaoFuncionarios"
+            ).style.display = "flex";
+
+        }
+
+
+        // fecha a sobreposição
+        function fecharFuncionarios() {
+
+            document.getElementById(
+                "sobreposicaoFuncionarios"
+            ).style.display = "none";
+
+        }
+
+
+        // monta a lista de funcionários na tela
+        function carregarFuncionarios() {
+
+            const lista =
+                document.getElementById("listaFuncionarios");
+
+            // pega os funcionários salvos no localStorage
+            const funcionarios =
+                JSON.parse(
+                    localStorage.getItem("funcionarios")
+                ) || [];
+
+
+            lista.innerHTML = "";
+
+
+            // se não tem nenhum, mostra mensagem
+            if (funcionarios.length === 0) {
+
+                lista.innerHTML =
+                    "<p class='nenhum-funcionario'>Nenhum funcionário cadastrado.</p>";
+
+                return;
+
+            }
+
+
+            // pra cada funcionário, cria um item na lista
+            funcionarios.forEach(function (funcionario) {
+
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "funcionario-item";
+
+
+                item.innerHTML = `
+
+                    <div class="icone-funcionario">
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Funcionário">
+
+                    </div>
+
+
+                    <div class="dados-funcionario">
+
+                        <strong>
+                            ${funcionario.nome}
+                        </strong>
+
+                        <span>
+                            ${funcionario.cargo}
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                lista.appendChild(item);
+
+            });
+
+        }
+
+    </script>
+
+</main>
+
+
+<!-- sobreposição que mostra a lista de funcionários cadastrados -->
+
+<div id="sobreposicaoFuncionarios"
+     class="sobreposicao-funcionarios">
+
+    <div class="lista-funcionarios">
+
+
+        <!-- botão de fechar a sobreposição -->
+        <button type="button"
+                class="fechar-funcionarios"
+                onclick="fecharFuncionarios()">
+
+            ×
+
+        </button>
+
+
+        <h2>
+            Funcionários cadastrados
+        </h2>
+
+
+        <!-- aqui o js injeta os itens da lista -->
+        <div id="listaFuncionarios">
+
+        </div>
+
+
+    </div>
+
+</div>
+</body>
+</html>

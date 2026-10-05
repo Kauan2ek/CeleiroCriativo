@@ -1,0 +1,311 @@
+/* ==================== CONFIGURAÇÕES GERAIS ==================== */
+
+/* reseta margens, paddings e box-sizing em tudo */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #5b5b5b;
+    min-height: 100vh;
+}
+
+
+/* ==================== CABEÇALHO ==================== */
+
+.cabecalho-projeto {
+    height: 70px;
+    background-color: #b6ff32;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+}
+
+
+/* Logo */
+
+.logo-projeto img {
+    width: 130px;
+    height: 65px;
+    object-fit: contain;
+}
+
+
+/* ==================== PERFIL DO GESTOR ==================== */
+
+/* fica jogado pra direita com margin-left auto */
+.informacoes-gestor {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    margin-left: auto;
+}
+
+
+/* ==================== PERFIL DO FUNCIONÁRIO ==================== */
+
+/* centralizado no meio do cabeçalho usando position absolute */
+.informacoes-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* ==================== PERFIL DO CLIENTE ==================== */
+
+.informacoes-cliente {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #222222;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* Cadastrar funcionário */
+
+.cadastrar-funcionario {
+    color: #222;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.cadastrar-funcionario:hover {
+    text-decoration: underline;
+}
+
+
+/* Ícone perfil */
+
+.icone-perfil {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+
+/* Ícone do usuário */
+
+.icone-usuario {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+
+/* ==================== CONTEÚDO ==================== */
+
+.conteudo-projeto {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    background-color: white;
+    padding: 15px 20px;
+}
+
+
+/* ==================== ÁREA DE PROJETOS ==================== */
+
+.lista-projetos {
+    background-color: #e5eef9;
+    border: 1px solid #c7d1dc;
+    border-radius: 7px;
+    padding: 5px 10px 8px;
+}
+
+
+/* ==================== TÍTULO ==================== */
+
+.titulo-lista {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 8px;
+}
+
+.titulo-lista h1 {
+    font-size: 17px;
+    font-weight: normal;
+    color: #222;
+}
+
+/* rótulo do status empurrado pra direita com margin-left auto */
+.titulo-lista span {
+    margin-left: auto;
+    margin-right: 40px;
+    font-size: 14px;
+    color: #555;
+}
+
+
+/* ==================== LINHA DO PROJETO ==================== */
+
+.projeto {
+    height: 45px;
+    margin-bottom: 7px;
+    padding: 0 7px;
+    background-color: #ffffff;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    color: #555;
+    font-size: 15px;
+}
+
+
+/* ==================== TÍTULO ==================== */
+
+/* corta com "..." se o título for muito longo */
+.titulo {
+    width: 145px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ==================== CLIENTE ==================== */
+
+.cliente {
+    width: 145px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-left: 8px;
+    border-left: 1px solid #aaa;
+}
+
+.cliente img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+}
+
+
+/* ==================== DATA ==================== */
+
+.data {
+    width: 125px;
+    padding-left: 8px;
+    border-left: 1px solid #aaa;
+    white-space: nowrap;
+}
+
+
+/* ==================== STATUS ==================== */
+
+/* caixinha com o status, empurrada pra direita */
+.status {
+    width: 145px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+
+/* Em análise */
+
+.status.analise {
+    background-color: #ffd6d6;
+}
+
+
+/* Em andamento */
+
+.status.andamento {
+    background-color: #fff0b3;
+}
+
+
+/* Finalizado */
+
+.status.finalizado {
+    background-color: #c9f7b0;
+}
+
+
+/* ==================== BOTÃO ABRIR ==================== */
+
+.abrir-projeto {
+    width: 30px;
+    height: 30px;
+    background-color: #e4edf0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.abrir-projeto img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.abrir-projeto:hover {
+    background-color: #ccdce1;
+}
+
+
+/* ==================== NOVO PROJETO ==================== */
+
+/* linha especial pro botão de criar projeto, com fundo mais escuro */
+.novo-projeto {
+    height: 45px;
+    background-color: #d0dce9;
+    border: 1px solid #b9c7d5;
+}
+
+
+/* ==================== BOTÃO CRIAR ==================== */
+
+.botao-criar {
+    width: 70px;
+    height: 30px;
+    background-color: #59c900;
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
+    font-size: 17px;
+    margin-left: auto;
+}
+
+.botao-criar img {
+    width: 15px;
+    height: 15px;
+    object-fit: contain;
+}
+
+.botao-criar:hover {
+    background-color: #48ad00;
+}
+
+#projetosCriados {
+    width: 100%;
+}
+

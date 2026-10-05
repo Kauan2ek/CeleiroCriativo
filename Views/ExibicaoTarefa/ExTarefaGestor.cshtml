@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exibição de Tarefa</title>
+
+    <!-- ícone da aba -->
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="/css/exibicao_tarefa.css" />
+</head>
+<body>
+<!-- ==========================================================
+     CABEÇALHO
+     ========================================================== -->
+
+<header class="cabecalho-tarefa">
+
+    <!-- logo que volta pra home -->
+  <a href="/" class="logo-tarefa">
+    <img src="/imagens/logo.png" alt="Logo">
+ </a>
+
+
+    <!-- atalho pra cadastrar funcionário -->
+    <a href="/CadastroFuncionario/CadastroFuncionario"
+       class="cadastrar-funcionario">
+
+        <img src="/imagens/criar_funcionario.png"
+             alt="Cadastrar funcionário">
+
+        <span>
+            Cadastrar Funcionário
+        </span>
+
+    </a>
+
+
+    <!-- informações do gestor logado -->
+    <div class="informacoes-gestor">
+
+        <span>
+            Nome do Gestor
+        </span>
+
+        <!-- link pro perfil do gestor -->
+        <a href="/Perfil/GestorPerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do gestor">
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ==========================================================
+     CONTEÚDO PRINCIPAL
+     ========================================================== -->
+
+<main class="conteudo-exibicao-tarefa">
+
+
+    <!-- ======================================================
+         FORMULÁRIO DA TAREFA
+         ====================================================== -->
+
+    <form method="post"
+          action="/Tarefa/Salvar">
+
+
+        <!-- ==================================================
+             IDENTIFICAÇÃO DA TAREFA
+             ================================================== -->
+
+        <!-- guarda o nome da tarefa que foi aberta no kanban -->
+        <!-- o valor vem do controller via ViewBag.Tarefa -->
+        <!-- o js usa isso pra saber qual tarefa teve o status alterado -->
+        <input type="hidden"
+               id="nomeTarefa"
+               name="Tarefa"
+               value="@ViewBag.Tarefa">
+
+
+        <!-- ==================================================
+             LINHA SUPERIOR
+             ================================================== -->
+
+        <div class="linha-superior-tarefa">
+
+
+            <!-- título da página -->
+
+            <div class="titulo-exibicao-tarefa">
+
+                <!-- botão de voltar pro kanban do gestor -->
+
+                <a href="/Tarefa/GestorTarefa"
+                   class="voltar-tarefa">
+
+                    <img src="/imagens/voltar.png"
+                         alt="Voltar">
+
+                </a>
+
+
+                <h1>
+                    Exibição de Tarefa
+                </h1>
+
+            </div>
+
+
+            <!-- ==================================================
+                 SITUAÇÃO / STATUS DA TAREFA
+                 ================================================== -->
+
+            <div class="situacao-tarefa"
+                 id="containerSituacao">
+
+                <span>
+                    Status:
+                </span>
+
+
+                <!-- o status pode ser alterado aqui na mão -->
+                <!-- o js também verifica o status que veio pela url -->
+                <!-- tipo ?status=a_fazer, ?status=andamento, etc -->
+                <select id="situacaoTarefa"
+                        name="Status">
+
+                    <option value="a_fazer">
+                        A Fazer
+                    </option>
+
+                    <option value="andamento">
+                        Em Andamento
+                    </option>
+
+                    <option value="finalizada">
+                        Finalizada
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             COLUNAS
+             ================================================== -->
+
+        <div class="colunas-tarefa">
+
+
+            <!-- ==================================================
+                 COLUNA ESQUERDA
+                 informações da tarefa
+                 ================================================== -->
+
+            <section class="coluna-info-tarefa">
+
+
+                <!-- TÍTULO DA TAREFA -->
+
+                <div class="campo-tarefa">
+
+                    <label for="tituloTarefa">
+                        Título da Tarefa
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="text"
+                               id="tituloTarefa"
+                               name="Titulo"
+                               placeholder="Título da Tarefa">
+
+
+                        <!-- ícone de editar -->
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORIA -->
+
+                <div class="campo-tarefa">
+
+                    <label for="categoriaTarefa">
+                        Categoria
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <select id="categoriaTarefa"
+                                name="Categoria">
+
+                            <option value=""
+                                    selected
+                                    disabled>
+
+                                Selecione uma categoria
+
+                            </option>
+
+                            <option value="planejamento">
+                                Planejamento
+                            </option>
+
+                            <option value="reuniao">
+                                Reunião
+                            </option>
+
+                            <option value="criacao_conteudo">
+                                Criação de Conteúdo
+                            </option>
+
+                            <option value="design">
+                                Design
+                            </option>
+
+                            <option value="redacao">
+                                Redação / Copywriting
+                            </option>
+
+                            <option value="social_media">
+                                Social Media
+                            </option>
+
+                            <option value="gravacao">
+                                Gravação
+                            </option>
+
+                            <option value="edicao_video">
+                                Edição de Vídeo
+                            </option>
+
+                            <option value="fotografia">
+                                Fotografia
+                            </option>
+
+                            <option value="campanha">
+                                Publicidade / Campanha
+                            </option>
+
+                            <option value="desenvolvimento_projeto">
+                                Desenvolvimento de Projeto
+                            </option>
+
+                            <option value="revisao">
+                                Revisão
+                            </option>
+
+                            <option value="aprovacao">
+                                Aprovação
+                            </option>
+
+                            <option value="entrega">
+                                Entrega
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIÇÃO -->
+
+                <div class="campo-tarefa">
+
+                    <label for="descricaoTarefa">
+                        Descrição
+                    </label>
+
+
+                    <div class="campo-texto-tarefa">
+
+                        <textarea id="descricaoTarefa"
+                                  name="Descricao"
+                                  placeholder="Texto.."></textarea>
+
+
+                        <!-- ícone de editar -->
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMENTÁRIOS -->
+
+                <div class="campo-tarefa">
+
+                    <label for="comentariosTarefa">
+                        Comentários
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="text"
+                               id="comentariosTarefa"
+                               name="Comentarios"
+                               placeholder="Digite um comentário">
+
+
+                        <!-- ícone de comentários -->
+                        <img src="/imagens/editar.png"
+                             alt="Comentários">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 COLUNA CENTRAL
+                 prazos e funcionários
+                 ================================================== -->
+
+            <section class="coluna-prazos-tarefa">
+
+
+                <!-- DATA DE INÍCIO -->
+
+                <div class="campo-tarefa">
+
+                    <label for="dataInicio">
+                        Data de Início
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="date"
+                               id="dataInicio"
+                               name="DataInicio">
+
+                    </div>
+
+                </div>
+
+
+                <!-- PREVISÃO DE TÉRMINO -->
+
+                <div class="campo-tarefa">
+
+                    <label for="previsaoTermino">
+                        Previsão de Término
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="date"
+                               id="previsaoTermino"
+                               name="PrevisaoTermino">
+
+                    </div>
+
+                </div>
+
+
+                <!-- DATA DE ENTREGA -->
+
+                <div class="campo-tarefa">
+
+                    <label for="dataEntrega">
+                        Data de Entrega
+                    </label>
+
+
+                    <div class="campo-com-icone-tarefa">
+
+                        <input type="date"
+                               id="dataEntrega"
+                               name="DataEntrega">
+
+                    </div>
+
+                </div>
+
+
+                <!-- FUNCIONÁRIOS -->
+
+                <h2 class="titulo-funcionarios">
+                    Funcionário(s):
+                </h2>
+
+
+                <!-- área onde os funcionários aparecem -->
+
+                <div class="area-funcionarios">
+
+
+                    <!-- funcionário 1 (exemplo fixo) -->
+
+                    <div class="funcionario">
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Funcionário"
+                             class="icone-funcionario">
+
+
+                        <span>
+                            Nome - Função
+                        </span>
+
+                    </div>
+
+
+                    <!-- funcionário 2 (exemplo fixo) -->
+
+                    <div class="funcionario">
+
+                        <img src="/imagens/Entrar.png"
+                             alt="Funcionário"
+                             class="icone-funcionario">
+
+
+                        <span>
+                            Nome - Função
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTÕES DOS FUNCIONÁRIOS -->
+
+                <div class="acoes-funcionarios">
+
+
+                    <!-- botão de baixar -->
+
+                    <button type="button"
+                            class="botao-download-funcionario"
+                            title="Baixar">
+                    </button>
+
+
+                    <!-- botão que abre o modal pra adicionar funcionário -->
+
+                    <button type="button"
+                            class="botao-adicionar-funcionario"
+                            title="Adicionar funcionário">
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 COLUNA DIREITA
+                 arquivos
+                 ================================================== -->
+
+            <section class="coluna-arquivos-tarefa">
+
+
+                <h2>
+                    Arquivos:
+                </h2>
+
+
+                <div class="area-arquivos">
+
+
+                    <!-- ARQUIVO WORD -->
+
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+
+                        <span class="nome-arquivo">
+                            doc_proj.docx
+                        </span>
+
+
+                        <!-- botão que abre o arquivo -->
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- ARQUIVO PDF -->
+
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+
+                        <span class="nome-arquivo">
+                            pdf_proj.pdf
+                        </span>
+
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- ARQUIVO WORD 2 -->
+
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+
+                        <span class="nome-arquivo">
+                            doc(1)_proj.docx
+                        </span>
+
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- ARQUIVO PDF 2 -->
+
+                    <div class="arquivo">
+
+                        <img src="/imagens/documento.png"
+                             alt="Docs"
+                             class="icone-arquivo">
+
+
+                        <span class="nome-arquivo">
+                            pdf(1)_proj.pdf
+                        </span>
+
+
+                        <a href="#"
+                           class="botao-abrir-arquivo"
+                           title="Abrir arquivo">
+
+                            <img src="/imagens/abrir.png"
+                                 alt="Abrir">
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- botão de adicionar arquivo -->
+
+                <div class="acoes-arquivos">
+
+                    <button type="button"
+                            class="botao-adicionar-arquivo"
+                            title="Adicionar arquivo">
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ==================================================
+             BOTÃO SALVAR
+             ================================================== -->
+
+       <div class="acoes-exibicao-tarefa">
+            <button type="button"
+                    class="botao-excluir-tarefa"
+                    onclick="confirmarExclusaoTarefa()">
+                Excluir tarefa
+            </button>
+
+            <button type="submit"
+                    class="botao-salvar-tarefa">
+                Salvar
+            </button>
+        </div>
+
+    </form>
+
+
+    <!-- ==========================================================
+         MODAL DE FUNCIONÁRIOS
+         ========================================================== -->
+
+    <!-- sobreposição que aparece quando clica no + de funcionário -->
+    <div class="modal-funcionarios"
+         id="modalFuncionarios">
+
+
+        <!-- caixa do modal -->
+
+        <div class="caixa-modal-funcionarios">
+
+
+            <!-- botão de fechar -->
+
+            <button type="button"
+                    class="fechar-modal-funcionarios"
+                    id="fecharModalFuncionarios">
+
+                X
+
+            </button>
+
+
+            <!-- cabeçalho do modal -->
+
+            <div class="cabecalho-modal">
+
+                <h2>
+                    O projeto foi Aprovado!
+                </h2>
+
+
+                <p>
+                    Selecione um ou mais integrantes
+                    para a realização dessa tarefa:
+                </p>
+
+            </div>
+
+
+            <!-- lista de funcionários disponíveis -->
+
+            <div class="lista-funcionarios">
+
+
+                <!-- funcionário 1 -->
+
+                <div class="funcionario-item">
+
+
+                    <div class="informacoes-funcionario">
+
+                        <img src="/imagens/entrar.png"
+                             alt="Funcionário">
+
+
+                        <div>
+
+                            <strong>
+                                Maria Silva
+                            </strong>
+
+                            <span>
+                                Designer
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- botão pra selecionar -->
+
+                    <button type="button"
+                            class="botao-selecionar-funcionario">
+
+                        +
+
+                    </button>
+
+                </div>
+
+
+                <!-- funcionário 2 -->
+
+                <div class="funcionario-item">
+
+                    <div class="informacoes-funcionario">
+
+                        <img src="/imagens/entrar.png"
+                             alt="Funcionário">
+
+
+                        <div>
+
+                            <strong>
+                                João Santos
+                            </strong>
+
+                            <span>
+                                Redator
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="botao-selecionar-funcionario">
+
+                        +
+
+                    </button>
+
+                </div>
+
+
+                <!-- funcionário 3 -->
+
+                <div class="funcionario-item">
+
+                    <div class="informacoes-funcionario">
+
+                        <img src="/imagens/entrar.png"
+                             alt="Funcionário">
+
+
+                        <div>
+
+                            <strong>
+                                Ana Oliveira
+                            </strong>
+
+                            <span>
+                                Social Media
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="botao-selecionar-funcionario">
+
+                        +
+
+                    </button>
+
+                </div>
+
+
+                <!-- funcionário 4 -->
+
+                <div class="funcionario-item">
+
+                    <div class="informacoes-funcionario">
+
+                        <img src="/imagens/entrar.png"
+                             alt="Funcionário">
+
+
+                        <div>
+
+                            <strong>
+                                Pedro Costa
+                            </strong>
+
+                            <span>
+                                Videomaker
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="botao-selecionar-funcionario">
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- botões do modal -->
+
+            <div class="botoes-modal-funcionarios">
+
+
+                <!-- cancelar -->
+
+                <button type="button"
+                        class="botao-cancelar-funcionario"
+                        id="cancelarFuncionarios">
+
+                    Cancelar
+
+                </button>
+
+
+                <!-- confirmar -->
+
+                <button type="button"
+                        class="botao-confirmar-funcionario"
+                        id="confirmarFuncionarios">
+
+                    Confirmar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<div id="modalExclusaoTarefa" class="modal-exclusao">
+    <div class="caixa-exclusao">
+        <h2>Excluir tarefa?</h2>
+
+        <p>Tem certeza que deseja excluir esta tarefa?</p>
+
+        <div class="acoes-exclusao">
+            <button type="button"
+                    class="botao-voltar-tarefa"
+                    onclick="fecharModalExclusao()">
+                Voltar para tarefa
+            </button>
+
+            <button type="button"
+                    class="botao-confirmar-exclusao"
+                    onclick="excluirTarefa()">
+                Excluir tarefa
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- js específico dessa tela -->
+<script src="/js/exibicao_tarefa.js"></script>
+</body>
