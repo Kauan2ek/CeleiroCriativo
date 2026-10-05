@@ -18,7 +18,7 @@ public class HomeController : Controller
         return View();
     }
 
-    // Página de cadastro
+    // Página de cadastro (ainda não implementada)
     // renderiza o formulário de cadastro de usuário
     public ActionResult Cadastro()
     {
