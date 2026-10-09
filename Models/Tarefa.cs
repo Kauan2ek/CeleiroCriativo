@@ -9,4 +9,5 @@ public class Tarefa
     public string Visibilidade { get; set; } 
     public List<Funcionario> Funcionarios {get; set;} // Alterado apenas via método
     public Status Status {get; set; } // O status deve ser alterado por meio de funções
+    public List<Comentario> Comentarios {get; set;} // Alterado apenas via método
 }

@@ -35,4 +35,25 @@ public class ProjetoController : Controller
     {
         return View("~/Views/Projeto/ClienteProjeto.cshtml");
     }
+
+    /*Para implementar depois*/
+    // exibe o projeto na visão do gestor
+    /*
+    public ActionResult ExProjetoGestor()
+    {
+        return View();
+    }
+
+    // exibe o projeto na visão do funcionário
+    public ActionResult ExProjetoFuncionario()
+    {
+        return View();
+    }
+
+    // exibe o projeto na visão do cliente
+    public ActionResult ExProjetoCliente()
+    {
+        return View();
+    }
+    */
 }
