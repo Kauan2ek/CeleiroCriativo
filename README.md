@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="wwwroot/imagens/logo.png" alt="Logo Celeiro Criativo" width="160">
-</p>
-
 <h1 align="center">🌾 Celeiro Criativo</h1>
 
 <p align="center">
