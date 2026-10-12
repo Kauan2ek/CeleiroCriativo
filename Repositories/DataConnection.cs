@@ -10,11 +10,19 @@ public abstract class DataConnection
 
     public DataConnection()
     {
-        string strConn = @"Server=F121-LB5-PROF;
+        // Faculdade
+        /*string strConn = @"Server=F121-LB5-PROF;
         User Id=aluno;
         Password=dba;
         Database=sistematarefas;
+        TrustServerCertificate=true";*/
+
+        // Kauan
+        string strConn = @"Server=(localdb)\MSSQLLocalDB;
+        Database=CeleiroCriativo;
+        Trusted_Connection=True;
         TrustServerCertificate=true";
+        
         conn = new SqlConnection(strConn);
         conn.Open();
     }

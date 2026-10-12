@@ -1,0 +1,30 @@
+[
+    {
+        "codigo": 1,
+        "titulo": "Cria\u00E7\u00E3o do logotipo",
+        "descricao": "Tr\u00EAs propostas de logotipo para aprova\u00E7\u00E3o.",
+        "dataHoraInicio": "2026-08-03T09:00:00",
+        "dataHoraPrevista": "2026-08-14T18:00:00",
+        "dataHoraFim": "2026-08-14T17:00:00",
+        "visibilidade": true,
+        "status": "Finalizado",
+        "categoria": null,
+        "funcionarios": [],
+        "comentarios": [],
+        "documentos": []
+    },
+    {
+        "codigo": 2,
+        "titulo": "Manual da marca",
+        "descricao": "Cores, tipografia e regras de uso do logotipo.",
+        "dataHoraInicio": "2026-08-17T09:00:00",
+        "dataHoraPrevista": "2026-08-31T18:00:00",
+        "dataHoraFim": "2026-08-28T16:30:00",
+        "visibilidade": true,
+        "status": "Finalizado",
+        "categoria": null,
+        "funcionarios": [],
+        "comentarios": [],
+        "documentos": []
+    }
+]

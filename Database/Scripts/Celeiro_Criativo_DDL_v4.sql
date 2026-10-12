@@ -22,6 +22,9 @@
 --      (Tarefas -> Categorias), que já era a usada na v3.
 -- =====================================================================
 
+CREATE DATABASE CeleiroCriativo;
+GO
+
 USE CeleiroCriativo;
 GO
 
@@ -52,7 +55,7 @@ CREATE TABLE Status (
 CREATE TABLE Categorias (
     codigo      INT IDENTITY(1,1) PRIMARY KEY,
     descricao   VARCHAR(50) NOT NULL,
-    cor         VARCHAR(20) NULL
+    cor         VARCHAR(20) NOT NULL
 );
 
 -- ---------------------------------------------------------------------
@@ -107,9 +110,9 @@ CREATE TABLE Projetos (
 CREATE TABLE Tarefas (
     codigo              INT IDENTITY(1,1) PRIMARY KEY,
     projeto_codigo      INT NOT NULL,
-    categoria_codigo    INT NULL,
+    categoria_codigo    INT NOT NULL,
     titulo              VARCHAR(50) NOT NULL,
-    descricao           VARCHAR(MAX) NULL,
+    descricao           VARCHAR(MAX) NOT NULL,
     status              VARCHAR(30) NOT NULL,
     datahora_inicio     DATETIME NULL,
     datahora_fim        DATETIME NULL,
@@ -127,7 +130,7 @@ CREATE TABLE Tarefas (
 CREATE TABLE TarefaFuncionarios (
     funcionario_codigo  INT NOT NULL,
     tarefa_codigo       INT NOT NULL,
-    responsavel         BIT NOT NULL DEFAULT 0,
+    --responsavel         BIT NOT NULL DEFAULT 0,
     CONSTRAINT PK_TarefaFuncionarios PRIMARY KEY (funcionario_codigo, tarefa_codigo),
     CONSTRAINT FK_TarefaFuncionarios_Funcionario FOREIGN KEY (funcionario_codigo) REFERENCES Funcionarios(pessoa_codigo),
     CONSTRAINT FK_TarefaFuncionarios_Tarefa      FOREIGN KEY (tarefa_codigo)      REFERENCES Tarefas(codigo)
@@ -140,9 +143,9 @@ CREATE TABLE TarefaFuncionarios (
 CREATE TABLE Documentos (
     codigo          INT IDENTITY(1,1) PRIMARY KEY,
     tarefa_codigo   INT NOT NULL,
-    descricao       VARCHAR(MAX) NULL,
-    extensao        VARCHAR(10) NULL, -- ex.: 'pdf', 'docx', 'png'
-    diretorio       VARCHAR(255) NULL,
+    descricao       VARCHAR(MAX) NOT NULL,
+    extensao        VARCHAR(10) NOT NULL, -- ex.: 'pdf', 'docx', 'png'
+    diretorio       VARCHAR(255) NOT NULL,
     CONSTRAINT FK_Documentos_Tarefa FOREIGN KEY (tarefa_codigo) REFERENCES Tarefas(codigo)
 );
 
@@ -158,8 +161,8 @@ CREATE TABLE Comentarios (
     codigo               INT IDENTITY(1,1) PRIMARY KEY,
     tarefa_codigo        INT NOT NULL,
     funcionario_codigo   INT NOT NULL,
-    titulo               VARCHAR(50) NULL,
-    descricao            VARCHAR(MAX) NULL,
+    --titulo               VARCHAR(50) NULL,
+    descricao            VARCHAR(MAX) NOT NULL,
     data_hora            DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_Comentarios_Tarefa            FOREIGN KEY (tarefa_codigo) REFERENCES Tarefas(codigo),
     CONSTRAINT FK_Comentarios_TarefaFuncionario FOREIGN KEY (funcionario_codigo, tarefa_codigo)

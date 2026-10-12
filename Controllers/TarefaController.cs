@@ -4,6 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 // controller responsável pelas telas e ações relacionadas às tarefas
 public class TarefaController : Controller
 {
+    private TarefaSqlRepository repository;
+    public TarefaController()
+    {
+        repository = new TarefaSqlRepository();
+    }
+
     // abre a tela de tarefas do gestor
     // segue a convenção: views/tarefa/gestortarefa.cshtml
     public ActionResult GestorTarefa()
@@ -67,4 +73,24 @@ public class TarefaController : Controller
         // retorna a view da pasta exibicaotarefa
         return View("~/Views/ExibicaoTarefa/ExTarefaCliente.cshtml");
     }
+
+    public ActionResult Create(Tarefa tarefa)
+    {
+        return Json(new {sucesso = repository.Create(tarefa)});
+    }
+
+    public ActionResult Read(int id)
+    {
+        return Json(repository.Read(id));
+    }
+
+
+    // /Tarefa/TesteListarPorProjeto/2
+    [HttpGet]
+    public ActionResult ReadAll(int id)
+    {
+        return Json(repository.ReadAll(id));
+    }
+
+
 }
