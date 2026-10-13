@@ -6,31 +6,43 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 
+// repositório das tarefas: é a única classe que conversa com o banco sobre tarefa
+// herda de DataConnection, que abre a conexão no construtor e deixa ela disponível em "conn"
+// quem usa o repositório (o controller) é quem chama o Dispose() pra fechar a conexão
 public class TarefaSqlRepository: DataConnection
 {
+    // cadastra uma tarefa nova e, se vier equipe, já vincula os funcionários a ela
+    // retorna true se a tarefa foi criada
     public bool Create(Tarefa tarefa)
     {
-        // executenonquery
+        // o comando tem duas partes: o insert da tarefa e um select que devolve o código gerado
+        // o codigo não entra no insert porque é IDENTITY, o próprio banco gera
+        // SCOPE_IDENTITY() devolve o último código gerado por esse comando
+        // o @ antes das aspas deixa a string ocupar várias linhas
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
         cmd.CommandText = @"
         insert into Tarefas
             (projeto_codigo, categoria_codigo, titulo, descricao, status,
              datahora_inicio, datahora_fim, datahora_prevista, visibilidade)
-            values 
+            values
             (@projeto, @categoria, @titulo, @descricao, @status,
              @inicio, @fim, @prevista, @visibilidade);
 
         SELECT CAST(SCOPE_IDENTITY() AS INT);
         ";
-        
-        
+
+
+        // cada @nome do sql recebe o seu valor aqui
+        // usar parâmetro (em vez de juntar texto) evita sql injection
+        // da categoria só vai o código, porque ela já existe no banco
         cmd.Parameters.AddWithValue("@projeto", tarefa.IdProjeto);
         cmd.Parameters.AddWithValue("@categoria", tarefa.Categoria.Codigo);
         cmd.Parameters.AddWithValue("@titulo", tarefa.Titulo);
         cmd.Parameters.AddWithValue("@descricao", tarefa.Descricao);
+        // se o status não vier preenchido, a tarefa nasce como "A Fazer"
         cmd.Parameters.AddWithValue("@status", tarefa.Status == null ? "A Fazer" : tarefa.Status);
-        
+
         // datas podem ser nulas, e o banco não entende o null do C#, precisa usar o DBNull.Value
         // HasValue verifica se a data foi preenchida: se sim manda a data, se não manda DBNull.Value
         // o (object) é porque os dois lados do ? : precisam ser do mesmo tipo,
@@ -42,14 +54,18 @@ public class TarefaSqlRepository: DataConnection
         cmd.Parameters.AddWithValue("@visibilidade", tarefa.Visibilidade);
 
         // ExecuteScalar retorna valor único (Codigo - Tarefa)
-        int IdTarefa = (int) cmd.ExecuteScalar(); // Retorna a quantidade de linhas afetadas (se for maior que 0, é porque foi criado)
-        
+        // é o resultado do SELECT SCOPE_IDENTITY() lá do comando: o código da tarefa que acabou de ser criada
+        int IdTarefa = (int) cmd.ExecuteScalar();
+
+        // a equipe não fica na tabela Tarefas, cada funcionário vira uma linha em TarefaFuncionarios
+        // por isso precisa do código da tarefa, que só existe depois do insert acima
         if (tarefa.Funcionarios != null)
         {
             // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();
             AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
         }
 
+        // comentários e documentos ainda não são gravados aqui (ficam pros repositórios deles)
         if (tarefa.Comentarios != null)
         {
             // Chamar o método ComentarioRepository.Create();
@@ -63,6 +79,9 @@ public class TarefaSqlRepository: DataConnection
         return IdTarefa > 0; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
     }
 
+    // lista os funcionários que estão alocados numa tarefa
+    // cada Funcionario volta só com o Codigo preenchido (nome, email e cargo ficam vazios),
+    // porque a consulta é feita só na tabela associativa TarefaFuncionarios
     public List<Funcionario> ListarFuncionario(int idTarefa)
     {
         SqlCommand cmd = new SqlCommand();
@@ -71,38 +90,52 @@ public class TarefaSqlRepository: DataConnection
 
         cmd.Parameters.AddWithValue("id", idTarefa);
 
+        // ExecuteReader é pra comandos que devolvem linhas (SELECT)
         SqlDataReader reader = cmd.ExecuteReader();
 
+        // cada volta do while é uma linha do resultado
+        // o Read() anda pra próxima linha e devolve false quando acabam
         List<Funcionario> funcionarios = new List<Funcionario>();
         while (reader.Read())
         {
             Funcionario funcionario = new Funcionario();
+            // o select só traz uma coluna, então ela está na posição 0
             funcionario.Codigo = reader.GetInt32(0);
 
             funcionarios.Add(funcionario);
         }
-        
+
+        // a conexão só aceita um reader aberto por vez, tem que fechar antes de rodar outro comando
         reader.Close();
         return funcionarios;
     }
 
+    // deixa a equipe da tarefa igual à lista recebida
+    // compara quem já está no banco com quem veio na lista nova:
+    // quem é novo é inserido, quem saiu da lista é removido, e quem continua não é tocado
     public void AtualizarFuncionarios (int idTarefa, List<Funcionario> funcionarios)
     {
+        // códigos de quem está na tarefa hoje, no banco
         List<int> ListaAtual = new List<int>();
         foreach (var funcionario in ListarFuncionario(idTarefa))
         {
             ListaAtual.Add(funcionario.Codigo);
         }
 
+        // códigos de quem deve ficar na tarefa, vindos do formulário
         List<int> ListaNova = new List<int>();
         foreach (var funcionario in funcionarios)
         {
-            ListaNova.Add(funcionario.Codigo);    
+            ListaNova.Add(funcionario.Codigo);
         }
 
+        // Except devolve o que está na primeira lista e não está na segunda (e já tira os repetidos)
+        // adicionar = está na nova mas não na atual
+        // remover = está na atual mas não na nova
         List<int> adicionar = ListaNova.Except(ListaAtual).ToList();
         List<int> remover = ListaAtual.Except(ListaNova).ToList();
 
+        // um insert por funcionário novo, cada um vira uma linha em TarefaFuncionarios
         foreach (var codigo in adicionar)
         {
             SqlCommand cmd = new SqlCommand();
@@ -110,15 +143,20 @@ public class TarefaSqlRepository: DataConnection
             cmd.CommandText = @"
             insert into TarefaFuncionarios
                 (funcionario_codigo, tarefa_codigo)
-            values 
+            values
                 (@funcionario, @tarefa)
             ";
             cmd.Parameters.AddWithValue("@funcionario", codigo);
             cmd.Parameters.AddWithValue("@tarefa", idTarefa);
 
+            // ExecuteNonQuery é pra comandos que não devolvem linhas (INSERT, UPDATE, DELETE)
             cmd.ExecuteNonQuery();
         }
 
+        // pra cada funcionário que saiu: tira o vínculo e os comentários dele nessa tarefa
+        // atenção: a tabela Comentarios tem FK pra TarefaFuncionarios, então o banco só deixa
+        // apagar o vínculo depois que os comentários já saíram. Do jeito que está (vínculo primeiro),
+        // o primeiro delete dá erro de FK quando o funcionário tem comentário na tarefa
         foreach (var codigo in remover)
         {
             SqlCommand cmd = new SqlCommand();
@@ -134,8 +172,12 @@ public class TarefaSqlRepository: DataConnection
         }
     }
 
+    // busca uma tarefa pelo código
+    // retorna null se não encontrar (por isso o ? em Tarefa?)
     public Tarefa? Read(int id)
     {
+        // a consulta é feita na view V_Tarefas, e não direto na tabela
+        // a view já traz os dados da categoria juntos e esconde as tarefas com status 'Cancelada'
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
         cmd.CommandText = "SELECT * FROM V_Tarefas WHERE codigo = @id";
@@ -144,28 +186,38 @@ public class TarefaSqlRepository: DataConnection
         Tarefa? tarefa = null;
         SqlDataReader reader = cmd.ExecuteReader();
 
+        // aqui é if e não while porque o código é único, vem no máximo uma linha
         if (reader.Read()) // verificar se o registro
-        {   
+        {
+            // passa cada coluna da linha pra propriedade correspondente da model
             tarefa = new Tarefa();
             tarefa.Codigo = reader.GetInt32("codigo");
             tarefa.Titulo = reader.GetString("titulo");
             tarefa.Descricao = reader.GetString("descricao");
+            // é o caminho inverso do Create: o banco devolve DBNull, e aqui vira o null do C#
+            // IsDBNull verifica antes, porque o GetDateTime dá erro se a coluna estiver nula
             tarefa.DataHoraInicio = reader.IsDBNull("datahora_inicio") ? null : reader.GetDateTime("DataHora_Inicio");
             tarefa.DataHoraPrevista = reader.IsDBNull("datahora_prevista") ? null : reader.GetDateTime("DataHora_Prevista");
             tarefa.DataHoraFim = reader.IsDBNull("datahora_fim") ? null : reader.GetDateTime("DataHora_Fim");
             tarefa.Visibilidade = reader.GetBoolean("visibilidade");
             tarefa.Status = reader.GetString("status");
+            // a categoria é um objeto dentro da tarefa, montado com as colunas categoria_* da view
             tarefa.Categoria = new Categoria(){
-                Codigo = reader.GetInt32("categoria_codigo"), 
-                Descricao = reader.GetString("categoria_descricao"), 
+                Codigo = reader.GetInt32("categoria_codigo"),
+                Descricao = reader.GetString("categoria_descricao"),
                 Cor = reader.GetString("categoria_cor")
             };
             tarefa.IdProjeto = reader.GetInt32("projeto_codigo");
+            // atenção: o ListarFuncionario abre outro reader na mesma conexão,
+            // e o reader daqui ainda está aberto (só fecha lá embaixo), então essa linha dá erro
+            // o certo é chamar depois do reader.Close()
             tarefa.Funcionarios = ListarFuncionario(id);
-            
+
             //Implementar as outras classes
+            // atenção: essa linha troca a lista de funcionários buscada acima por uma lista vazia
             tarefa.Funcionarios = new List<Funcionario>();
             // Exemplo: tarefa.Funcionarios = FuncionarioSqlRepository.ListarPorTarefa(tarefa.Codigo);
+            // comentários e documentos ainda não são buscados, por enquanto voltam vazios
             tarefa.Comentarios = new List<Comentario>();
             tarefa.Documentos = new List<Documento>();
         }
@@ -174,6 +226,8 @@ public class TarefaSqlRepository: DataConnection
         return tarefa;
     }
 
+    // lista todas as tarefas de um projeto
+    // se o projeto não tiver tarefa, retorna uma lista vazia (nunca null)
     public List<Tarefa> ReadAll(int idProjeto)
     {
         SqlCommand cmd = new SqlCommand();
@@ -184,6 +238,8 @@ public class TarefaSqlRepository: DataConnection
         List<Tarefa> tarefas = new List<Tarefa>();
         SqlDataReader reader = cmd.ExecuteReader();
 
+        // aqui é while porque podem vir várias linhas, uma por tarefa
+        // a leitura das colunas é igual à do Read
         while (reader.Read())
         {
             Tarefa tarefa = new Tarefa();
@@ -196,12 +252,15 @@ public class TarefaSqlRepository: DataConnection
             tarefa.Visibilidade = reader.GetBoolean("visibilidade");
             tarefa.Status = reader.GetString("status");
             tarefa.Categoria = new Categoria(){
-                Codigo = reader.GetInt32("categoria_codigo"), 
-                Descricao = reader.GetString("categoria_descricao"), 
+                Codigo = reader.GetInt32("categoria_codigo"),
+                Descricao = reader.GetString("categoria_descricao"),
                 Cor = reader.GetString("categoria_cor")
             };
-            
+            // o IdProjeto não é preenchido aqui (fica 0), diferente do Read
+
             //Implementar as outras classes
+            // a busca dos funcionários está comentada porque não dá pra chamar com o reader aberto
+            // por enquanto as três listas voltam vazias
             //tarefa.Funcionarios = ListarFuncionario(tarefa.Codigo);
             tarefa.Funcionarios = new List<Funcionario>();
             // Exemplo: tarefa.Funcionarios = FuncionarioSqlRepository.ListarPorTarefa(tarefa.Codigo);
@@ -215,12 +274,16 @@ public class TarefaSqlRepository: DataConnection
         return tarefas;
     }
 
+    // altera os dados de uma tarefa que já existe e atualiza a equipe dela
+    // retorna false se não existir tarefa com o código informado
     public bool Update(Tarefa tarefa)
     {
+        // o WHERE garante que só a tarefa desse código é alterada
+        // o projeto_codigo fica de fora: a tarefa não muda de projeto
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
         cmd.CommandText = @"
-            UPDATE Tarefas 
+            UPDATE Tarefas
             SET categoria_codigo = @categoria, titulo = @titulo, descricao = @descricao,
                 status = @status, datahora_inicio = @inicio, datahora_fim = @fim,
                 datahora_prevista = @prevista, visibilidade = @visibilidade
@@ -230,14 +293,21 @@ public class TarefaSqlRepository: DataConnection
         cmd.Parameters.AddWithValue("@categoria", tarefa.Categoria.Codigo);
         cmd.Parameters.AddWithValue("@titulo", tarefa.Titulo);
         cmd.Parameters.AddWithValue("@descricao", tarefa.Descricao);
+        // diferente do Create, aqui o status não tem valor padrão: se vier nulo, o comando dá erro
         cmd.Parameters.AddWithValue("@status", tarefa.Status);
+        // mesmo tratamento de data nula do Create
         cmd.Parameters.AddWithValue("@inicio", tarefa.DataHoraInicio.HasValue ? (object) tarefa.DataHoraInicio : DBNull.Value);
         cmd.Parameters.AddWithValue("@prevista", tarefa.DataHoraPrevista.HasValue ? (object) tarefa.DataHoraPrevista : DBNull.Value);
         cmd.Parameters.AddWithValue("@fim", tarefa.DataHoraFim.HasValue ? (object) tarefa.DataHoraFim : DBNull.Value);
         cmd.Parameters.AddWithValue("@visibilidade", tarefa.Visibilidade);
 
+        // ExecuteNonQuery devolve quantas linhas foram alteradas
+        // se for 0, é porque não existe tarefa com esse código
         bool resultado = cmd.ExecuteNonQuery() > 0;
 
+        // se a lista vier nula (nenhum funcionário enviado), a equipe fica como está
+        // atenção: a equipe é atualizada mesmo quando resultado é false (tarefa inexistente),
+        // e nesse caso o insert em TarefaFuncionarios dá erro de FK
         if (tarefa.Funcionarios != null)
         {
             // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();
@@ -257,6 +327,10 @@ public class TarefaSqlRepository: DataConnection
         return resultado;
     }
 
+    // "apaga" uma tarefa sem tirar a linha do banco (exclusão lógica)
+    // só troca o status pra 'Cancelada', e como a view V_Tarefas esconde esse status,
+    // a tarefa some do Read e do ReadAll, mas os comentários, documentos e a equipe dela continuam guardados
+    // retorna false se não existir tarefa com o código informado
     public bool Delete(int id)
     {
         SqlCommand cmd = new SqlCommand();
@@ -265,6 +339,6 @@ public class TarefaSqlRepository: DataConnection
 
         cmd.Parameters.AddWithValue("@codigo", id);
 
-        return cmd.ExecuteNonQuery() > 0; 
+        return cmd.ExecuteNonQuery() > 0;
     }
 }
