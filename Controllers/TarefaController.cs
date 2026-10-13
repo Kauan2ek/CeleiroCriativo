@@ -1,5 +1,6 @@
 // importa as funcionalidades necessárias do asp.net core mvc
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 // controller responsável pelas telas e ações relacionadas às tarefas
 public class TarefaController : Controller
@@ -74,14 +75,38 @@ public class TarefaController : Controller
         return View("~/Views/ExibicaoTarefa/ExTarefaCliente.cshtml");
     }
 
+
+    // CRUD: por enquanto aplicado com API
+    [HttpPost]
     public ActionResult Create(Tarefa tarefa)
     {
-        return Json(new {sucesso = repository.Create(tarefa)});
+        try
+        {
+            bool resultado = repository.Create(tarefa);
+
+            repository.Dispose();
+            return Json(new {sucesso = resultado});        
+        }
+        catch (SqlException e)
+        {
+
+            repository.Dispose();
+            return Json(new {sucesso = false, erro = e.Message});
+        }
     }
 
     public ActionResult Read(int id)
     {
-        return Json(repository.Read(id));
+        // Adicionar try catch depois 
+        Tarefa? tarefa = repository.Read(id);
+
+        if (tarefa == null)
+        {
+            repository.Dispose();
+            return NotFound();
+        }
+        repository.Dispose();
+        return Json(new {sucesso = true, tarefa});
     }
 
 
@@ -89,8 +114,49 @@ public class TarefaController : Controller
     [HttpGet]
     public ActionResult ReadAll(int id)
     {
-        return Json(repository.ReadAll(id));
+        // Adicionar try catch depois 
+        List<Tarefa> tarefas = repository.ReadAll(id);
+
+        if (tarefas.Count() == 0)
+        {   
+            repository.Dispose();
+            return Json(new {sucesso = false, erro = "Nenhuma tarefa encontrada"});
+        }
+        repository.Dispose();
+        return Json(new {sucesso = false, tarefas});
     }
 
+    [HttpPost]
+    public ActionResult Update(Tarefa tarefa)
+    {
+        try
+        {
+            bool resultado = repository.Update(tarefa);
 
+            repository.Dispose();
+            return Json(new {sucesso = resultado});        
+        }
+        catch (SqlException e)
+        {
+            repository.Dispose();
+            return Json(new {sucesso = false, erro = e.Message});
+        }
+    }
+
+    [HttpGet]
+    public ActionResult Delete(int id)
+    {
+        try
+        {
+            bool resultado = repository.Delete(id);
+
+            repository.Dispose();
+            return Json(new {sucesso = resultado});
+        }
+        catch (SqlException e)
+        {
+            repository.Dispose();
+            return Json(new {sucesso = false, erro = e.Message});
+        }
+    }
 }

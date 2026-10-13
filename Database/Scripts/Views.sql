@@ -6,4 +6,7 @@ select A.codigo, A.titulo, A.descricao, A.datahora_inicio, A.datahora_prevista,
        B.descricao categoria_descricao, B.cor categoria_cor
 from tarefas A
 inner join Categorias B on B.codigo = A.categoria_codigo
+where A.status <> 'Cancelada'
+go
+
 
