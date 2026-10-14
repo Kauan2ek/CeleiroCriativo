@@ -61,116 +61,24 @@ public class TarefaSqlRepository: DataConnection
         // por isso precisa do código da tarefa, que só existe depois do insert acima
         if (tarefa.Funcionarios != null)
         {
-            // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();
-            AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
+            new FuncionarioSqlRepository().AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
         }
 
         // comentários e documentos ainda não são gravados aqui (ficam pros repositórios deles)
         if (tarefa.Comentarios != null)
         {
-            // Chamar o método ComentarioRepository.Create();
+            // Seguir a mesma lógica da lista de funcionários (pendente)
         }
 
         if (tarefa.Documentos != null)
         {
-            // Chamar o método DocumentoRepository.Create();
+            // Seguir a mesma lógica da lista de funcionários (pendente)
         }
 
         return IdTarefa > 0; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
     }
 
-    // lista os funcionários que estão alocados numa tarefa
-    // cada Funcionario volta só com o Codigo preenchido (nome, email e cargo ficam vazios),
-    // porque a consulta é feita só na tabela associativa TarefaFuncionarios
-    public List<Funcionario> ListarFuncionario(int idTarefa)
-    {
-        SqlCommand cmd = new SqlCommand();
-        cmd.Connection = conn;
-        cmd.CommandText = "SELECT funcionario_codigo FROM TarefaFuncionarios WHERE tarefa_codigo = @id";
-
-        cmd.Parameters.AddWithValue("id", idTarefa);
-
-        // ExecuteReader é pra comandos que devolvem linhas (SELECT)
-        SqlDataReader reader = cmd.ExecuteReader();
-
-        // cada volta do while é uma linha do resultado
-        // o Read() anda pra próxima linha e devolve false quando acabam
-        List<Funcionario> funcionarios = new List<Funcionario>();
-        while (reader.Read())
-        {
-            Funcionario funcionario = new Funcionario();
-            // o select só traz uma coluna, então ela está na posição 0
-            funcionario.Codigo = reader.GetInt32(0);
-
-            funcionarios.Add(funcionario);
-        }
-
-        // a conexão só aceita um reader aberto por vez, tem que fechar antes de rodar outro comando
-        reader.Close();
-        return funcionarios;
-    }
-
-    // deixa a equipe da tarefa igual à lista recebida
-    // compara quem já está no banco com quem veio na lista nova:
-    // quem é novo é inserido, quem saiu da lista é removido, e quem continua não é tocado
-    public void AtualizarFuncionarios (int idTarefa, List<Funcionario> funcionarios)
-    {
-        // códigos de quem está na tarefa hoje, no banco
-        List<int> ListaAtual = new List<int>();
-        foreach (var funcionario in ListarFuncionario(idTarefa))
-        {
-            ListaAtual.Add(funcionario.Codigo);
-        }
-
-        // códigos de quem deve ficar na tarefa, vindos do formulário
-        List<int> ListaNova = new List<int>();
-        foreach (var funcionario in funcionarios)
-        {
-            ListaNova.Add(funcionario.Codigo);
-        }
-
-        // Except devolve o que está na primeira lista e não está na segunda (e já tira os repetidos)
-        // adicionar = está na nova mas não na atual
-        // remover = está na atual mas não na nova
-        List<int> adicionar = ListaNova.Except(ListaAtual).ToList();
-        List<int> remover = ListaAtual.Except(ListaNova).ToList();
-
-        // um insert por funcionário novo, cada um vira uma linha em TarefaFuncionarios
-        foreach (var codigo in adicionar)
-        {
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = @"
-            insert into TarefaFuncionarios
-                (funcionario_codigo, tarefa_codigo)
-            values
-                (@funcionario, @tarefa)
-            ";
-            cmd.Parameters.AddWithValue("@funcionario", codigo);
-            cmd.Parameters.AddWithValue("@tarefa", idTarefa);
-
-            // ExecuteNonQuery é pra comandos que não devolvem linhas (INSERT, UPDATE, DELETE)
-            cmd.ExecuteNonQuery();
-        }
-
-        // pra cada funcionário que saiu: tira o vínculo e os comentários dele nessa tarefa
-        // atenção: a tabela Comentarios tem FK pra TarefaFuncionarios, então o banco só deixa
-        // apagar o vínculo depois que os comentários já saíram. Do jeito que está (vínculo primeiro),
-        // o primeiro delete dá erro de FK quando o funcionário tem comentário na tarefa
-        foreach (var codigo in remover)
-        {
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = @"
-            DELETE FROM TarefaFuncionarios WHERE funcionario_codigo = @codigo AND tarefa_codigo = @tarefa;
-            DELETE FROM Comentarios WHERE funcionario_codigo = @codigo AND tarefa_codigo = @tarefa;
-            ";
-            cmd.Parameters.AddWithValue("@codigo", codigo);
-            cmd.Parameters.AddWithValue("@tarefa", idTarefa);
-
-            cmd.ExecuteNonQuery();
-        }
-    }
+    
 
     // busca uma tarefa pelo código
     // retorna null se não encontrar (por isso o ? em Tarefa?)
@@ -211,7 +119,6 @@ public class TarefaSqlRepository: DataConnection
             // atenção: o ListarFuncionario abre outro reader na mesma conexão,
             // e o reader daqui ainda está aberto (só fecha lá embaixo), então essa linha dá erro
             // o certo é chamar depois do reader.Close()
-            tarefa.Funcionarios = ListarFuncionario(id);
 
             //Implementar as outras classes
             // atenção: essa linha troca a lista de funcionários buscada acima por uma lista vazia
@@ -223,6 +130,7 @@ public class TarefaSqlRepository: DataConnection
         }
 
         reader.Close();
+        tarefa?.Funcionarios = new FuncionarioSqlRepository().ListarFuncionario(id);
         return tarefa;
     }
 
@@ -311,7 +219,7 @@ public class TarefaSqlRepository: DataConnection
         if (tarefa.Funcionarios != null)
         {
             // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();
-            AtualizarFuncionarios(tarefa.Codigo, tarefa.Funcionarios);
+            new FuncionarioSqlRepository().AtualizarFuncionarios(tarefa.Codigo, tarefa.Funcionarios);
         }
 
         if (tarefa.Comentarios != null)

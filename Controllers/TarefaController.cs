@@ -81,6 +81,35 @@ public class TarefaController : Controller
     }
 
 
+
+    // Novas VIEWS()
+    // 
+    public ActionResult DetalhesCliente()
+    {
+
+        return View();
+    }
+
+    public ActionResult DetalhesFuncionario()
+    {
+        return View();
+    }
+
+    public ActionResult DetalhesGestor(int id)
+    {
+        Tarefa? tarefa = repository.Read(id);
+        repository.Dispose();
+
+        if (tarefa == null)
+        {
+            return NotFound();
+        }
+
+        return View(tarefa);
+    }
+
+
+
     // CRUD: por enquanto aplicado com API
     // as actions abaixo não devolvem tela, devolvem JSON (dá pra testar pelo Bruno ou pelo navegador)
     // todas seguem o mesmo roteiro: chamam o repositório, fecham a conexão com o Dispose() e montam a resposta
@@ -107,7 +136,6 @@ public class TarefaController : Controller
         // outros tipos de erro (ex: categoria vazia) não entram nesse catch
         catch (SqlException e)
         {
-
             repository.Dispose();
             return Json(new {sucesso = false, erro = e.Message});
         }

@@ -1,3 +1,5 @@
+@model Tarefa
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -84,7 +86,7 @@
         <input type="hidden"
                id="nomeTarefa"
                name="Tarefa"
-               value="@ViewBag.Tarefa">
+               value="@Model.Titulo">
 
 
         <!-- ==================================================
@@ -133,19 +135,15 @@
                 <!-- tipo ?status=a_fazer, ?status=andamento, etc -->
                 <select id="situacaoTarefa"
                         name="Status">
-
                     <option value="a_fazer">
                         A Fazer
                     </option>
-
                     <option value="andamento">
                         Em Andamento
                     </option>
-
                     <option value="finalizada">
                         Finalizada
                     </option>
-
                 </select>
 
             </div>
@@ -182,7 +180,9 @@
                         <input type="text"
                                id="tituloTarefa"
                                name="Titulo"
-                               placeholder="Título da Tarefa">
+                               placeholder="Título da Tarefa"
+                               value="@Model.Titulo" 
+                        >
 
 
                         <!-- ícone de editar -->
@@ -207,7 +207,7 @@
 
                         <select id="categoriaTarefa"
                                 name="Categoria">
-
+                            @* Adicionar depois *@
                             <option value=""
                                     selected
                                     disabled>
@@ -292,7 +292,8 @@
 
                         <textarea id="descricaoTarefa"
                                   name="Descricao"
-                                  placeholder="Texto.."></textarea>
+                                  placeholder="Texto.."
+                        >@Model.Descricao</textarea>
 
 
                         <!-- ícone de editar -->
@@ -314,7 +315,7 @@
 
 
                     <div class="campo-com-icone-tarefa">
-
+                        @* Sugestão de ajuste (pendente) *@
                         <input type="text"
                                id="comentariosTarefa"
                                name="Comentarios"
@@ -353,7 +354,8 @@
 
                         <input type="date"
                                id="dataInicio"
-                               name="DataInicio">
+                               name="DataInicio"
+                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")">
 
                     </div>
 
@@ -373,7 +375,9 @@
 
                         <input type="date"
                                id="previsaoTermino"
-                               name="PrevisaoTermino">
+                               name="PrevisaoTermino"
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")">
+
 
                     </div>
 
@@ -393,7 +397,8 @@
 
                         <input type="date"
                                id="dataEntrega"
-                               name="DataEntrega">
+                               name="DataEntrega"
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")">
 
                     </div>
 
@@ -414,34 +419,26 @@
 
                     <!-- funcionário 1 (exemplo fixo) -->
 
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
+                        @if (@Model.Funcionarios != null)
+                        {
+                             @foreach (var funcionario in @Model.Funcionarios)
+                            {
+                                <div class="funcionario">
+                                    <img src="/imagens/Entrar.png"
+                                         alt="Funcionário"
+                                         class="icone-funcionario">
 
 
-                    <!-- funcionário 2 (exemplo fixo) -->
+                                    <span>
+                                        @funcionario.Nome - @funcionario.Cargo.Descricao
+                                    </span>
+                                </div>
+                                }
+                        } else @*Analisar o porque não está retornando o texto do else... (pendente)*@
+                        {
+                            <span>Ainda não há funcionários para essa tarefa...</span>
+                        }
 
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
 
                 </div>
 
