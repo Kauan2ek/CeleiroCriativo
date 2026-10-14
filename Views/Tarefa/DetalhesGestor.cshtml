@@ -121,7 +121,7 @@
             <!-- ==================================================
                  SITUAÇÃO / STATUS DA TAREFA
                  ================================================== -->
-
+            @* Verificar o pq o status está sumindo (pendente) *@
             <div class="situacao-tarefa"
                  id="containerSituacao">
 
@@ -315,7 +315,7 @@
 
 
                     <div class="campo-com-icone-tarefa">
-                        @* Sugestão de ajuste (pendente) *@
+                        @* Sugestão de ajuste no design (pendente) *@
                         <input type="text"
                                id="comentariosTarefa"
                                name="Comentarios"
@@ -419,7 +419,7 @@
 
                     <!-- funcionário 1 (exemplo fixo) -->
 
-                        @if (@Model.Funcionarios != null)
+                        @if (@Model.Funcionarios != null && @Model.Funcionarios.Count() > 0)
                         {
                              @foreach (var funcionario in @Model.Funcionarios)
                             {

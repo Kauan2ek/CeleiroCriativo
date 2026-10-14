@@ -17,7 +17,7 @@ public class FuncionarioSqlRepository: DataConnection
     // a consulta usa a function F_FuncionariosDaTarefa (Database/Scripts/Functions.sql),
     // que já junta TarefaFuncionarios, Funcionarios, Pessoas e Cargos e recebe o código da tarefa como parâmetro
     // atenção: a senha vem junto, e como o Read da tarefa devolve esses funcionários em JSON, ela aparece na resposta
-    public List<Funcionario> ListarFuncionario(int id) // Isso daqui vai pra FuncionarioSqlRepository (pendente)
+    public List<Funcionario> ListarFuncionario(int id) 
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
