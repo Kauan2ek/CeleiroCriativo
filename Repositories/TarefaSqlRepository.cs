@@ -1,12 +1,13 @@
 // o System.Data traz métodos extras pro reader (GetInt32, GetString, GetDateTime...)
 // que recebem o NOME da coluna em vez do índice dela
 // por baixo ele procura a posição da coluna pelo nome e lê o valor dessa posição
-// aqui é usado no Listar(), pra ler cada coluna sem depender da ordem delas na tabela
+// aqui é usado no Read() e no ReadAll(), pra ler cada coluna sem depender da ordem delas na tabela
 // o nome passado tem que ser o nome da coluna no banco (ou no SELECT), não o da propriedade da model
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-// repositório das tarefas: é a única classe que conversa com o banco sobre tarefa
+// repositório das tarefas: cuida da tabela Tarefas (criar, ler, alterar e cancelar)
+// a equipe da tarefa (tabela TarefaFuncionarios) fica por conta do FuncionarioSqlRepository
 // herda de DataConnection, que abre a conexão no construtor e deixa ela disponível em "conn"
 // quem usa o repositório (o controller) é quem chama o Dispose() pra fechar a conexão
 public class TarefaSqlRepository: DataConnection
@@ -59,6 +60,9 @@ public class TarefaSqlRepository: DataConnection
 
         // a equipe não fica na tabela Tarefas, cada funcionário vira uma linha em TarefaFuncionarios
         // por isso precisa do código da tarefa, que só existe depois do insert acima
+        // quem grava essas linhas é o FuncionarioSqlRepository
+        // o new cria um repositório só pra essa chamada, e ele abre uma conexão própria (separada da "conn" daqui)
+        // atenção: como ele não fica guardado em variável, ninguém chama o Dispose() dele e essa conexão não é fechada
         if (tarefa.Funcionarios != null)
         {
             new FuncionarioSqlRepository().AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
@@ -80,7 +84,7 @@ public class TarefaSqlRepository: DataConnection
 
     
 
-    // busca uma tarefa pelo código
+    // busca uma tarefa pelo código, já com a categoria e a equipe preenchidas
     // retorna null se não encontrar (por isso o ? em Tarefa?)
     public Tarefa? Read(int id)
     {
@@ -116,12 +120,10 @@ public class TarefaSqlRepository: DataConnection
                 Cor = reader.GetString("categoria_cor")
             };
             tarefa.IdProjeto = reader.GetInt32("projeto_codigo");
-            // atenção: o ListarFuncionario abre outro reader na mesma conexão,
-            // e o reader daqui ainda está aberto (só fecha lá embaixo), então essa linha dá erro
-            // o certo é chamar depois do reader.Close()
+            // os funcionários não são buscados aqui dentro, só depois do reader.Close() lá embaixo
 
             //Implementar as outras classes
-            // atenção: essa linha troca a lista de funcionários buscada acima por uma lista vazia
+            // a lista de funcionários começa vazia e é trocada pela lista de verdade depois do reader.Close()
             tarefa.Funcionarios = new List<Funcionario>();
             // Exemplo: tarefa.Funcionarios = FuncionarioSqlRepository.ListarPorTarefa(tarefa.Codigo);
             // comentários e documentos ainda não são buscados, por enquanto voltam vazios
@@ -130,11 +132,14 @@ public class TarefaSqlRepository: DataConnection
         }
 
         reader.Close();
+        // busca a equipe da tarefa pelo FuncionarioSqlRepository, que devolve os funcionários completos (nome, cargo...)
+        // o ?. faz a linha ser pulada quando a tarefa não foi encontrada (tarefa == null)
+        // atenção: esse repositório abre uma conexão própria e ninguém chama o Dispose() dele, então ela não é fechada
         tarefa?.Funcionarios = new FuncionarioSqlRepository().ListarFuncionario(id);
         return tarefa;
     }
 
-    // lista todas as tarefas de um projeto
+    // lista todas as tarefas de um projeto, com a categoria de cada uma (a equipe não vem, diferente do Read)
     // se o projeto não tiver tarefa, retorna uma lista vazia (nunca null)
     public List<Tarefa> ReadAll(int idProjeto)
     {
@@ -167,7 +172,7 @@ public class TarefaSqlRepository: DataConnection
             // o IdProjeto não é preenchido aqui (fica 0), diferente do Read
 
             //Implementar as outras classes
-            // a busca dos funcionários está comentada porque não dá pra chamar com o reader aberto
+            // a busca dos funcionários ainda não é feita na listagem (a linha abaixo ficou comentada)
             // por enquanto as três listas voltam vazias
             //tarefa.Funcionarios = ListarFuncionario(tarefa.Codigo);
             tarefa.Funcionarios = new List<Funcionario>();
@@ -214,8 +219,10 @@ public class TarefaSqlRepository: DataConnection
         bool resultado = cmd.ExecuteNonQuery() > 0;
 
         // se a lista vier nula (nenhum funcionário enviado), a equipe fica como está
+        // quem compara a lista nova com a atual e grava a diferença é o FuncionarioSqlRepository
         // atenção: a equipe é atualizada mesmo quando resultado é false (tarefa inexistente),
         // e nesse caso o insert em TarefaFuncionarios dá erro de FK
+        // atenção: o repositório criado aqui abre uma conexão própria que não é fechada (igual no Create)
         if (tarefa.Funcionarios != null)
         {
             // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();

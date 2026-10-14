@@ -83,28 +83,39 @@ public class TarefaController : Controller
 
 
     // Novas VIEWS()
-    // 
+    // telas de detalhes da tarefa, uma por perfil
+    // seguem a convenção de nome: a action DetalhesGestor abre views/tarefa/detalhesgestor.cshtml
+
+    // tela de detalhes pro cliente
+    // por enquanto só abre a view, sem buscar a tarefa no banco
     public ActionResult DetalhesCliente()
     {
 
         return View();
     }
 
+    // tela de detalhes pro funcionário
+    // por enquanto só abre a view, sem buscar a tarefa no banco
     public ActionResult DetalhesFuncionario()
     {
         return View();
     }
 
+    // tela de detalhes pro gestor, já com os dados reais da tarefa
+    // GET /Tarefa/DetalhesGestor/5 (o 5 da url cai no parâmetro id)
     public ActionResult DetalhesGestor(int id)
     {
+        // busca a tarefa (com categoria e equipe) e já fecha a conexão
         Tarefa? tarefa = repository.Read(id);
         repository.Dispose();
 
+        // tarefa inexistente ou cancelada: responde 404
         if (tarefa == null)
         {
             return NotFound();
         }
 
+        // entrega a tarefa pra view, que acessa ela pelo @Model (por isso o "@model Tarefa" no topo do cshtml)
         return View(tarefa);
     }
 
@@ -141,7 +152,7 @@ public class TarefaController : Controller
         }
     }
 
-    // busca uma tarefa pelo código
+    // busca uma tarefa pelo código, com a categoria e a equipe
     // GET /Tarefa/Read/5 (o 5 da url cai no parâmetro id, por causa da rota padrão do Program.cs)
     public ActionResult Read(int id)
     {
@@ -162,7 +173,7 @@ public class TarefaController : Controller
     }
 
 
-    // lista as tarefas de um projeto
+    // lista as tarefas de um projeto (sem a equipe de cada uma)
     // GET /Tarefa/ReadAll/2 (aqui o id da url é o código do PROJETO, não da tarefa)
     [HttpGet]
     public ActionResult ReadAll(int id)

@@ -1,19 +1,22 @@
 // o System.Data traz métodos extras pro reader (GetInt32, GetString, GetDateTime...)
 // que recebem o NOME da coluna em vez do índice dela
 // por baixo ele procura a posição da coluna pelo nome e lê o valor dessa posição
-// aqui é usado no Listar(), pra ler cada coluna sem depender da ordem delas na tabela
+// aqui é usado no ListarFuncionario(), pra ler cada coluna sem depender da ordem delas na tabela
 // o nome passado tem que ser o nome da coluna no banco (ou no SELECT), não o da propriedade da model
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-// repositório das tarefas: é a única classe que conversa com o banco sobre tarefa
+// repositório dos funcionários: por enquanto só tem a parte da equipe de uma tarefa
+// (listar quem está alocado e atualizar a tabela TarefaFuncionarios)
 // herda de DataConnection, que abre a conexão no construtor e deixa ela disponível em "conn"
-// quem usa o repositório (o controller) é quem chama o Dispose() pra fechar a conexão
+// quem cria o repositório é quem tem que chamar o Dispose() pra fechar a conexão
 public class FuncionarioSqlRepository: DataConnection
 {
-    // lista os funcionários que estão alocados numa tarefa
-    // cada Funcionario volta só com o Codigo preenchido (nome, email e cargo ficam vazios),
-    // porque a consulta é feita só na tabela associativa TarefaFuncionarios
+    // lista os funcionários que estão alocados numa tarefa (o id recebido é o código da TAREFA)
+    // cada Funcionario volta completo: dados de pessoa, email, senha, ativo e o cargo
+    // a consulta usa a function F_FuncionariosDaTarefa (Database/Scripts/Functions.sql),
+    // que já junta TarefaFuncionarios, Funcionarios, Pessoas e Cargos e recebe o código da tarefa como parâmetro
+    // atenção: a senha vem junto, e como o Read da tarefa devolve esses funcionários em JSON, ela aparece na resposta
     public List<Funcionario> ListarFuncionario(int id) // Isso daqui vai pra FuncionarioSqlRepository (pendente)
     {
         SqlCommand cmd = new SqlCommand();
@@ -31,7 +34,9 @@ public class FuncionarioSqlRepository: DataConnection
         while (reader.Read())
         {
             Funcionario funcionario = new Funcionario();
-            // o select só traz uma coluna, então ela está na posição 0
+            // cada coluna é lida pelo nome que a function devolve (ex: tipo_documento, cargo_descricao)
+            // o telefone pode ser nulo no banco, por isso o IsDBNull antes
+            // o cargo é um objeto dentro do funcionário, montado com as colunas cargo_*
             funcionario.Codigo        = reader.GetInt32("codigo");
             funcionario.Nome          = reader.GetString("nome");
             funcionario.Email         = reader.GetString("email");
@@ -59,6 +64,7 @@ public class FuncionarioSqlRepository: DataConnection
     public void AtualizarFuncionarios (int idTarefa, List<Funcionario> funcionarios)
     {
         // códigos de quem está na tarefa hoje, no banco
+        // o ListarFuncionario traz o funcionário completo, mas aqui só o código interessa
         List<int> ListaAtual = new List<int>();
         foreach (var funcionario in ListarFuncionario(idTarefa))
         {
