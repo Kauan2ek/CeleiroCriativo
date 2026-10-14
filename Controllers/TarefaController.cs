@@ -115,6 +115,10 @@ public class TarefaController : Controller
             return NotFound();
         }
 
+        CategoriaSqlRepository categoriaSqlRepository = new CategoriaSqlRepository();
+        ViewBag.Categorias = categoriaSqlRepository.ReadAll();
+        categoriaSqlRepository.Dispose();
+
         // entrega a tarefa pra view, que acessa ela pelo @Model (por isso o "@model Tarefa" no topo do cshtml)
         return View(tarefa);
     }

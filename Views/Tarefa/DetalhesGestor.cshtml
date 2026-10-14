@@ -207,7 +207,6 @@
 
                         <select id="categoriaTarefa"
                                 name="Categoria">
-                            @* Adicionar depois *@
                             <option value=""
                                     selected
                                     disabled>
@@ -216,61 +215,15 @@
 
                             </option>
 
-                            <option value="planejamento">
-                                Planejamento
-                            </option>
-
-                            <option value="reuniao">
-                                Reunião
-                            </option>
-
-                            <option value="criacao_conteudo">
-                                Criação de Conteúdo
-                            </option>
-
-                            <option value="design">
-                                Design
-                            </option>
-
-                            <option value="redacao">
-                                Redação / Copywriting
-                            </option>
-
-                            <option value="social_media">
-                                Social Media
-                            </option>
-
-                            <option value="gravacao">
-                                Gravação
-                            </option>
-
-                            <option value="edicao_video">
-                                Edição de Vídeo
-                            </option>
-
-                            <option value="fotografia">
-                                Fotografia
-                            </option>
-
-                            <option value="campanha">
-                                Publicidade / Campanha
-                            </option>
-
-                            <option value="desenvolvimento_projeto">
-                                Desenvolvimento de Projeto
-                            </option>
-
-                            <option value="revisao">
-                                Revisão
-                            </option>
-
-                            <option value="aprovacao">
-                                Aprovação
-                            </option>
-
-                            <option value="entrega">
-                                Entrega
-                            </option>
+                            @foreach (var categoria in ViewBag.Categorias) 
+                            {
+                                @if (@Model.Categoria.Codigo == categoria.Codigo){
+                                    <option value="@categoria.Codigo" selected>@categoria.Descricao</option>
+                                } else {
+                                    <option value="@categoria.Codigo">@categoria.Descricao</option>
+                                }
+                            }
+                            
 
                         </select>
 
@@ -316,16 +269,21 @@
 
                     <div class="campo-com-icone-tarefa">
                         @* Sugestão de ajuste no design (pendente) *@
-                        <input type="text"
-                               id="comentariosTarefa"
-                               name="Comentarios"
-                               placeholder="Digite um comentário">
-
-
-                        <!-- ícone de comentários -->
-                        <img src="/imagens/editar.png"
-                             alt="Comentários">
-
+                        @if (@Model.Comentarios != null && @Model.Comentarios.Count() > 0) {
+                            @foreach(var comentario in @Model.Comentarios)
+                            {
+                                <input type="text"
+                                       id="comentariosTarefa"
+                                       name="@comentario.Codigo"
+                                       placeholder="@comentario.Descricao"
+                                       >
+                                       
+                                <!-- ícone de comentários -->
+                                <img src="/imagens/editar.png"
+                                    alt="Comentários">
+                            }
+                        }
+                        
                     </div>
 
                 </div>
@@ -414,10 +372,10 @@
 
                 <!-- área onde os funcionários aparecem -->
 
-                <div class="area-funcionarios">
 
 
                     <!-- funcionário 1 (exemplo fixo) -->
+                <div class="area-funcionarios">
 
                         @if (@Model.Funcionarios != null && @Model.Funcionarios.Count() > 0)
                         {

@@ -55,7 +55,7 @@ CREATE TABLE Status (
 CREATE TABLE Categorias (
     codigo      INT IDENTITY(1,1) PRIMARY KEY,
     descricao   VARCHAR(50) NOT NULL,
-    cor         VARCHAR(20) NOT NULL
+    cor         VARCHAR(20)     NULL
 );
 
 -- ---------------------------------------------------------------------

@@ -82,8 +82,6 @@ public class TarefaSqlRepository: DataConnection
         return IdTarefa > 0; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
     }
 
-    
-
     // busca uma tarefa pelo código, já com a categoria e a equipe preenchidas
     // retorna null se não encontrar (por isso o ? em Tarefa?)
     public Tarefa? Read(int id)
@@ -134,8 +132,18 @@ public class TarefaSqlRepository: DataConnection
         reader.Close();
         // busca a equipe da tarefa pelo FuncionarioSqlRepository, que devolve os funcionários completos (nome, cargo...)
         // o ?. faz a linha ser pulada quando a tarefa não foi encontrada (tarefa == null)
-        // atenção: esse repositório abre uma conexão própria e ninguém chama o Dispose() dele, então ela não é fechada
-        tarefa?.Funcionarios = new FuncionarioSqlRepository().ListarFuncionario(id);
+        FuncionarioSqlRepository funcionarioRepos = new FuncionarioSqlRepository();
+        tarefa?.Funcionarios = funcionarioRepos.FuncionariosTarefa(id);
+        funcionarioRepos.Dispose();
+
+        ComentarioSqlRepository comentarioRepos = new ComentarioSqlRepository();
+        tarefa?.Comentarios = comentarioRepos.ComentariosTarefa(id);
+        comentarioRepos.Dispose();
+
+        DocumentoSqlRepository documentoRepos = new DocumentoSqlRepository();
+        tarefa?.Documentos = documentoRepos.DocumentosTarefa(id);
+        documentoRepos.Dispose();
+
         return tarefa;
     }
 
@@ -148,7 +156,7 @@ public class TarefaSqlRepository: DataConnection
         cmd.CommandText = "SELECT * FROM V_Tarefas WHERE projeto_codigo = @IdProjeto";
         cmd.Parameters.AddWithValue("@IdProjeto", idProjeto);
 
-        List<Tarefa> tarefas = new List<Tarefa>();
+        List<Tarefa>? tarefas = new List<Tarefa>();
         SqlDataReader reader = cmd.ExecuteReader();
 
         // aqui é while porque podem vir várias linhas, uma por tarefa
@@ -171,12 +179,8 @@ public class TarefaSqlRepository: DataConnection
             };
             // o IdProjeto não é preenchido aqui (fica 0), diferente do Read
 
-            //Implementar as outras classes
-            // a busca dos funcionários ainda não é feita na listagem (a linha abaixo ficou comentada)
-            // por enquanto as três listas voltam vazias
-            //tarefa.Funcionarios = ListarFuncionario(tarefa.Codigo);
+
             tarefa.Funcionarios = new List<Funcionario>();
-            // Exemplo: tarefa.Funcionarios = FuncionarioSqlRepository.ListarPorTarefa(tarefa.Codigo);
             tarefa.Comentarios = new List<Comentario>();
             tarefa.Documentos = new List<Documento>();
 

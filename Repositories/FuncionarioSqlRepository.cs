@@ -17,7 +17,7 @@ public class FuncionarioSqlRepository: DataConnection
     // a consulta usa a function F_FuncionariosDaTarefa (Database/Scripts/Functions.sql),
     // que já junta TarefaFuncionarios, Funcionarios, Pessoas e Cargos e recebe o código da tarefa como parâmetro
     // atenção: a senha vem junto, e como o Read da tarefa devolve esses funcionários em JSON, ela aparece na resposta
-    public List<Funcionario> ListarFuncionario(int id) 
+    public List<Funcionario> FuncionariosTarefa (int id) 
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
@@ -66,7 +66,7 @@ public class FuncionarioSqlRepository: DataConnection
         // códigos de quem está na tarefa hoje, no banco
         // o ListarFuncionario traz o funcionário completo, mas aqui só o código interessa
         List<int> ListaAtual = new List<int>();
-        foreach (var funcionario in ListarFuncionario(idTarefa))
+        foreach (var funcionario in FuncionariosTarefa(idTarefa))
         {
             ListaAtual.Add(funcionario.Codigo);
         }
