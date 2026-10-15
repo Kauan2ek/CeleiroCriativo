@@ -135,13 +135,13 @@
                 <!-- tipo ?status=a_fazer, ?status=andamento, etc -->
                 <select id="situacaoTarefa"
                         name="Status">
-                    <option value="a_fazer">
+                    <option value="A fazer" selected="@(Model.Status == "A Fazer")">
                         A Fazer
                     </option>
-                    <option value="andamento">
+                    <option value="Em andamento">
                         Em Andamento
                     </option>
-                    <option value="finalizada">
+                    <option value="Finalizado">
                         Finalizada
                     </option>
                 </select>
@@ -258,35 +258,28 @@
                 </div>
 
 
-                <!-- COMENTÁRIOS -->
-
+                                <!-- CAMPO DE COMENTÁRIOS -->
+                <!-- mostra o último comentário (montado no C#); a conversa completa fica no modal -->
                 <div class="campo-tarefa">
+                    <label for="comentariosTarefa">Comentários</label>
 
-                    <label for="comentariosTarefa">
-                        Comentários
-                    </label>
+                    <div class="campo-com-icone-tarefa campo-comentarios-chat">
+                        <input type="text"
+                            id="comentariosTarefa"
+                            name="Comentarios"
+                            placeholder="Nenhum comentário ainda"
+                            readonly
+                            title="Último comentário"
+                            value="">
 
-
-                    <div class="campo-com-icone-tarefa">
-                        @* Sugestão de ajuste no design (pendente) *@
-                        @if (@Model.Comentarios != null && @Model.Comentarios.Count() > 0) {
-                            @foreach(var comentario in @Model.Comentarios)
-                            {
-                                <input type="text"
-                                       id="comentariosTarefa"
-                                       name="@comentario.Codigo"
-                                       placeholder="@comentario.Descricao"
-                                       >
-                                       
-                                <!-- ícone de comentários -->
-                                <img src="/imagens/editar.png"
-                                    alt="Comentários">
-                            }
-                        }
-                        
+                        <!-- o lápis abre a conversa completa -->
+                        <img src="/imagens/editar.png"
+                            alt="Abrir comentários"
+                            id="iconeComentarios"
+                            title="Abrir conversa">
                     </div>
-
                 </div>
+
 
             </section>
 
@@ -392,7 +385,7 @@
                                     </span>
                                 </div>
                                 }
-                        } else @*Analisar o porque não está retornando o texto do else... (pendente)*@
+                        } else
                         {
                             <span>Ainda não há funcionários para essa tarefa...</span>
                         }
@@ -443,112 +436,43 @@
 
 
                 <div class="area-arquivos">
+                    @if (Model.Documentos != null && Model.Documentos.Count() > 0)
+                    {
+                        @foreach (var documento in Model.Documentos)
+                        {
+                            <div class="arquivo">
 
+                                <img src="/imagens/documento.png"
+                                     alt="@documento.Extensao"
+                                     class="icone-arquivo">
 
-                    <!-- ARQUIVO WORD -->
+                                <span class="nome-arquivo">
+                                    @($"{documento.Descricao}.{documento.Extensao}")
+                                </span>
 
-                    <div class="arquivo">
+                                <!-- botão que abre o arquivo -->
+                                <a href="@documento.Diretorio"
+                                   target="_blank"
+                                   class="botao-abrir-arquivo"
+                                   title="Abrir arquivo">
+                                    <img src="/imagens/abrir.png" alt="Abrir">
+                                </a>
 
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
+                                <!-- botão que exclui o arquivo (visual do CeleiroCriativo-master) -->
+                                <button type="button"
+                                        class="botao-excluir-arquivo"
+                                        title="Excluir arquivo"
+                                        onclick="excluirArquivo(this)">
+                                    <img src="/imagens/excluir_arquivo.png" alt="Excluir">
+                                </button>
 
-
-                        <span class="nome-arquivo">
-                            doc_proj.docx
-                        </span>
-
-
-                        <!-- botão que abre o arquivo -->
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- ARQUIVO PDF -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            pdf_proj.pdf
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- ARQUIVO WORD 2 -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            doc(1)_proj.docx
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- ARQUIVO PDF 2 -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            pdf(1)_proj.pdf
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>Ainda não há arquivos para essa tarefa...</span>
+                    }
 
                 </div>
 
@@ -837,6 +761,43 @@
                 Excluir tarefa
             </button>
         </div>
+    </div>
+</div>
+<!-- ==========================================================
+     MODAL DE COMENTÁRIOS - CHAT
+     ========================================================== -->
+<div id="modalComentarios" class="modal-comentarios">
+    <div class="caixa-chat">
+
+        <div class="cabecalho-chat">
+            <div>
+                <h2>Comentários da tarefa</h2>
+                <span>Conversa entre os participantes</span>
+            </div>
+            <button type="button" id="fecharChat" class="fechar-chat">×</button>
+        </div>
+
+        <!-- as mensagens vêm do banco, montadas pelo C# -->
+        <div id="mensagensChat" class="mensagens-chat">
+            @if (@Model.Comentarios != null && @Model.Comentarios.Count() > 0) {
+                @foreach (var comentario in @Model.Comentarios)
+                {
+                    <div class="mensagem mensagem-outra">
+                        <span class="nome-mensagem">(@comentario.Funcionario.Nome)</span>
+                        <p>@comentario.Descricao</p>
+                        <span class="horario-mensagem">@comentario.DataHora.ToString("dd/MM HH:mm")</span>
+                    </div>
+                }
+            }
+        </div>
+
+        <form id="formularioChat" class="formulario-chat">
+            <input type="text" id="novoComentario"
+                   placeholder="Digite seu comentário..."
+                   autocomplete="off" maxlength="500">
+            <button type="submit" class="enviar-comentario">Enviar</button>
+        </form>
+
     </div>
 </div>
 
