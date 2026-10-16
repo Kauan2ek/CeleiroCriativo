@@ -1,24 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 
-// controller responsável pelas telas de perfil
-// cada action mostra o perfil de um tipo de usuário diferente
+// Controller responsável pelas telas de perfil.
+// As Views existentes se chamam Gestor.cshtml, Funcionario.cshtml e Cliente.cshtml,
+// então os nomes são informados explicitamente para evitar procurar arquivos inexistentes.
 public class PerfilController : Controller
 {
-    // exibe o perfil do gestor
     public ActionResult GestorPerfil()
     {
-        return View();
+        return View("Gestor");
     }
 
-    // exibe o perfil do funcionário
     public ActionResult FuncionarioPerfil()
     {
-        return View();
+        return View("Funcionario");
     }
 
-    // exibe o perfil do cliente
     public ActionResult ClientePerfil()
     {
-        return View();
+        return View("Cliente");
     }
 }

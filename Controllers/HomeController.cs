@@ -18,11 +18,12 @@ public class HomeController : Controller
         return View();
     }
 
-    // Página de cadastro (ainda não implementada)
-    // renderiza o formulário de cadastro de usuário
+    // O cadastro fica dentro da própria landing page.
+    // Enquanto o envio ao banco não faz parte desta etapa, esta rota apenas
+    // leva o usuário até a seção correta em vez de procurar uma View inexistente.
     public ActionResult Cadastro()
     {
-        return View();
+        return Redirect("/Home/Index#cadastro");
     }
 
 }

@@ -76,7 +76,7 @@ CREATE TABLE Clientes (
     pessoa_codigo       INT PRIMARY KEY,
     codigo_verificacao  VARCHAR(20) NULL,
     email               VARCHAR(100) NOT NULL,
-    senha               VARCHAR(255) NULL, -- nullable: só é definida após aprovação da ideia
+    senha               VARCHAR(255) NULL, -- nullable no banco, mas o cadastro atual já permite salvar a senha
     CONSTRAINT FK_Clientes_Pessoa FOREIGN KEY (pessoa_codigo) REFERENCES Pessoas(codigo)
 );
 

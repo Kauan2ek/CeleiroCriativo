@@ -710,3 +710,78 @@ body {
     white-space: nowrap;
     flex-shrink: 0;
 }
+
+/* ==========================================================
+   COMPLEMENTOS DO CRUD COM BANCO
+   ========================================================== */
+.mensagem-crud {
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.sucesso {
+    background-color: #dff4d5;
+    border: 1px solid #9fd28d;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}
+
+/* Select de cliente usa o mesmo visual dos inputs. */
+#clienteProjeto {
+    width: 100%;
+    min-height: 42px;
+    border: none;
+    outline: none;
+    background-color: #ffffff;
+    padding: 0 12px;
+    border-radius: 6px;
+}
+
+.titulo-tarefa-projeto {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.acoes-tarefas-links {
+    gap: 10px;
+}
+
+.link-tarefas-projeto {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 6px;
+    background-color: #e4edf0;
+    color: #333333;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Os formulários de excluir/aprovar/negar ficam fora do formulário principal. */
+.acoes-secundarias-projeto {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.acoes-secundarias-projeto form {
+    margin: 0;
+}
+
+.aviso-tarefas-projeto {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #777777;
+}

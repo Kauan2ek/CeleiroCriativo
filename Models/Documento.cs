@@ -1,7 +1,8 @@
+// Documento anexado a uma Tarefa.
 public class Documento
 {
-    public int Codigo { get; set; } // Código não é alterado via código
-    public string Descricao { get; set; }
-    public string Extensao { get; set; }
-    public string Diretorio { get; set; }
+    public int Codigo { get; set; }
+    public string Descricao { get; set; } = "";
+    public string Extensao { get; set; } = "";
+    public string Diretorio { get; set; } = "";
 }

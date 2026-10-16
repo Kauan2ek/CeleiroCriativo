@@ -1,48 +1,54 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
 
+// Repository auxiliar das Categorias de Tarefa.
 public class CategoriaSqlRepository : DataConnection
 {
+    // Categorias são cadastradas via INSERT nesta etapa; o CRUD de Tarefa
+    // apenas precisa listá-las para o select.
     public List<Categoria> ReadAll()
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = "SELECT * FROM Categorias";
+        cmd.CommandText = "SELECT codigo, descricao, cor FROM Categorias ORDER BY descricao";
 
-        List<Categoria>? categorias = new List<Categoria>();
+        List<Categoria> categorias = new List<Categoria>();
         SqlDataReader reader = cmd.ExecuteReader();
 
         while (reader.Read())
         {
-            Categoria categoria = new Categoria();
-            categoria.Codigo = reader.GetInt32("codigo");
-            categoria.Descricao = reader.GetString("descricao");
-            categoria.Cor = reader.IsDBNull("cor") ? null : reader.GetString("cor");
-
-            categorias.Add(categoria);
+            categorias.Add(new Categoria
+            {
+                Codigo = reader.GetInt32("codigo"),
+                Descricao = reader.GetString("descricao"),
+                Cor = reader.IsDBNull("cor") ? null : reader.GetString("cor")
+            });
         }
 
         reader.Close();
         return categorias;
     }
 
-    // Listar por tarefa - porém na tarefa ele já traz pela VIEW (sugestão de excluir caso não utilize)
-    public Categoria? Read(int idTarefa)
+    // Busca uma categoria pelo próprio código.
+    // Corrige o método antigo, que consultava a tabela Comentarios por engano.
+    public Categoria? Read(int id)
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = "SELECT * FROM Comentarios WHERE tarefa_codigo = @tarefa";
-        cmd.Parameters.AddWithValue("@tarefa", idTarefa);
+        cmd.CommandText = "SELECT codigo, descricao, cor FROM Categorias WHERE codigo = @codigo";
+        cmd.Parameters.AddWithValue("@codigo", id);
 
         Categoria? categoria = null;
         SqlDataReader reader = cmd.ExecuteReader();
-        
+
         if (reader.Read())
         {
-            categoria = new Categoria();
-            categoria.Codigo = reader.GetInt32("codigo");
-            categoria.Descricao = reader.GetString("Descricao");
-            categoria.Cor = reader.IsDBNull("cor") ? null : reader.GetString("cor");
+            categoria = new Categoria
+            {
+                Codigo = reader.GetInt32("codigo"),
+                Descricao = reader.GetString("descricao"),
+                Cor = reader.IsDBNull("cor") ? null : reader.GetString("cor")
+            };
         }
 
         reader.Close();

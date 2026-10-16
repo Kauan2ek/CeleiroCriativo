@@ -1,462 +1,283 @@
+@model Projeto
+
+@{
+    // Código 0 significa que o formulário está criando um novo Projeto.
+    bool novoProjeto = Model.Codigo == 0;
+    bool emAnalise = !novoProjeto && Model.Status.Descricao == "Em análise";
+
+    string statusClasse = "analise";
+    if (Model.Status.Descricao == "Em andamento")
+    {
+        statusClasse = "andamento";
+    }
+    else if (Model.Status.Descricao == "Finalizado")
+    {
+        statusClasse = "finalizado";
+    }
+}
+
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-
-    <!-- faz a página se adaptar a celulares -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- título que aparece na aba do navegador -->
-    <title>Projeto - Celeiro Criativo</title>
-
-    <!-- ícone da aba -->
+    <title>@(novoProjeto ? "Novo Projeto" : "Projeto") - Celeiro Criativo</title>
     <link rel="icon" type="image/png" href="/imagens/logo.png">
-
-    <!-- css específico dessa tela -->
     <link rel="stylesheet" href="/css/exibicao_projeto.css" />
 </head>
 <body>
-<!-- ==================== CABEÇALHO ==================== -->
-
-<header class="cabecalho-projeto">
-
-    <!-- Logo -->
-
-    <!-- clicar na logo volta pra home -->
-
-    <a href="/" class="logo-projeto">
-
-        <img src="/imagens/logo.png"
-             alt="Logo">
-
-    </a>
-
-
-    <!-- Cadastrar funcionário -->
-
-    <!-- atalho pra tela de cadastro de funcionário -->
-
-    <a href="/CadastroFuncionario/CadastroFuncionario"
-       class="cadastrar-funcionario">
-
-        <img src="/imagens/criar_funcionario.png"
-             alt="Cadastrar funcionário">
-
-        <span>
-
-            Cadastrar Funcionário
-
-        </span>
-
-    </a>
-
-
-    <!-- Informações do gestor -->
-
-    <div class="informacoes-gestor">
-
-        <span>
-
-            Nome do Gestor
-
-        </span>
-
-        <!-- link pro perfil do gestor -->
-
-        <a href="/Perfil/GestorPerfil"
-           class="link-perfil">
-
-            <img src="/imagens/Entrar.png"
-                 alt="Perfil do gestor">
-
+    <!-- ==================== CABEÇALHO ==================== -->
+    <header class="cabecalho-projeto">
+        <a href="/" class="logo-projeto">
+            <img src="/imagens/logo.png" alt="Logo">
         </a>
 
-    </div>
+        <a href="/Funcionario/Criar" class="cadastrar-funcionario">
+            <img src="/imagens/criar_funcionario.png" alt="Cadastrar funcionário">
+            <span>Cadastrar Funcionário</span>
+        </a>
 
-</header>
-
-
-<!-- ==================== CONTEÚDO ==================== -->
-
-<main class="conteudo-exibicao">
-
-
-    <!-- ==================== FORMULÁRIO ==================== -->
-
-    <!-- form sem action definida, o envio é controlado pelo js -->
-
-    <form id="formProjeto">
-
-
-        <!-- ==================== LINHA SUPERIOR ==================== -->
-
-        <div class="linha-superior">
-
-            <div class="titulo-exibicao">
-
-                <!-- botão de voltar pra tela de projetos do gestor -->
-
-                <a href="/Projeto/GestorProjeto"
-                   class="voltar-projetos">
-
-                    <img src="/imagens/voltar.png"
-                         alt="Voltar">
-
-                </a>
-
-                <h1>
-
-                    Exibição de Projeto
-
-                </h1>
-
-            </div>
-
-
-            <!-- Situação -->
-
-            <!-- container com id pra o js trocar a classe conforme o status -->
-
-            <div class="situacao analise"
-                 id="containerSituacao">
-
-                <span>
-
-                    Situação:
-
-                </span>
-
-                <!-- select com os status possíveis do projeto -->
-
-                <select id="situacaoProjeto"
-                        name="Situacao">
-
-                    <option value="analise">
-
-                        Em análise
-
-                    </option>
-
-                    <option value="andamento">
-
-                        Em andamento
-
-                    </option>
-
-                    <option value="finalizado">
-
-                        Finalizado
-
-                    </option>
-
-                </select>
-
-            </div>
-
+        <div class="informacoes-gestor">
+            <span>Nome do Gestor</span>
+            <a href="/Perfil/GestorPerfil" class="link-perfil">
+                <img src="/imagens/Entrar.png" alt="Perfil do gestor">
+            </a>
         </div>
-
-
-        <!-- ==================== COLUNAS ==================== -->
-
-        <div class="colunas-projeto">
-
-
-            <!-- ==================== COLUNA ESQUERDA ==================== -->
-
-            <section class="coluna-esquerda">
-
-
-                <!-- Título -->
-
-                <div class="campo-projeto">
-
-                    <label for="tituloProjeto">
-
-                        Título do Projeto
-
-                    </label>
-
-                    <div class="campo-com-icone">
-
-                        <input type="text"
-                               id="tituloProjeto"
-                               name="Titulo"
-                               placeholder="Título do Projeto">
-
-                        <!-- ícone de editar ao lado do campo -->
-
-                        <img src="/imagens/editar.png"
-                             alt="Editar">
-
-                    </div>
-
-                </div>
-
-
-                <!-- Descrição -->
-
-                <div class="campo-projeto">
-
-                    <label for="descricaoProjeto">
-
-                        Descrição de Ideia:
-
-                    </label>
-
-                    <div class="campo-texto">
-
-                        <!-- textarea pra descrição, que costuma ser um texto maior -->
-
-                        <textarea id="descricaoProjeto"
-                                  name="Descricao"
-                                  placeholder="Texto.."></textarea>
-
-                        <img src="/imagens/editar.png"
-                             alt="Editar">
-
-                    </div>
-
-                </div>
-
-
-                <!-- Comentários -->
-
-                <div class="campo-projeto">
-
-                    <label for="comentariosProjeto">
-
-                        Comentários
-
-                    </label>
-
-                    <div class="campo-com-icone">
-
-                        <input type="text"
-                               id="comentariosProjeto"
-                               name="Comentarios"
-                               placeholder="Digite um comentário">
-
-                        <img src="/imagens/editar.png"
-                             alt="Comentários">
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ==================== COLUNA DO MEIO ==================== -->
-
-            <section class="coluna-meio">
-
-
-                <!-- Data de início -->
-
-                <div class="campo-projeto">
-
-                    <label for="dataInicio">
-
-                        Data de Início
-
-                    </label>
-
-                    <div class="campo-com-icone">
-
-                        <input type="date"
-                               id="dataInicio"
-                               name="DataInicio">
-
-                    </div>
-
-                </div>
-
-
-                <!-- Previsão de término -->
-
-                <div class="campo-projeto">
-
-                    <label for="previsaoTermino">
-
-                        Previsão de Término
-
-                    </label>
-
-                    <div class="campo-com-icone">
-
-                        <input type="date"
-                               id="previsaoTermino"
-                               name="PrevisaoTermino">
-
-                    </div>
-
-                </div>
-
-
-                <!-- Data de entrega -->
-
-                <div class="campo-projeto">
-
-                    <label for="dataEntrega">
-
-                        Data de Entrega
-
-                    </label>
-
-                    <div class="campo-com-icone">
-
-                        <input type="date"
-                               id="dataEntrega"
-                               name="DataEntrega">
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ==================== COLUNA DIREITA ==================== -->
-
-            <section class="coluna-tarefas">
-
-                <h2>
-
-                    Tarefas:
-
-                </h2>
-
-
-                <div class="area-tarefas">
-
-
-                    <!-- Tarefa -->
-
-                    <div class="tarefa">
-
-                        <!-- ícone do responsável pela tarefa -->
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Responsável"
-                             class="icone-responsavel">
-
-
-                        <input type="text"
-                               id="tituloTarefa"
-                               name="Tarefa"
-                               placeholder="Título Tarefa">
-
-
-                        <!-- link que abre a tarefa na visão do gestor -->
-
-                        <a href="/Tarefa/GestorTarefa"
-                           class="botao-expandir">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Adicionar tarefa -->
-
-                <div class="acoes-tarefas">
-
-                    <!-- botão pra adicionar uma nova tarefa ao projeto -->
-
-                    <a href="/Tarefa/ExTarefaGestor"
-                       class="botao-documento"
-                       title="Adicionar tarefa">
-
-                        <img src="/imagens/adicionar_tarefa.png"
-                             alt="Adicionar tarefa">
-
+    </header>
+
+    <!-- ==================== CONTEÚDO ==================== -->
+    <main class="conteudo-exibicao">
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
+        }
+        @if (TempData["Erro"] != null)
+        {
+            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+        }
+
+        <!--
+            O formulário sempre envia para Projeto/Salvar.
+            O Controller identifica se é criação ou edição pelo Código do projeto:
+            Código 0  -> cria um novo projeto.
+            Código > 0 -> atualiza um projeto existente.
+
+            Mantemos este fluxo igual ao cadastro de Funcionário, que já está
+            funcionando corretamente no projeto.
+        -->
+        <form method="post" action="/Projeto/Salvar">
+            <input type="hidden" name="Codigo" value="@Model.Codigo">
+
+            <!-- ==================== LINHA SUPERIOR ==================== -->
+            <div class="linha-superior">
+                <div class="titulo-exibicao">
+                    <a href="@Url.Action("GestorProjeto", "Projeto")" class="voltar-projetos">
+                        <img src="/imagens/voltar.png" alt="Voltar">
                     </a>
-
+                    <h1>@(novoProjeto ? "Criar Projeto" : "Exibição de Projeto")</h1>
                 </div>
 
-            </section>
-
-        </div>
-
-
-        <!-- ==================== AÇÕES DO PROJETO ==================== -->
-
-        <div class="acoes-projeto">
-
-
-            <!-- Botão Salvar -->
-
-            <!-- agora é submit de verdade, o js que intercepta o envio -->
-
-            <button type="submit"
-                    class="botao-salvar">
-
-                Salvar
-
-            </button>
-
-
-            <!-- Botão Excluir Projeto -->
-
-            <!-- type button impede que o botão envie o formulário -->
-
-            <button type="button"
-                    id="btnExcluirProjeto"
-                    class="botao-excluir">
-
-                Excluir Projeto
-
-            </button>
-
-
-            <!-- Botões Aprovar e Negar -->
-
-            <div class="botoes-aprovacao"
-                 id="botoesAprovacao">
-
-                <button type="button"
-                        class="botao-aprovar">
-
-                    Aprovar
-
-                </button>
-
-                <button type="button"
-                        class="botao-negar">
-
-                    Negar
-
-                </button>
-
+                <!-- Status é entidade própria para Projeto. -->
+                <div class="situacao @statusClasse" id="containerSituacao">
+                    <span>Situação:</span>
+                    <select id="situacaoProjeto" name="StatusCodigo">
+                        @foreach (Status status in ViewBag.StatusList)
+                        {
+                            if (Model.Status.Codigo == status.Codigo)
+                            {
+                                <option value="@status.Codigo" selected>@status.Descricao</option>
+                            }
+                            else
+                            {
+                                <option value="@status.Codigo">@status.Descricao</option>
+                            }
+                        }
+                    </select>
+                </div>
             </div>
 
-        </div>
+            <!-- ==================== COLUNAS ==================== -->
+            <div class="colunas-projeto">
+                <!-- Dados principais do Projeto. -->
+                <section class="coluna-esquerda">
+                    <div class="campo-projeto">
+                        <label for="tituloProjeto">Título do Projeto</label>
+                        <div class="campo-com-icone">
+                            <input type="text"
+                                   id="tituloProjeto"
+                                   name="Titulo"
+                                   value="@Model.Titulo"
+                                   maxlength="50"
+                                   required
+                                   placeholder="Título do Projeto">
+                            <img src="/imagens/editar.png" alt="Editar">
+                        </div>
+                    </div>
 
-    </form>
+                    <div class="campo-projeto">
+                        <label for="clienteProjeto">Cliente</label>
+                        <div class="campo-com-icone">
+                            <select id="clienteProjeto" name="ClienteCodigo" required>
+                                <option value="">Selecione o cliente</option>
+                                @foreach (Cliente cliente in ViewBag.Clientes)
+                                {
+                                    if (Model.Cliente.Codigo == cliente.Codigo)
+                                    {
+                                        <option value="@cliente.Codigo" selected>@cliente.Nome</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@cliente.Codigo">@cliente.Nome</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
 
-</main>
+                    <div class="campo-projeto">
+                        <label for="descricaoProjeto">Descrição da ideia</label>
+                        <div class="campo-texto">
+                            <textarea id="descricaoProjeto"
+                                      name="Descricao"
+                                      placeholder="Descreva o projeto...">@Model.Descricao</textarea>
+                            <img src="/imagens/editar.png" alt="Editar">
+                        </div>
+                    </div>
+                </section>
 
+                <!-- Datas do Projeto. -->
+                <section class="coluna-meio">
+                    <div class="campo-projeto">
+                        <label for="dataInicio">Data de Início</label>
+                        <div class="campo-com-icone">
+                            <input type="date"
+                                   id="dataInicio"
+                                   name="DataInicio"
+                                   value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")">
+                        </div>
+                    </div>
 
-<!-- ==================== JAVASCRIPT ==================== -->
+                    <div class="campo-projeto">
+                        <label for="previsaoTermino">Previsão de Término</label>
+                        <div class="campo-com-icone">
+                            <input type="date"
+                                   id="previsaoTermino"
+                                   name="DataPrevista"
+                                   value="@(Model.DataPrevista.HasValue ? Model.DataPrevista.Value.ToString("yyyy-MM-dd") : "")">
+                        </div>
+                    </div>
 
-<script>
+                    <div class="campo-projeto">
+                        <label for="dataEntrega">Data de Entrega</label>
+                        <div class="campo-com-icone">
+                            <input type="date"
+                                   id="dataEntrega"
+                                   name="DataFim"
+                                   value="@(Model.DataFim.HasValue ? Model.DataFim.Value.ToString("yyyy-MM-dd") : "")">
+                        </div>
+                    </div>
+                </section>
 
-    // guarda a rota do gestor numa variável global
+                <!-- Resumo das tarefas do Projeto. -->
+                <section class="coluna-tarefas">
+                    <h2>Tarefas:</h2>
 
-    // o js externo usa isso pra redirecionar sem precisar chumbar a url
+                    <div class="area-tarefas">
+                        @if (novoProjeto)
+                        {
+                            <span>Salve o projeto antes de cadastrar tarefas.</span>
+                        }
+                        else if (Model.tarefas == null || Model.tarefas.Count == 0)
+                        {
+                            <span>Este projeto ainda não possui tarefas.</span>
+                        }
+                        else
+                        {
+                            @foreach (Tarefa tarefa in Model.tarefas)
+                            {
+                                <div class="tarefa">
+                                    <img src="/imagens/Entrar.png"
+                                         alt="Tarefa"
+                                         class="icone-responsavel">
 
-    window.rotaGestorProjeto =
-        '@Url.Action("GestorProjeto", "Projeto")';
+                                    <span class="titulo-tarefa-projeto" title="@tarefa.Titulo">
+                                        @tarefa.Titulo
+                                    </span>
 
-</script>
+                                    <a href="/Tarefa/ExTarefaGestor?id=@tarefa.Codigo"
+                                       class="botao-expandir"
+                                       title="Abrir tarefa">
+                                        <img src="/imagens/abrir.png" alt="Abrir">
+                                    </a>
+                                </div>
+                            }
+                        }
+                    </div>
 
-<script src="/js/projeto.js"></script>
+                    @if (!novoProjeto && !emAnalise)
+                    {
+                        <div class="acoes-tarefas acoes-tarefas-links">
+                            <!-- Página própria que lista todas as tarefas deste projeto. -->
+                            <a href="/Tarefa/GestorTarefa?id=@Model.Codigo" class="link-tarefas-projeto">
+                                Ver todas
+                            </a>
 
+                            <a href="/Tarefa/ExTarefaGestor?projetoCodigo=@Model.Codigo"
+                               class="botao-documento"
+                               title="Adicionar tarefa">
+                                <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
+                            </a>
+                        </div>
+                    }
+                    else if (emAnalise)
+                    {
+                        <p class="aviso-tarefas-projeto">Aprove o projeto antes de cadastrar tarefas.</p>
+                    }
+                </section>
+            </div>
+
+            <!--
+                O botão está dentro do próprio formulário, por isso basta usar
+                type="submit". Não é necessário informar o atributo form.
+            -->
+            <div class="acoes-projeto">
+                <button type="submit" class="botao-salvar">
+                    @(novoProjeto ? "Criar Projeto" : "Salvar Alterações")
+                </button>
+            </div>
+        </form>
+
+        <!-- ==================== AÇÕES FORA DO FORM PRINCIPAL ==================== -->
+        @if (!novoProjeto)
+        {
+            <div class="acoes-secundarias-projeto">
+                <!-- Exclusão normal é lógica: Status = Excluído. -->
+                <form method="post" action="@Url.Action("Excluir", "Projeto")"
+                      onsubmit="return confirm('Tem certeza que deseja excluir este projeto?');">
+                    <input type="hidden" name="id" value="@Model.Codigo">
+                    <button type="submit" class="botao-excluir">Excluir Projeto</button>
+                </form>
+
+                @if (emAnalise)
+                {
+                    <!-- Aprovar apenas muda o projeto para Em andamento. -->
+                    <form method="post" action="@Url.Action("Aprovar", "Projeto")">
+                        <input type="hidden" name="id" value="@Model.Codigo">
+                        <button type="submit" class="botao-aprovar">Aprovar</button>
+                    </form>
+
+                    <!-- Negar remove fisicamente a solicitação Em análise. -->
+                    <form method="post" action="@Url.Action("Negar", "Projeto")"
+                          onsubmit="return confirm('Negar e remover este projeto?');">
+                        <input type="hidden" name="id" value="@Model.Codigo">
+                        <button type="submit" class="botao-negar">Negar</button>
+                    </form>
+                }
+            </div>
+        }
+    </main>
+
+    <!-- JS apenas para efeitos visuais do status; os dados são salvos pelo Controller. -->
+    <script src="/js/projeto.js"></script>
 </body>
 </html>

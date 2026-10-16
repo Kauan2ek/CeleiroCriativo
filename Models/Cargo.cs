@@ -1,5 +1,6 @@
+// Cargo de um funcionário.
 public class Cargo
 {
-    public int Codigo { get; set; } // Código não é alterado via código
-    public string Descricao { get; set; }
+    public int Codigo { get; set; }
+    public string Descricao { get; set; } = "";
 }

@@ -1,0 +1,90 @@
+@model List<Funcionario>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funcionários - Celeiro Criativo</title>
+    <link rel="icon" type="image/png" href="/imagens/logo.png">
+    <link rel="stylesheet" href="/css/cadastro_funcionario.css" />
+</head>
+<body>
+    <header class="cabecalho-cadastro">
+        <a href="/" class="logo-cadastro">
+            <img src="/imagens/logo.png" alt="Logo">
+        </a>
+
+        <div class="informacoes-gestor">
+            <span>Nome do Gestor</span>
+            <a href="/Perfil/GestorPerfil" class="link-perfil">
+                <img src="/imagens/Entrar.png" alt="Perfil do gestor">
+            </a>
+        </div>
+    </header>
+
+    <main class="conteudo-cadastro">
+        <div class="titulo-cadastro">
+            <a href="/Projeto/GestorProjeto" class="voltar-cadastro">
+                <img src="/imagens/voltar.png" alt="Voltar">
+            </a>
+
+            <h1>Funcionários</h1>
+
+            <a href="/Funcionario/Criar" class="botao-ver-funcionarios">
+                + Cadastrar Funcionário
+            </a>
+        </div>
+
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
+        }
+        @if (TempData["Erro"] != null)
+        {
+            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+        }
+
+        <!-- Lista real vinda do banco; substitui o localStorage usado no protótipo. -->
+        <div class="lista-funcionarios-crud">
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="funcionario-crud vazio">Nenhum funcionário ativo cadastrado.</div>
+            }
+            else
+            {
+                @foreach (Funcionario funcionario in Model)
+                {
+                    <div class="funcionario-crud">
+                        <div class="icone-funcionario-crud">
+                            <img src="/imagens/Entrar.png" alt="Funcionário">
+                        </div>
+
+                        <div class="dados-funcionario-crud">
+                            <strong>@funcionario.Nome</strong>
+                            <span>@funcionario.Cargo.Descricao</span>
+                            <span>@funcionario.Email</span>
+                        </div>
+
+                        <div class="acoes-funcionario-crud">
+                            <a href="/Funcionario/Editar?id=@funcionario.Codigo" class="botao-editar-funcionario">
+                                Editar
+                            </a>
+
+                            <!-- Exclusão lógica: define ativo = 0. -->
+                            <form method="post"
+                                  action="/Funcionario/Excluir"
+                                  onsubmit="return confirm('Desativar este funcionário?');">
+                                <input type="hidden" name="id" value="@funcionario.Codigo">
+                                <button type="submit" class="botao-excluir-funcionario">
+                                    Desativar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </main>
+</body>
+</html>

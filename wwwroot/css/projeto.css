@@ -309,3 +309,23 @@ body {
     width: 100%;
 }
 
+
+/* ==========================================================
+   COMPLEMENTOS DO CRUD COM BANCO
+   ========================================================== */
+.mensagem-crud {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.sucesso {
+    background-color: #dff4d5;
+    border: 1px solid #9fd28d;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}

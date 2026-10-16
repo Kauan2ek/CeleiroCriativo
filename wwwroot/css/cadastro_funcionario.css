@@ -314,3 +314,94 @@ body {
     color: #777;
     padding: 20px;
 }
+/* ==========================================================
+   LISTAGEM / CRUD DE FUNCIONÁRIOS
+   ========================================================== */
+.mensagem-crud {
+    max-width: 900px;
+    margin: 0 auto 14px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.sucesso {
+    background-color: #dff4d5;
+    border: 1px solid #9fd28d;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}
+
+.lista-funcionarios-crud {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.funcionario-crud {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #d7dde3;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+.funcionario-crud.vazio {
+    color: #666666;
+}
+
+.icone-funcionario-crud img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.dados-funcionario-crud {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.dados-funcionario-crud span {
+    font-size: 13px;
+    color: #666666;
+}
+
+.acoes-funcionario-crud {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.acoes-funcionario-crud form {
+    margin: 0;
+}
+
+.botao-editar-funcionario,
+.botao-excluir-funcionario {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.botao-editar-funcionario {
+    background-color: #e4edf0;
+    color: #333333;
+}
+
+.botao-excluir-funcionario {
+    background-color: #d9534f;
+    color: white;
+}

@@ -1222,3 +1222,82 @@ body {
 .botao-excluir-arquivo:hover {
     opacity: 0.65;
 }
+/* ==========================================================
+   COMPLEMENTOS DO CRUD COM BANCO
+   ========================================================== */
+.mensagem-crud {
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}
+
+.campo-visibilidade > div {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+.campo-visibilidade input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+/* Checkbox real usado no modal; substitui a seleção apenas visual do protótipo. */
+.checkbox-funcionario {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.funcionario-item:has(.checkbox-funcionario:checked) {
+    background-color: #eefbdd;
+}
+
+.titulo-comentarios-leitura {
+    margin-top: 20px;
+}
+
+.comentarios-leitura {
+    max-height: 260px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comentario-leitura {
+    padding: 9px;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    background-color: #ffffff;
+    font-size: 12px;
+}
+
+.comentario-leitura strong,
+.comentario-leitura span {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.comentario-leitura p {
+    margin: 5px 0 0;
+    line-height: 1.4;
+}
+
+.form-excluir-tarefa {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+/* Durante a criação o status permanece "A fazer" no formulário,
+   mas visualmente fica oculto como na primeira versão da tela. */
+.situacao-nova-tarefa {
+    display: none;
+}

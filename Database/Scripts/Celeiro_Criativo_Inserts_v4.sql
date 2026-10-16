@@ -9,7 +9,7 @@
 --   2) Todos os dados são fictícios (nomes, documentos, e-mails,
 --      telefones e diretórios de arquivos).
 --   3) As senhas estão em texto puro ('123456'), apenas para teste.
---   4) Status tem só 3 registros: são os 3 status de projeto definidos.
+--   4) Status possui os 3 estados de projeto e o status 'Excluído' usado na exclusão lógica.
 --   5) Datas no formato ISO ('AAAAMMDD' e 'AAAA-MM-DDTHH:MM:SS'), que
 --      não depende do idioma configurado no SQL Server.
 --   6) Tudo roda em uma transação: se um insert falhar, nada é gravado.
@@ -49,7 +49,8 @@ INSERT INTO Cargos (descricao) VALUES
 INSERT INTO Status (descricao) VALUES
     ('Em análise'),         -- 1
     ('Em andamento'),       -- 2
-    ('Finalizado');         -- 3
+    ('Finalizado'),         -- 3
+    ('Excluído');           -- 4 - usado para exclusão lógica de Projeto
 
 INSERT INTO Categorias (descricao, cor) VALUES
     ('Design',          '#4A90D9'),   -- 1
@@ -69,13 +70,13 @@ INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha) VALU
     (4, 4, 1, 'larissa@celeirocriativo.com', '123456'),   -- Editor de Vídeo
     (5, 5, 1, 'tiago@celeirocriativo.com',   '123456');   -- Redator
 
--- Cliente 10 ainda não tem senha: o projeto dele está "Em análise".
+-- Mesmo projetos em análise podem ter senha: o cadastro da landing page já salva a senha.
 INSERT INTO Clientes (pessoa_codigo, codigo_verificacao, email, senha) VALUES
     (6,  'A1B2C3', 'contato@cafeaurora.exemplo.com',    '123456'),
     (7,  'D4E5F6', 'contato@ecoverde.exemplo.com',      '123456'),
     (8,  'G7H8I9', 'contato@tecnova.exemplo.com',       '123456'),
     (9,  'J1K2L3', 'contato@floresdocampo.exemplo.com', '123456'),
-    (10, 'M4N5O6', 'marina@exemplo.com',                NULL);
+    (10, 'M4N5O6', 'marina@exemplo.com',                '123456');
 
 -- ---------------------------------------------------------------------
 -- PROJETOS (depende de Clientes e Status)

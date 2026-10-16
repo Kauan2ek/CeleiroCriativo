@@ -17,11 +17,16 @@ public abstract class DataConnection
         Database=sistematarefas;
         TrustServerCertificate=true";*/
 
-        // Kauan
+        /* Kauan
         string strConn = @"Server=(localdb)\MSSQLLocalDB;
         Database=CeleiroCriativo;
         Trusted_Connection=True;
-        TrustServerCertificate=true";
+        TrustServerCertificate=true"; */
+
+        string strConn = @"Server=DESKTOP-0PQAFOH\SQLEXPRESS;
+Database=CeleiroCriativo;
+Trusted_Connection=True;
+TrustServerCertificate=true";
         
         conn = new SqlConnection(strConn);
         conn.Open();

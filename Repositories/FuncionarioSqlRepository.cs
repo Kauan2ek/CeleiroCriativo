@@ -1,123 +1,305 @@
-// o System.Data traz métodos extras pro reader (GetInt32, GetString, GetDateTime...)
-// que recebem o NOME da coluna em vez do índice dela
-// por baixo ele procura a posição da coluna pelo nome e lê o valor dessa posição
-// aqui é usado no ListarFuncionario(), pra ler cada coluna sem depender da ordem delas na tabela
-// o nome passado tem que ser o nome da coluna no banco (ou no SELECT), não o da propriedade da model
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-// repositório dos funcionários: por enquanto só tem a parte da equipe de uma tarefa
-// (listar quem está alocado e atualizar a tabela TarefaFuncionarios)
-// herda de DataConnection, que abre a conexão no construtor e deixa ela disponível em "conn"
-// quem cria o repositório é quem tem que chamar o Dispose() pra fechar a conexão
-public class FuncionarioSqlRepository: DataConnection
+// Repository de Funcionário.
+// Além do CRUD do funcionário, esta classe mantém as funções de associação
+// entre Funcionário e Tarefa que já existiam no projeto.
+public class FuncionarioSqlRepository : DataConnection
 {
-    // lista os funcionários que estão alocados numa tarefa (o id recebido é o código da TAREFA)
-    // cada Funcionario volta completo: dados de pessoa, email, senha, ativo e o cargo
-    // a consulta usa a function F_FuncionariosDaTarefa (Database/Scripts/Functions.sql),
-    // que já junta TarefaFuncionarios, Funcionarios, Pessoas e Cargos e recebe o código da tarefa como parâmetro
-    // atenção: a senha vem junto, e como o Read da tarefa devolve esses funcionários em JSON, ela aparece na resposta
-    public List<Funcionario> FuncionariosTarefa (int id) 
+    // Lista funcionários. Por padrão mostra apenas os ativos, pois a exclusão
+    // é lógica e usa a coluna Funcionarios.ativo.
+    public List<Funcionario> ReadAll(bool incluirInativos = false)
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = "SELECT * FROM F_FuncionariosDaTarefa (@tarefa)";
+        cmd.CommandText = @"
+            SELECT P.codigo, P.nome, P.telefone, P.documento, P.tipo_doc,
+                   F.email, F.ativo,
+                   C.codigo AS cargo_codigo, C.descricao AS cargo_descricao
+            FROM Funcionarios F
+            INNER JOIN Pessoas P ON P.codigo = F.pessoa_codigo
+            INNER JOIN Cargos C ON C.codigo = F.cargo_codigo
+            WHERE (@incluirInativos = 1 OR F.ativo = 1)
+            ORDER BY P.nome
+        ";
+        cmd.Parameters.AddWithValue("@incluirInativos", incluirInativos);
 
-        cmd.Parameters.AddWithValue("tarefa", id);
-
-        // ExecuteReader é pra comandos que devolvem linhas (SELECT)
+        List<Funcionario> funcionarios = new List<Funcionario>();
         SqlDataReader reader = cmd.ExecuteReader();
 
-        // cada volta do while é uma linha do resultado
-        // o Read() anda pra próxima linha e devolve false quando acabam
-        List<Funcionario> funcionarios = new List<Funcionario>();
         while (reader.Read())
         {
-            Funcionario funcionario = new Funcionario();
-            // cada coluna é lida pelo nome que a function devolve (ex: tipo_documento, cargo_descricao)
-            // o telefone pode ser nulo no banco, por isso o IsDBNull antes
-            // o cargo é um objeto dentro do funcionário, montado com as colunas cargo_*
-            funcionario.Codigo        = reader.GetInt32("codigo");
-            funcionario.Nome          = reader.GetString("nome");
-            funcionario.Email         = reader.GetString("email");
-            funcionario.Senha         = reader.GetString("senha");
-            funcionario.Telefone      = reader.IsDBNull("telefone") ? null : reader.GetString("telefone");
-            funcionario.TipoDocumento = reader.GetString("tipo_documento");
-            funcionario.Documento     = reader.GetString("documento");
-            funcionario.Ativo         = reader.GetBoolean("ativo");
-            funcionario.Cargo         = new Cargo {
-                Codigo    = reader.GetInt32("cargo_codigo"),
-                Descricao = reader.GetString("cargo_descricao"),
-            };
-
-            funcionarios.Add(funcionario);
+            funcionarios.Add(MontarFuncionario(reader));
         }
 
-        // a conexão só aceita um reader aberto por vez, tem que fechar antes de rodar outro comando
         reader.Close();
         return funcionarios;
     }
 
-    // deixa a equipe da tarefa igual à lista recebida
-    // compara quem já está no banco com quem veio na lista nova:
-    // quem é novo é inserido, quem saiu da lista é removido, e quem continua não é tocado
-    public void AtualizarFuncionarios (int idTarefa, List<Funcionario> funcionarios)
+    // Busca um funcionário pelo código.
+    public Funcionario? Read(int id)
     {
-        // códigos de quem está na tarefa hoje, no banco
-        // o ListarFuncionario traz o funcionário completo, mas aqui só o código interessa
-        List<int> ListaAtual = new List<int>();
-        foreach (var funcionario in FuncionariosTarefa(idTarefa))
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT P.codigo, P.nome, P.telefone, P.documento, P.tipo_doc,
+                   F.email, F.ativo,
+                   C.codigo AS cargo_codigo, C.descricao AS cargo_descricao
+            FROM Funcionarios F
+            INNER JOIN Pessoas P ON P.codigo = F.pessoa_codigo
+            INNER JOIN Cargos C ON C.codigo = F.cargo_codigo
+            WHERE P.codigo = @codigo
+        ";
+        cmd.Parameters.AddWithValue("@codigo", id);
+
+        Funcionario? funcionario = null;
+        SqlDataReader reader = cmd.ExecuteReader();
+
+        if (reader.Read())
         {
-            ListaAtual.Add(funcionario.Codigo);
+            funcionario = MontarFuncionario(reader);
         }
 
-        // códigos de quem deve ficar na tarefa, vindos do formulário
-        List<int> ListaNova = new List<int>();
-        foreach (var funcionario in funcionarios)
+        reader.Close();
+        return funcionario;
+    }
+
+    // Cria Pessoa e Funcionário na mesma transação.
+    // Se o segundo INSERT falhar, o primeiro também é desfeito.
+    public int Create(Funcionario funcionario)
+    {
+        SqlTransaction transaction = conn.BeginTransaction();
+
+        try
         {
-            ListaNova.Add(funcionario.Codigo);
+            SqlCommand cmdPessoa = new SqlCommand();
+            cmdPessoa.Connection = conn;
+            cmdPessoa.Transaction = transaction;
+            cmdPessoa.CommandText = @"
+                INSERT INTO Pessoas (nome, telefone, documento, tipo_doc)
+                VALUES (@nome, @telefone, @documento, @tipoDocumento);
+
+                SELECT CAST(SCOPE_IDENTITY() AS INT);
+            ";
+            cmdPessoa.Parameters.AddWithValue("@nome", funcionario.Nome);
+            cmdPessoa.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(funcionario.Telefone) ? DBNull.Value : funcionario.Telefone);
+            cmdPessoa.Parameters.AddWithValue("@documento", funcionario.Documento);
+            cmdPessoa.Parameters.AddWithValue("@tipoDocumento", funcionario.TipoDocumento);
+
+            int codigoPessoa = (int)cmdPessoa.ExecuteScalar();
+
+            SqlCommand cmdFuncionario = new SqlCommand();
+            cmdFuncionario.Connection = conn;
+            cmdFuncionario.Transaction = transaction;
+            cmdFuncionario.CommandText = @"
+                INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha)
+                VALUES (@pessoa, @cargo, 1, @email, @senha)
+            ";
+            cmdFuncionario.Parameters.AddWithValue("@pessoa", codigoPessoa);
+            cmdFuncionario.Parameters.AddWithValue("@cargo", funcionario.Cargo.Codigo);
+            cmdFuncionario.Parameters.AddWithValue("@email", funcionario.Email);
+            cmdFuncionario.Parameters.AddWithValue("@senha", funcionario.Senha);
+            cmdFuncionario.ExecuteNonQuery();
+
+            transaction.Commit();
+            return codigoPessoa;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    // Atualiza os dados de Pessoa e Funcionário.
+    // Quando a senha vem vazia na edição, a senha atual é mantida.
+    public bool Update(Funcionario funcionario)
+    {
+        SqlTransaction transaction = conn.BeginTransaction();
+
+        try
+        {
+            SqlCommand cmdPessoa = new SqlCommand();
+            cmdPessoa.Connection = conn;
+            cmdPessoa.Transaction = transaction;
+            cmdPessoa.CommandText = @"
+                UPDATE Pessoas
+                SET nome = @nome,
+                    telefone = @telefone,
+                    documento = @documento,
+                    tipo_doc = @tipoDocumento
+                WHERE codigo = @codigo
+            ";
+            cmdPessoa.Parameters.AddWithValue("@codigo", funcionario.Codigo);
+            cmdPessoa.Parameters.AddWithValue("@nome", funcionario.Nome);
+            cmdPessoa.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(funcionario.Telefone) ? DBNull.Value : funcionario.Telefone);
+            cmdPessoa.Parameters.AddWithValue("@documento", funcionario.Documento);
+            cmdPessoa.Parameters.AddWithValue("@tipoDocumento", funcionario.TipoDocumento);
+
+            bool pessoaAtualizada = cmdPessoa.ExecuteNonQuery() > 0;
+
+            SqlCommand cmdFuncionario = new SqlCommand();
+            cmdFuncionario.Connection = conn;
+            cmdFuncionario.Transaction = transaction;
+
+            // A senha só entra no SET quando uma nova senha foi informada.
+            if (string.IsNullOrWhiteSpace(funcionario.Senha))
+            {
+                cmdFuncionario.CommandText = @"
+                    UPDATE Funcionarios
+                    SET cargo_codigo = @cargo,
+                        email = @email
+                    WHERE pessoa_codigo = @codigo
+                ";
+            }
+            else
+            {
+                cmdFuncionario.CommandText = @"
+                    UPDATE Funcionarios
+                    SET cargo_codigo = @cargo,
+                        email = @email,
+                        senha = @senha
+                    WHERE pessoa_codigo = @codigo
+                ";
+                cmdFuncionario.Parameters.AddWithValue("@senha", funcionario.Senha);
+            }
+
+            cmdFuncionario.Parameters.AddWithValue("@codigo", funcionario.Codigo);
+            cmdFuncionario.Parameters.AddWithValue("@cargo", funcionario.Cargo.Codigo);
+            cmdFuncionario.Parameters.AddWithValue("@email", funcionario.Email);
+
+            bool funcionarioAtualizado = cmdFuncionario.ExecuteNonQuery() > 0;
+
+            // Se uma das duas tabelas não encontrou o registro, não deixamos
+            // uma atualização pela metade.
+            if (!pessoaAtualizada || !funcionarioAtualizado)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    // Exclusão lógica: mantém o histórico e os vínculos com tarefas,
+    // mas o funcionário deixa de aparecer nas listagens e novas atribuições.
+    public bool Delete(int id)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = "UPDATE Funcionarios SET ativo = 0 WHERE pessoa_codigo = @codigo";
+        cmd.Parameters.AddWithValue("@codigo", id);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    // Lista os funcionários alocados em uma tarefa.
+    public List<Funcionario> FuncionariosTarefa(int idTarefa)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT P.codigo, P.nome, P.telefone, P.documento, P.tipo_doc,
+                   F.email, F.ativo,
+                   C.codigo AS cargo_codigo, C.descricao AS cargo_descricao
+            FROM TarefaFuncionarios TF
+            INNER JOIN Funcionarios F ON F.pessoa_codigo = TF.funcionario_codigo
+            INNER JOIN Pessoas P ON P.codigo = F.pessoa_codigo
+            INNER JOIN Cargos C ON C.codigo = F.cargo_codigo
+            WHERE TF.tarefa_codigo = @tarefa
+            ORDER BY P.nome
+        ";
+        cmd.Parameters.AddWithValue("@tarefa", idTarefa);
+
+        List<Funcionario> funcionarios = new List<Funcionario>();
+        SqlDataReader reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            funcionarios.Add(MontarFuncionario(reader));
         }
 
-        // Except devolve o que está na primeira lista e não está na segunda (e já tira os repetidos)
-        // adicionar = está na nova mas não na atual
-        // remover = está na atual mas não na nova
-        List<int> adicionar = ListaNova.Except(ListaAtual).ToList();
-        List<int> remover = ListaAtual.Except(ListaNova).ToList();
+        reader.Close();
+        return funcionarios;
+    }
 
-        // um insert por funcionário novo, cada um vira uma linha em TarefaFuncionarios
-        foreach (var codigo in adicionar)
+    // Deixa a equipe da tarefa exatamente igual à lista recebida.
+    public void AtualizarFuncionarios(int idTarefa, List<Funcionario> funcionarios)
+    {
+        List<int> listaAtual = new List<int>();
+        foreach (Funcionario funcionario in FuncionariosTarefa(idTarefa))
+        {
+            listaAtual.Add(funcionario.Codigo);
+        }
+
+        List<int> listaNova = new List<int>();
+        foreach (Funcionario funcionario in funcionarios)
+        {
+            listaNova.Add(funcionario.Codigo);
+        }
+
+        List<int> adicionar = listaNova.Except(listaAtual).ToList();
+        List<int> remover = listaAtual.Except(listaNova).ToList();
+
+        // Adiciona novos funcionários à tarefa.
+        foreach (int codigo in adicionar)
         {
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             cmd.CommandText = @"
-            insert into TarefaFuncionarios
-                (funcionario_codigo, tarefa_codigo)
-            values
-                (@funcionario, @tarefa)
+                INSERT INTO TarefaFuncionarios (funcionario_codigo, tarefa_codigo)
+                VALUES (@funcionario, @tarefa)
             ";
             cmd.Parameters.AddWithValue("@funcionario", codigo);
             cmd.Parameters.AddWithValue("@tarefa", idTarefa);
-
-            // ExecuteNonQuery é pra comandos que não devolvem linhas (INSERT, UPDATE, DELETE)
             cmd.ExecuteNonQuery();
         }
 
-        // pra cada funcionário que saiu: tira o vínculo e os comentários dele nessa tarefa
-        // atenção: a tabela Comentarios tem FK pra TarefaFuncionarios, então o banco só deixa
-        // apagar o vínculo depois que os comentários já saíram. Do jeito que está (vínculo primeiro),
-        // o primeiro delete dá erro de FK quando o funcionário tem comentário na tarefa
-        foreach (var codigo in remover)
+        // Para remover um funcionário da equipe, primeiro apagamos os comentários
+        // escritos por ele naquela tarefa. Essa ordem corrige o erro de FK que havia
+        // no código anterior.
+        foreach (int codigo in remover)
         {
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             cmd.CommandText = @"
-            DELETE FROM TarefaFuncionarios WHERE funcionario_codigo = @codigo AND tarefa_codigo = @tarefa;
-            DELETE FROM Comentarios WHERE funcionario_codigo = @codigo AND tarefa_codigo = @tarefa;
-            ";
-            cmd.Parameters.AddWithValue("@codigo", codigo);
-            cmd.Parameters.AddWithValue("@tarefa", idTarefa);
+                DELETE FROM Comentarios
+                WHERE funcionario_codigo = @funcionario AND tarefa_codigo = @tarefa;
 
+                DELETE FROM TarefaFuncionarios
+                WHERE funcionario_codigo = @funcionario AND tarefa_codigo = @tarefa;
+            ";
+            cmd.Parameters.AddWithValue("@funcionario", codigo);
+            cmd.Parameters.AddWithValue("@tarefa", idTarefa);
             cmd.ExecuteNonQuery();
         }
+    }
+
+    // Monta a Model sem trazer a senha para telas/listagens.
+    private Funcionario MontarFuncionario(SqlDataReader reader)
+    {
+        return new Funcionario
+        {
+            Codigo = reader.GetInt32("codigo"),
+            Nome = reader.GetString("nome"),
+            Telefone = reader.IsDBNull("telefone") ? null : reader.GetString("telefone"),
+            Documento = reader.GetString("documento"),
+            TipoDocumento = reader.GetString("tipo_doc"),
+            Email = reader.GetString("email"),
+            Senha = "",
+            Ativo = reader.GetBoolean("ativo"),
+            Cargo = new Cargo
+            {
+                Codigo = reader.GetInt32("cargo_codigo"),
+                Descricao = reader.GetString("cargo_descricao")
+            }
+        };
     }
 }
