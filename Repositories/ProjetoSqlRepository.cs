@@ -160,9 +160,7 @@ public class ProjetoSqlRepository : DataConnection
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    // Ao NEGAR uma solicitação que ainda está "Em análise", o usuário pediu
-    // para remover o Projeto por enquanto. Como projetos em análise não deveriam
-    // ter tarefas, o DELETE físico é permitido apenas quando não há tarefas ligadas.
+    // Ao NEGAR uma solicitação que ainda está "Em análise", é realizado a exclusão do banco
     public bool Negar(int id)
     {
         SqlCommand cmd = new SqlCommand();
