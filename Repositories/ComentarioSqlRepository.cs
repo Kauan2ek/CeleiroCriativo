@@ -7,9 +7,6 @@ using Microsoft.Data.SqlClient;
 public class ComentarioSqlRepository : DataConnection
 {
     // Retorna todos os comentários pertencentes à tarefa informada.
-    //
-    // Antes este método dependia da View SQL V_Comentarios. Isso fazia a abertura
-    // da tarefa falhar quando a View ainda não tinha sido criada no banco local.
     // Como todas as informações necessárias já existem nas tabelas, fazemos os
     // JOINs diretamente aqui, mantendo o mesmo padrão usado nos outros repositories.
     public List<Comentario> ComentariosTarefa(int idTarefa)
