@@ -6,6 +6,7 @@ public class CategoriaSqlRepository : DataConnection
 {
     // Categorias são cadastradas via INSERT nesta etapa; o CRUD de Tarefa
     // apenas precisa listá-las para o select.
+    // Usado pela action DetalhesGestor do TarefaController (ViewBag.Categorias).
     public List<Categoria> ReadAll()
     {
         SqlCommand cmd = new SqlCommand();
@@ -29,8 +30,8 @@ public class CategoriaSqlRepository : DataConnection
         return categorias;
     }
 
-    // Busca uma categoria pelo próprio código.
-    // Corrige o método antigo, que consultava a tabela Comentarios por engano.
+    // Busca uma categoria pelo próprio código, na tabela Categorias.
+    // Retorna null se não encontrar.
     public Categoria? Read(int id)
     {
         SqlCommand cmd = new SqlCommand();

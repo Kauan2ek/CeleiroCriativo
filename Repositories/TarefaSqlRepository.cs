@@ -41,8 +41,9 @@ public class TarefaSqlRepository: DataConnection
         cmd.Parameters.AddWithValue("@categoria", tarefa.Categoria.Codigo);
         cmd.Parameters.AddWithValue("@titulo", tarefa.Titulo);
         cmd.Parameters.AddWithValue("@descricao", tarefa.Descricao);
-        // se o status não vier preenchido, a tarefa nasce como "A Fazer"
-        cmd.Parameters.AddWithValue("@status", tarefa.Status == null ? "A Fazer" : tarefa.Status);
+        // se o status não vier preenchido, a tarefa nasce como "A fazer"
+        // tem que ser escrito igual ao banco, ao select da tela e ao kanban, porque o C# e o js comparam letra por letra
+        cmd.Parameters.AddWithValue("@status", tarefa.Status == null ? "A fazer" : tarefa.Status);
 
         // datas podem ser nulas, e o banco não entende o null do C#, precisa usar o DBNull.Value
         // HasValue verifica se a data foi preenchida: se sim manda a data, se não manda DBNull.Value
@@ -68,12 +69,13 @@ public class TarefaSqlRepository: DataConnection
             new FuncionarioSqlRepository().AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
         }
 
-        // comentários e documentos ainda não são gravados aqui (ficam pros repositórios deles)
+        // comentários não são gravados aqui: tarefa nova nem mostra o chat,
+        // e depois de salva cada comentário vai sozinho pelo ComentarioController (formulário do chat)
         if (tarefa.Comentarios != null)
         {
-            // Seguir a mesma lógica da lista de funcionários (pendente)
         }
 
+        // documentos ainda não são gravados (o upload de arquivo está pendente)
         if (tarefa.Documentos != null)
         {
             // Seguir a mesma lógica da lista de funcionários (pendente)
@@ -82,7 +84,8 @@ public class TarefaSqlRepository: DataConnection
         return IdTarefa > 0; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
     }
 
-    // busca uma tarefa pelo código, já com a categoria e a equipe preenchidas
+    // busca uma tarefa pelo código, já com a categoria, a equipe, os comentários e os documentos preenchidos
+    // é o que a tela DetalhesGestor usa pra mostrar uma tarefa existente
     // retorna null se não encontrar (por isso o ? em Tarefa?)
     public Tarefa? Read(int id)
     {
@@ -97,7 +100,7 @@ public class TarefaSqlRepository: DataConnection
         SqlDataReader reader = cmd.ExecuteReader();
 
         // aqui é if e não while porque o código é único, vem no máximo uma linha
-        if (reader.Read()) // verificar se o registro
+        if (reader.Read()) // true quando achou a tarefa
         {
             // passa cada coluna da linha pra propriedade correspondente da model
             tarefa = new Tarefa();
@@ -117,29 +120,33 @@ public class TarefaSqlRepository: DataConnection
                 Descricao = reader.GetString("categoria_descricao"),
                 Cor = reader.GetString("categoria_cor")
             };
+            // usado pelo link de voltar pro kanban e pelo formulário de exclusão (o Delete volta pro kanban desse projeto)
             tarefa.IdProjeto = reader.GetInt32("projeto_codigo");
-            // os funcionários não são buscados aqui dentro, só depois do reader.Close() lá embaixo
 
-            //Implementar as outras classes
-            // a lista de funcionários começa vazia e é trocada pela lista de verdade depois do reader.Close()
+            // equipe, comentários e documentos ficam em outras tabelas e são buscados pelos repositórios deles,
+            // mas só depois do reader.Close() lá embaixo (enquanto o reader está aberto, a conexão fica ocupada)
+            // até lá as listas começam vazias
             tarefa.Funcionarios = new List<Funcionario>();
-            // Exemplo: tarefa.Funcionarios = FuncionarioSqlRepository.ListarPorTarefa(tarefa.Codigo);
-            // comentários e documentos ainda não são buscados, por enquanto voltam vazios
             tarefa.Comentarios = new List<Comentario>();
             tarefa.Documentos = new List<Documento>();
         }
 
         reader.Close();
-        // busca a equipe da tarefa pelo FuncionarioSqlRepository, que devolve os funcionários completos (nome, cargo...)
+        // cada repositório abre a própria conexão, por isso cada um tem o seu Dispose()
         // o ?. faz a linha ser pulada quando a tarefa não foi encontrada (tarefa == null)
+
+        // equipe da tarefa (tabela TarefaFuncionarios), com nome e cargo, em ordem alfabética
+        // a tela usa o primeiro dessa lista como autor provisório dos comentários
         FuncionarioSqlRepository funcionarioRepos = new FuncionarioSqlRepository();
         tarefa?.Funcionarios = funcionarioRepos.FuncionariosTarefa(id);
         funcionarioRepos.Dispose();
 
+        // comentários da tarefa, do mais antigo pro mais novo, cada um com o funcionário que escreveu
         ComentarioSqlRepository comentarioRepos = new ComentarioSqlRepository();
         tarefa?.Comentarios = comentarioRepos.ComentariosTarefa(id);
         comentarioRepos.Dispose();
 
+        // arquivos anexados à tarefa (só leitura por enquanto, o upload está pendente)
         DocumentoSqlRepository documentoRepos = new DocumentoSqlRepository();
         tarefa?.Documentos = documentoRepos.DocumentosTarefa(id);
         documentoRepos.Dispose();
@@ -148,6 +155,7 @@ public class TarefaSqlRepository: DataConnection
     }
 
     // lista todas as tarefas de um projeto, com a categoria de cada uma (a equipe não vem, diferente do Read)
+    // é o que monta os cards do kanban (IndexGestor), que separa as tarefas nas colunas pelo Status
     // se o projeto não tiver tarefa, retorna uma lista vazia (nunca null)
     public List<Tarefa> ReadAll(int idProjeto)
     {
@@ -178,6 +186,7 @@ public class TarefaSqlRepository: DataConnection
                 Cor = reader.GetString("categoria_cor")
             };
             // o IdProjeto não é preenchido aqui (fica 0), diferente do Read
+            // por isso a action IndexGestor manda o código do projeto pela ViewBag.IdProjeto
 
 
             tarefa.Funcionarios = new List<Funcionario>();
@@ -222,25 +231,19 @@ public class TarefaSqlRepository: DataConnection
         // se for 0, é porque não existe tarefa com esse código
         bool resultado = cmd.ExecuteNonQuery() > 0;
 
-        // se a lista vier nula (nenhum funcionário enviado), a equipe fica como está
+        // a equipe só é mexida se a tarefa existe (resultado true), senão o insert em TarefaFuncionarios daria erro de FK
         // quem compara a lista nova com a atual e grava a diferença é o FuncionarioSqlRepository
-        // atenção: a equipe é atualizada mesmo quando resultado é false (tarefa inexistente),
-        // e nesse caso o insert em TarefaFuncionarios dá erro de FK
-        // atenção: o repositório criado aqui abre uma conexão própria que não é fechada (igual no Create)
-        if (tarefa.Funcionarios != null)
+        if (resultado)
         {
-            // Teste: TarefaFuncionariosSqlRepository tarefaFuncionarios = new TarefaFuncionariosSqlRepository();
-            new FuncionarioSqlRepository().AtualizarFuncionarios(tarefa.Codigo, tarefa.Funcionarios);
-        }
+            // o formulário da tarefa sempre envia a lista de funcionários,
+            // então lista nula aqui quer dizer que nenhum funcionário foi marcado:
+            // nesse caso vai uma lista vazia, e o AtualizarFuncionarios remove todo mundo da tarefa
+            List<Funcionario> equipe = tarefa.Funcionarios == null ? new List<Funcionario>() : tarefa.Funcionarios;
 
-        if (tarefa.Comentarios != null)
-        {
-            // Chamar o método ComentarioRepository.Create();
-        }
-
-        if (tarefa.Documentos != null)
-        {
-            // Chamar o método DocumentoRepository.Create();
+            // o repositório fica numa variável pra dar pra fechar a conexão dele depois
+            FuncionarioSqlRepository funcionarioRepos = new FuncionarioSqlRepository();
+            funcionarioRepos.AtualizarFuncionarios(tarefa.Codigo, equipe);
+            funcionarioRepos.Dispose();
         }
 
         return resultado;

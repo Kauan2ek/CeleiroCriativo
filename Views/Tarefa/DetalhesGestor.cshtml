@@ -1,11 +1,21 @@
 @model Tarefa
 
+@{
+    // Código 0 significa que o formulário está criando uma nova Tarefa (igual ao novoProjeto da tela do projeto).
+    // Tarefa nova ainda não existe no banco, então ainda não pode receber comentários.
+    bool novaTarefa = Model.Codigo == 0;
+
+    // sem equipe não tem autor válido pro comentário (a FK do banco exige alguém da equipe da tarefa)
+    // usado pra desabilitar o campo e o botão do chat
+    bool semEquipe = Model.Funcionarios == null || Model.Funcionarios.Count() < 1;
+}
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exibição de Tarefa</title>
+    <title>@(@Model.Codigo == 0 ? "Nova Tarefa" : "Exibição de Tarefa")</title>
 
     <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
@@ -67,28 +77,32 @@
 
 <main class="conteudo-exibicao-tarefa">
 
+    <!-- mensagem de erro do Create, Update ou Delete -->
+    <!-- o ViewBag.Erro vem do catch das actions da tarefa, ou do ?erro= da url quando o comentário falha -->
+    @if (ViewBag.Erro != null)
+    {
+        <div class="mensagem-crud erro">@ViewBag.Erro</div>
+    }
+
 
     <!-- ======================================================
          FORMULÁRIO DA TAREFA
          ====================================================== -->
 
     <form method="post"
-          action="/Tarefa/Salvar">
-
-
+          id="formTarefa"
+          action=@(@Model.Codigo == 0 ? "/tarefa/create" : "/tarefa/update")>
         <!-- ==================================================
              IDENTIFICAÇÃO DA TAREFA
              ================================================== -->
-
-        <!-- guarda o nome da tarefa que foi aberta no kanban -->
-        <!-- o valor vem do controller via ViewBag.Tarefa -->
-        <!-- o js usa isso pra saber qual tarefa teve o status alterado -->
-        <input type="hidden"
-               id="nomeTarefa"
-               name="Tarefa"
-               value="@Model.Titulo">
-
-
+        <!-- código 0 = tarefa nova (o form vai pro Create); maior que 0 = tarefa existente (vai pro Update) -->
+        <input type="hidden" id="codigoTarefa" name="Codigo" value="@Model.Codigo">
+        <!-- ==================================================
+             PROJETO DA TAREFA
+             ================================================== -->
+        <!-- tarefa nova: veio da url (?idProjeto=2); tarefa existente: veio do banco pelo Read -->
+        <!-- o Create usa pra gravar a tarefa no projeto certo, e o Update usa pra voltar pro kanban desse projeto -->
+        <input type="hidden" name="IdProjeto" value="@(Model.IdProjeto)">
         <!-- ==================================================
              LINHA SUPERIOR
              ================================================== -->
@@ -100,9 +114,9 @@
 
             <div class="titulo-exibicao-tarefa">
 
-                <!-- botão de voltar pro kanban do gestor -->
+                <!-- botão de voltar pro kanban do projeto dono da tarefa (/Tarefa/IndexGestor/2) -->
 
-                <a href="/Tarefa/GestorTarefa"
+                <a href="/Tarefa/IndexGestor/@Model.IdProjeto"
                    class="voltar-tarefa">
 
                     <img src="/imagens/voltar.png"
@@ -121,7 +135,8 @@
             <!-- ==================================================
                  SITUAÇÃO / STATUS DA TAREFA
                  ================================================== -->
-            @* Verificar o pq o status está sumindo (pendente) *@
+            <!-- em tarefa nova o exibicao_tarefa.js esconde esse bloco de propósito: -->
+            <!-- a tarefa nasce "A fazer" (opção que já vem selecionada) e o status só muda depois de salva -->
             <div class="situacao-tarefa"
                  id="containerSituacao">
 
@@ -130,18 +145,19 @@
                 </span>
 
 
-                <!-- o status pode ser alterado aqui na mão -->
-                <!-- o js também verifica o status que veio pela url -->
-                <!-- tipo ?status=a_fazer, ?status=andamento, etc -->
+                <!-- o status pode ser alterado aqui na mão, e é gravado quando clica em Salvar -->
+                <!-- o Razor deixa selecionada a opção igual ao Model.Status -->
+                <!-- os values têm que ser escritos igual ao banco e ao kanban ("A fazer", "Em andamento", "Finalizado"), -->
+                <!-- senão a tarefa cai na coluna errada do kanban -->
                 <select id="situacaoTarefa"
                         name="Status">
-                    <option value="A fazer" selected="@(Model.Status == "A Fazer")">
+                    <option value="A fazer" selected="@(Model.Status == "A fazer" || Model.Status == "" || Model.Status == null)">
                         A Fazer
                     </option>
-                    <option value="Em andamento">
+                    <option value="Em andamento" selected="@(Model.Status == "Em andamento")">
                         Em Andamento
                     </option>
-                    <option value="Finalizado">
+                    <option value="Finalizado" selected="@(Model.Status == "Finalizado")">
                         Finalizada
                     </option>
                 </select>
@@ -205,8 +221,10 @@
 
                     <div class="campo-com-icone-tarefa">
 
+                        <!-- as opções vêm da ViewBag.Categorias; na tarefa existente, a categoria dela já vem selecionada -->
+                        <!-- o name Categoria.Codigo preenche o objeto Categoria de dentro da Tarefa (model binding) -->
                         <select id="categoriaTarefa"
-                                name="Categoria">
+                                name="Categoria.Codigo">
                             <option value=""
                                     selected
                                     disabled>
@@ -217,7 +235,7 @@
 
                             @foreach (var categoria in ViewBag.Categorias) 
                             {
-                                @if (@Model.Categoria.Codigo == categoria.Codigo){
+                                @if (@Model.Codigo != 0 && @Model.Categoria.Codigo == categoria.Codigo){
                                     <option value="@categoria.Codigo" selected>@categoria.Descricao</option>
                                 } else {
                                     <option value="@categoria.Codigo">@categoria.Descricao</option>
@@ -258,26 +276,34 @@
                 </div>
 
 
-                                <!-- CAMPO DE COMENTÁRIOS -->
-                <!-- mostra o último comentário (montado no C#); a conversa completa fica no modal -->
+                <!-- CAMPO DE COMENTÁRIOS -->
+                <!-- mostra o último comentário (o js copia da última mensagem do chat, que foi montado no C#) -->
+                <!-- a conversa completa fica no modal, que abre clicando no campo ou no lápis -->
                 <div class="campo-tarefa">
                     <label for="comentariosTarefa">Comentários</label>
 
-                    <div class="campo-com-icone-tarefa campo-comentarios-chat">
-                        <input type="text"
-                            id="comentariosTarefa"
-                            name="Comentarios"
-                            placeholder="Nenhum comentário ainda"
-                            readonly
-                            title="Último comentário"
-                            value="">
+                    @if (novaTarefa)
+                    {
+                        <!-- tarefa nova: no lugar do campo, um aviso (igual ao "Salve o projeto antes..." do projeto) -->
+                        <p class="aviso-comentarios-tarefa">Salve a tarefa antes de comentar.</p>
+                    }
+                    else
+                    {
+                        <div class="campo-com-icone-tarefa campo-comentarios-chat">
+                            <input type="text"
+                                id="comentariosTarefa"
+                                placeholder="Nenhum comentário ainda"
+                                readonly
+                                title="Último comentário"
+                                value="">
 
-                        <!-- o lápis abre a conversa completa -->
-                        <img src="/imagens/editar.png"
-                            alt="Abrir comentários"
-                            id="iconeComentarios"
-                            title="Abrir conversa">
-                    </div>
+                            <!-- o lápis abre a conversa completa -->
+                            <img src="/imagens/editar.png"
+                                alt="Abrir comentários"
+                                id="iconeComentarios"
+                                title="Abrir conversa">
+                        </div>
+                    }
                 </div>
 
 
@@ -305,7 +331,7 @@
 
                         <input type="date"
                                id="dataInicio"
-                               name="DataInicio"
+                               name="DataHoraInicio"
                                value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")">
 
                     </div>
@@ -326,7 +352,7 @@
 
                         <input type="date"
                                id="previsaoTermino"
-                               name="PrevisaoTermino"
+                               name="DataHoraPrevista"
                                value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")">
 
 
@@ -348,7 +374,7 @@
 
                         <input type="date"
                                id="dataEntrega"
-                               name="DataEntrega"
+                               name="DataHoraFim"
                                value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")">
 
                     </div>
@@ -363,11 +389,8 @@
                 </h2>
 
 
-                <!-- área onde os funcionários aparecem -->
-
-
-
-                    <!-- funcionário 1 (exemplo fixo) -->
+                <!-- área onde aparece a equipe atual da tarefa (Model.Funcionarios, que vem do Read) -->
+                <!-- pra mudar a equipe é pelo modal do +, e a mudança só é gravada quando clica em Salvar -->
                 <div class="area-funcionarios">
 
                         @if (@Model.Funcionarios != null && @Model.Funcionarios.Count() > 0)
@@ -491,6 +514,12 @@
 
                 </div>
 
+                <!-- a visibilidade ainda não tem campo na tela: o hidden devolve o mesmo valor que veio do banco, -->
+                <!-- pro Update não trocar sem querer (tarefa nova vai com false) -->
+                <input type="hidden" name="Visibilidade" value="@(Model.Visibilidade ? "true" : "false")">
+
+
+
             </section>
 
         </div>
@@ -500,18 +529,28 @@
              BOTÃO SALVAR
              ================================================== -->
 
-       <div class="acoes-exibicao-tarefa">
-            <button type="button"
-                    class="botao-excluir-tarefa"
-                    onclick="confirmarExclusaoTarefa()">
-                Excluir tarefa
-            </button>
+        @if (@Model.Codigo == 0) // Create
+        {
+            <div class="acoes-exibicao-tarefa">
+                <button type="submit"
+                        class="botao-salvar-tarefa">
+                    Nova Tarefa
+                </button>
+            </div>
+        } else {
+            <div class="acoes-exibicao-tarefa">
+                <button type="button"
+                        class="botao-excluir-tarefa"
+                        onclick="confirmarExclusaoTarefa()">
+                    Excluir tarefa
+                </button>
 
-            <button type="submit"
-                    class="botao-salvar-tarefa">
-                Salvar
-            </button>
-        </div>
+                <button type="submit"
+                        class="botao-salvar-tarefa">
+                    Salvar
+                </button>
+            </div>
+        }
 
     </form>
 
@@ -563,147 +602,48 @@
             <div class="lista-funcionarios">
 
 
-                <!-- funcionário 1 -->
-
-                <div class="funcionario-item">
-
-
-                    <div class="informacoes-funcionario">
-
-                        <img src="/imagens/entrar.png"
-                             alt="Funcionário">
-
-
-                        <div>
-
-                            <strong>
-                                Maria Silva
-                            </strong>
-
-                            <span>
-                                Designer
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- botão pra selecionar -->
-
-                    <button type="button"
-                            class="botao-selecionar-funcionario">
-
-                        +
-
-                    </button>
-
-                </div>
-
-
-                <!-- funcionário 2 -->
-
-                <div class="funcionario-item">
-
-                    <div class="informacoes-funcionario">
-
-                        <img src="/imagens/entrar.png"
-                             alt="Funcionário">
-
-
-                        <div>
-
-                            <strong>
-                                João Santos
-                            </strong>
-
-                            <span>
-                                Redator
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <button type="button"
-                            class="botao-selecionar-funcionario">
-
-                        +
-
-                    </button>
-
-                </div>
-
-
-                <!-- funcionário 3 -->
-
-                <div class="funcionario-item">
-
-                    <div class="informacoes-funcionario">
-
-                        <img src="/imagens/entrar.png"
-                             alt="Funcionário">
-
-
-                        <div>
-
-                            <strong>
-                                Ana Oliveira
-                            </strong>
-
-                            <span>
-                                Social Media
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <button type="button"
-                            class="botao-selecionar-funcionario">
-
-                        +
-
-                    </button>
-
-                </div>
-
-
-                <!-- funcionário 4 -->
-
-                <div class="funcionario-item">
-
-                    <div class="informacoes-funcionario">
-
-                        <img src="/imagens/entrar.png"
-                             alt="Funcionário">
-
-
-                        <div>
-
-                            <strong>
-                                Pedro Costa
-                            </strong>
-
-                            <span>
-                                Videomaker
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <button type="button"
-                            class="botao-selecionar-funcionario">
-
-                        +
-
-                    </button>
-
-                </div>
+                <!-- um item pra cada funcionário ativo (ViewBag.Funcionarios) -->
+                <!-- quem já está na equipe da tarefa (naEquipe) vem marcado -->
+                <!-- os inputs ficam aqui fora do form, mas o atributo form="formTarefa" faz eles serem enviados junto com a tarefa -->
+
+
+
+                    @if (@ViewBag.Funcionarios.Count > 0) 
+                    {
+                        @foreach(var func in @ViewBag.Funcionarios) {
+                            bool naEquipe = Model.Funcionarios != null && Model.Funcionarios.Any(f => f.Codigo == func.Codigo);
+                            
+                            <label class="funcionario-item @(naEquipe ? "selecionado" : "")">
+                                <div class="informacoes-funcionario">
+                                    <img src="/imagens/entrar.png" alt="Funcionário">
+                                    <div>
+                                        <strong>@func.Nome</strong>
+                                        <span>@func.Cargo.Descricao</span>
+                                    </div>
+                                </div>
+
+                                <!-- marcado = entra na lista; o value diz QUAL índice do hidden abaixo deve ser lido -->
+                                <input type="checkbox"
+                                    form="formTarefa"
+                                    name="Funcionarios.Index"
+                                    value="@func.Codigo"
+                                    checked="@naEquipe"
+                                    style="display:none">
+
+                                <!-- o código que vai pro objeto; só é lido se o checkbox acima estiver marcado -->
+                                <input type="hidden"
+                                    form="formTarefa"
+                                    name="Funcionarios[@func.Codigo].Codigo"
+                                    value="@func.Codigo"
+                                    style="display:none">
+
+                                <!-- botão pra selecionar -->
+                                <button type="button" class="botao-selecionar-funcionario">+</button>
+
+                            </label>
+                        }
+                    }
+                    
 
             </div>
 
@@ -715,13 +655,13 @@
 
                 <!-- cancelar -->
 
-                <button type="button"
+                <!--<button type="button"
                         class="botao-cancelar-funcionario"
                         id="cancelarFuncionarios">
 
                     Cancelar
 
-                </button>
+                </button>-->
 
 
                 <!-- confirmar -->
@@ -755,17 +695,27 @@
                 Voltar para tarefa
             </button>
 
-            <button type="button"
-                    class="botao-confirmar-exclusao"
-                    onclick="excluirTarefa()">
-                Excluir tarefa
-            </button>
+            <!-- form próprio da exclusão: fica fora do form da tarefa, porque form dentro de form não é permitido -->
+            <!-- os dois códigos vêm do @Model e vão pros parâmetros id e idProjeto da action Delete -->
+            <form method="post" action="/Tarefa/Delete">
+                <input type="hidden" name="id" value="@Model.Codigo">
+                <input type="hidden" name="idProjeto" value="@Model.IdProjeto">
+
+                <button type="submit"
+                        class="botao-confirmar-exclusao">
+                    Excluir tarefa
+                </button>
+            </form>
         </div>
     </div>
 </div>
 <!-- ==========================================================
      MODAL DE COMENTÁRIOS - CHAT
+     só existe pra tarefa já salva: tarefa nova não tem código pra ligar o comentário
+     (o js do chat checa se cada elemento existe, então não precisa mudar nada nele)
      ========================================================== -->
+@if (!novaTarefa)
+{
 <div id="modalComentarios" class="modal-comentarios">
     <div class="caixa-chat">
 
@@ -777,7 +727,8 @@
             <button type="button" id="fecharChat" class="fechar-chat">×</button>
         </div>
 
-        <!-- as mensagens vêm do banco, montadas pelo C# -->
+        <!-- as mensagens vêm do banco (Model.Comentarios, do mais antigo pro mais novo), montadas pelo C# -->
+        <!-- o js não cria mensagem nenhuma: depois de enviar, a página recarrega e o comentário novo aparece aqui -->
         <div id="mensagensChat" class="mensagens-chat">
             @if (@Model.Comentarios != null && @Model.Comentarios.Count() > 0) {
                 @foreach (var comentario in @Model.Comentarios)
@@ -791,15 +742,31 @@
             }
         </div>
 
-        <form id="formularioChat" class="formulario-chat">
+        <!-- envia o comentário pra action Create do ComentarioController -->
+        <!-- os nomes dos campos são os nomes das propriedades da model Comentario (model binding) -->
+        <form id="formularioChat" class="formulario-chat"
+              method="post" action="/Comentario/Create">
+
+            <!-- tarefa dona do comentário -->
+            <input type="hidden" name="IdTarefa" value="@Model.Codigo">
+
+            <!-- autor provisório: o primeiro funcionário da equipe (em ordem alfabética), enquanto não existe login -->
+            <!-- atenção: o banco só aceita se esse funcionário estiver na equipe da tarefa -->
+            <!-- se der erro, o ComentarioController volta pra cá com ?erro= na url e a mensagem aparece no topo da tela -->
+            <input type="hidden" name="Funcionario.Codigo" value="@(semEquipe ? 0 : Model.Funcionarios[0].Codigo)">
+
+            <!-- disabled="@semEquipe": igual ao selected/checked, com false o razor nem escreve o atributo -->
             <input type="text" id="novoComentario"
-                   placeholder="Digite seu comentário..."
-                   autocomplete="off" maxlength="500">
-            <button type="submit" class="enviar-comentario">Enviar</button>
+                   name="Descricao"
+                   placeholder="@(semEquipe ? "Adicione alguém à equipe para comentar" : "Digite seu comentário...")"
+                   autocomplete="off" maxlength="500" required
+                   disabled="@semEquipe">
+            <button type="submit" class="enviar-comentario" disabled="@semEquipe">Enviar</button>
         </form>
 
     </div>
 </div>
+}
 
 <!-- js específico dessa tela -->
 <script src="/js/exibicao_tarefa.js"></script>

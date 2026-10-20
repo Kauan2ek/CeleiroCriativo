@@ -11,44 +11,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const situacaoTarefa =
         document.getElementById("situacaoTarefa");
 
-    // pega o input escondido que guarda o nome da tarefa
-    const nomeTarefa =
-        document.getElementById("nomeTarefa");
-
-    // ==========================================================
-    // IDENTIFICAR A TAREFA
-    // ==========================================================
-    // lê os parâmetros passados pela url
-    // tipo ?status=andamento&tarefa=xyz
-    const parametros =
-        new URLSearchParams(window.location.search);
-
-    // pega só o status da url
-    const statusUrl =
-        parametros.get("status");
-
-    // pega só o nome da tarefa da url
-    const tarefaUrl =
-        parametros.get("tarefa");
+    // pega o input escondido que guarda o código da tarefa (preenchido pelo Razor)
+    const codigoTarefa =
+        document.getElementById("codigoTarefa");
 
     // ==========================================================
     // VERIFICAR SE É UMA TAREFA NOVA OU EXISTENTE
     // ==========================================================
-    // se não veio tarefa na url, é porque o usuário clicou em criar
-    if (!nomeTarefa || !nomeTarefa.value) {
+    // código 0 = tarefa nova (o usuário clicou em criar, o form vai pro Create)
+    // código maior que 0 = tarefa existente (o form vai pro Update)
+    if (!codigoTarefa || codigoTarefa.value === "0") {
         // esconde o seletor de status, faz sentido só pra tarefa existente
+        // o select continua sendo enviado, e o Razor já deixou "A fazer" selecionado
         if (containerSituacao) {
             containerSituacao.style.display = "none";
         }
-
-        // já deixa "a_fazer" marcado como padrão
-        if (situacaoTarefa) {
-            situacaoTarefa.value = "a_fazer";
-        }
     }
     else {
-        // se veio tarefa na url, estamos editando uma existente
-        // então mostra o seletor de status normalmente
+        // tarefa existente: mostra o seletor de status normalmente
         if (containerSituacao) {
             containerSituacao.style.display = "flex";
         }
@@ -59,6 +39,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================================
     // função que troca a classe do container conforme o status
     // pra mudar a cor (rosa, azul, verde)
+    // os textos comparados são os values do select ("A fazer", "Em andamento", "Finalizado"),
+    // escritos igual ao banco, porque a comparação é letra por letra
     function atualizarStatus(status) {
         // se algum dos elementos não existir, nem tenta
         if (!containerSituacao || !situacaoTarefa) {
@@ -72,24 +54,13 @@ document.addEventListener("DOMContentLoaded", function () {
             "finalizada"
         );
 
-        // se o status não for um dos válidos, força "a_fazer"
-        if (
-            status !== "a_fazer" &&
-            status !== "andamento" &&
-            status !== "finalizada"
-        ) {
-            status = "a_fazer";
-        }
-
-        // sincroniza o select com o status
-        situacaoTarefa.value = status;
 
         // mostra o botão excluir somente quando a tarefa está em A Fazer
         const botaoExcluir =
             document.querySelector(".botao-excluir-tarefa");
 
         if (botaoExcluir) {
-            if (status === "a_fazer") {
+            if (status === "A fazer") {
                 botaoExcluir.style.display = "block";
             }
             else {
@@ -98,13 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // aplica a classe certa pro css pintar
-        if (status === "a_fazer") {
+        if (status === "A fazer") {
             containerSituacao.classList.add("a-fazer");
         }
-        else if (status === "andamento") {
+        else if (status === "Em andamento") {
             containerSituacao.classList.add("andamento");
         }
-        else if (status === "finalizada") {
+        else if (status === "Finalizado") {
             containerSituacao.classList.add("finalizada");
         }
     }
@@ -112,9 +83,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================================
     // RECUPERAR STATUS DA TAREFA EXISTENTE
     // ==========================================================
-    // começa com "a_fazer" por padrão
-        // usa o status que o C# já deixou selecionado no <select>
-    let statusInicial = situacaoTarefa ? situacaoTarefa.value : "a_fazer";
+    // usa o status que o C# já deixou selecionado no <select>
+    // (se o select não existir, considera "A fazer")
+    let statusInicial = situacaoTarefa ? situacaoTarefa.value : "A fazer";
 
 
     // aplica o status inicial assim que a página abre
@@ -135,6 +106,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================================
     // VALIDAR FORMULÁRIO
     // ==========================================================
+    // querySelector("form") pega o primeiro form da página, que é o da tarefa (formTarefa)
+    // os outros forms (exclusão e chat) vêm depois no html, então não entram aqui
     const formulario =
         document.querySelector("form");
 
@@ -195,16 +168,30 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".funcionario-item");
 
     funcionarios.forEach(function (funcionario) {
+        const checkbox =
+            funcionario.querySelector("input[type=checkbox]");
+
         const botao =
             funcionario.querySelector(".botao-selecionar-funcionario");
 
-        if (botao) {
-            // clicar no + (ou check) alterna a seleção
+        if (checkbox) {
+            // clicar no nome/foto: o próprio label marca o checkbox, aqui só atualiza o visual
+            checkbox.addEventListener("change", function () {
+                funcionario.classList.toggle("selecionado", checkbox.checked);
+            });
+        }
+
+        if (checkbox && botao) {
+            // clicar no + / ✓: o label não reage a botão, então o JS inverte o checkbox
             botao.addEventListener("click", function () {
-                funcionario.classList.toggle("selecionado");
+                checkbox.checked = !checkbox.checked;
+                // mudar o .checked pelo JS não dispara o "change", por isso o visual é atualizado aqui também
+                funcionario.classList.toggle("selecionado", checkbox.checked);
             });
         }
     });
+
+
 
     // ==========================================================
     // BOTÃO CANCELAR
@@ -227,8 +214,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const selecionados =
                 document.querySelectorAll(".funcionario-item.selecionado");
 
-            // loga no console (por enquanto não faz mais nada)
-            console.log("Funcionários selecionados:", selecionados);
+            // não precisa enviar nada daqui: os checkboxes marcados já fazem parte do form da tarefa
+            // (atributo form="formTarefa"), então a equipe nova é gravada quando clica em Salvar
+            //console.log("Funcionários selecionados:", selecionados);
 
             // fecha o modal
             if (modal) {
@@ -255,6 +243,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================================
     // MODAL DE COMENTÁRIOS
     // ==========================================================
+    // o chat só existe em tarefa já salva (o Razor não monta ele em tarefa nova),
+    // por isso cada parte abaixo confere se o elemento existe antes de usar
     const campoComentarios =
         document.getElementById("comentariosTarefa");
 
@@ -383,58 +373,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================================
     if (formularioChat && novoComentario && mensagensChat) {
         formularioChat.addEventListener("submit", function (event) {
-            // impede a página de recarregar ao enviar a mensagem
-            event.preventDefault();
-
             // pega o texto digitado e remove espaços extras
             const texto = novoComentario.value.trim();
 
-            // não envia mensagens vazias
+            // não envia mensagens só com espaços
+            // (o required do html já barra o campo vazio, mas aceita "   ")
             if (!texto) {
+                event.preventDefault();
                 return;
             }
 
-            // cria o elemento que representa a mensagem
-            const mensagem = document.createElement("div");
-            mensagem.classList.add("mensagem", "mensagem-eu");
-
-            // identifica quem enviou a mensagem
-            const nome = document.createElement("span");
-            nome.classList.add("nome-mensagem");
-            nome.textContent = "(Eu)";
-
-            // adiciona o texto da mensagem
-            const conteudo = document.createElement("p");
-            conteudo.textContent = texto;
-
-            // registra o horário atual
-            const horario = document.createElement("span");
-            horario.classList.add("horario-mensagem");
-            horario.textContent =
-                new Date().toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
-
-            // organiza o conteúdo da mensagem
-            mensagem.appendChild(nome);
-            mensagem.appendChild(conteudo);
-            mensagem.appendChild(horario);
-
-            // adiciona a mensagem à conversa
-            mensagensChat.appendChild(mensagem);
-
-            // limpa o campo de digitação
-            novoComentario.value = "";
-
-            // atualiza o resumo da tela menor
-            atualizarResumoComentarios();
-
-            // rola a conversa até a mensagem mais recente
-            mensagensChat.scrollTop = mensagensChat.scrollHeight;
-
-            // mantém o cursor no campo de digitação
-            novoComentario.focus();
+            // não salvar nem desenhar a mensagem por JavaScript aqui:
+            // o formulário segue pro ComentarioController, que grava no banco,
+            // e a tela recarrega já com o comentário montado pelo C#
+            // atenção: não usar event.preventDefault() fora do if acima,
+            // senão o formulário nunca chega no controller e nada é gravado
+            // (era o que a versão antiga fazia: desenhava "(Eu)" na tela e não salvava)
         });
     }
 
@@ -455,10 +409,5 @@ function fecharModalExclusao() {
     document.getElementById("modalExclusaoTarefa").style.display = "none";
 }
 
-// exclusão temporariamente sem implementação local
-function excluirTarefa() {
-    // a exclusão deverá ser feita pelo controller usando o banco de dados
-    // não remover nem simular a exclusão no navegador
-    alert("A exclusão será conectada ao CRUD do banco de dados.");
-    
-}
+// a exclusão em si não é feita aqui: o botão de confirmar do modal
+// envia o formulário pra action Delete do TarefaController

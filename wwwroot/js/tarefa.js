@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const colunas =
         document.querySelectorAll(".corpo-coluna");
 
+    // true quando os cards foram montados pelo C# com dados do banco (tela do gestor)
+    // nesse caso o link de cada card e a coluna dele já vêm certos do servidor,
+    // e o js não pode trocar nada disso com o que estiver salvo no navegador
+    const dadosDoBanco =
+        document.querySelector(".kanban-board[data-banco]") !== null;
+
 
     // ==========================================================
     // VERIFICAR SE A TELA É DO CLIENTE
@@ -36,6 +42,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // o link de abrir muda conforme quem tá vendo o kanban
     // gestor, funcionário ou cliente têm telas diferentes
     function atualizarLinkTarefa(card) {
+
+        // com dados do banco, o link já vem certo do C# (/Tarefa/DetalhesGestor/codigo)
+        if (dadosDoBanco) {
+            return;
+        }
 
         // procura o link dentro do botão expandir
         const link =
@@ -193,6 +204,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // e se tiver, move ele pra coluna certa
     function recuperarStatusSalvo(card) {
 
+        // com dados do banco, a coluna do card é o status salvo no banco, não o do navegador
+        if (dadosDoBanco) {
+            return;
+        }
+
         const tarefa =
             card.dataset.tarefa;
 
@@ -236,7 +252,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // ======================================================
 
         // cliente só visualiza, não arrasta
-        if (ehCliente()) {
+        // com dados do banco também não arrasta, porque mover o card não salvava o status
+        if (ehCliente() || dadosDoBanco) {
 
             card.setAttribute(
                 "draggable",
@@ -446,12 +463,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // pega a lista de tarefas criadas salvas no localStorage
     // se não tiver nada, começa com array vazio
+    // com dados do banco a lista fica vazia, pra não misturar cards falsos com as tarefas reais
     const tarefasCriadas =
-        JSON.parse(
-            localStorage.getItem(
-                "tarefas_criadas"
-            )
-        ) || [];
+        dadosDoBanco
+            ? []
+            : JSON.parse(
+                localStorage.getItem(
+                    "tarefas_criadas"
+                )
+            ) || [];
 
 
     // pra cada tarefa salva, cria o card no kanban
@@ -544,8 +564,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 "dragover",
                 function (event) {
 
-                    // cliente não pode arrastar
-                    if (ehCliente()) {
+                    // cliente não pode arrastar (nem a tela com dados do banco)
+                    if (ehCliente() || dadosDoBanco) {
                         return;
                     }
 
@@ -561,8 +581,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 "drop",
                 function (event) {
 
-                    // cliente não mexe
-                    if (ehCliente()) {
+                    // cliente não mexe (nem a tela com dados do banco)
+                    if (ehCliente() || dadosDoBanco) {
                         return;
                     }
 

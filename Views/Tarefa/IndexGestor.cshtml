@@ -1,3 +1,5 @@
+@model List<Tarefa>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -64,8 +66,8 @@
 
     <div class="titulo-tarefas">
 
-        <!-- botão de voltar -->
-        <a href="/Projeto/ExProjetoGestor"
+        <!-- botão de voltar: volta pra tela do projeto dono dessas tarefas -->
+        <a href="/Projeto/Detalhes/@ViewBag.IdProjeto"
            class="voltar-tarefas">
 
             <img src="/imagens/voltar.png"
@@ -82,7 +84,8 @@
     <!-- ==================== KANBAN ==================== -->
 
     <!-- quadro kanban com três colunas de status -->
-    <div class="kanban-board">
+    <!-- data-banco avisa o tarefa.js que os cards vêm do banco, então ele não mexe nos links nem nas colunas deles -->
+    <div class="kanban-board" data-banco="true">
 
 
         <!-- ==================== A FAZER ==================== -->
@@ -95,8 +98,8 @@
 
                 <h2>Tarefas a Fazer</h2>
 
-                <!-- botão que leva pra tela de criação de tarefa -->
-                <a href="/Tarefa/ExTarefaGestor"
+                <!-- botão que leva pra tela de criação de tarefa, já ligada a esse projeto -->
+                <a href="/Tarefa/DetalhesGestor?idProjeto=@ViewBag.IdProjeto"
                    class="botao-criar-tarefa">
 
                     + Criar Tarefa
@@ -110,56 +113,60 @@
             <div class="corpo-coluna"
                  data-status="a_fazer">
 
+                <!-- um card pra cada tarefa que não está em andamento nem finalizada -->
+                <!-- (inclui status fora do padrão, pra nenhuma tarefa sumir do quadro) -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status != "Em andamento" && t.Status != "Finalizado"))
+                {
+                    <!-- draggable=false: arrastar entre colunas está desativado, porque não salvava no banco -->
+                    <!-- o status muda pela tela da tarefa (select + Salvar) -->
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <!-- card de tarefa -->
-                <!-- draggable=true, o gestor pode arrastar entre colunas -->
+                        <!-- conteúdo do card -->
 
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Texto da empresa...">
+                        <div class="conteudo-card">
 
-                    <!-- conteúdo do card -->
-
-                    <div class="conteudo-card">
-
-                        <p>
-                            Texto da empresa...
-                        </p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
 
-                        <!-- botão pra abrir a tarefa -->
-                        <!-- tem um button envolvendo o link, meio redundante mas ok -->
+                            <!-- botão pra abrir a tarefa -->
+                            <!-- tem um button envolvendo o link, meio redundante mas ok -->
 
-                        <button type="button"
-                                class="botao-expandir-tarefa">
+                            <button type="button"
+                                    class="botao-expandir-tarefa">
 
-                            <a href="/Tarefa/ExTarefaGestor"
-                               class="botao-expandir-tarefa">
+                                <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
+                                   class="botao-expandir-tarefa">
 
-                                <img src="/imagens/abrir.png"
-                                     alt="Abrir tarefa">
+                                    <img src="/imagens/abrir.png"
+                                         alt="Abrir tarefa">
 
-                            </a>
+                                </a>
 
-                        </button>
+                            </button>
+
+                        </div>
+
+
+                        <!-- ação de compartilhar -->
+
+                        <div class="acoes-card">
+
+                            <button type="button"
+                                    class="botao-compartilhar">
+
+                                Compartilhar
+
+                            </button>
+
+                        </div>
 
                     </div>
-
-
-                    <!-- ação de compartilhar -->
-
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-
-                            Compartilhar
-
-                        </button>
-
-                    </div>
-
-                </div>
+                }
 
             </div>
 
@@ -184,54 +191,56 @@
             <div class="corpo-coluna"
                  data-status="andamento">
 
+                <!-- um card pra cada tarefa em andamento -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Em andamento"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <!-- card de tarefa -->
+                        <!-- conteúdo do card -->
 
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Documentação da Equipe">
+                        <div class="conteudo-card">
 
-                    <!-- conteúdo do card -->
-
-                    <div class="conteudo-card">
-
-                        <p>
-                            Documentação da Equipe
-                        </p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
 
-                        <!-- botão pra abrir a tarefa -->
+                            <!-- botão pra abrir a tarefa -->
 
-                        <button type="button"
-                                class="botao-expandir-tarefa">
+                            <button type="button"
+                                    class="botao-expandir-tarefa">
 
-                            <a href="/Tarefa/ExTarefaGestor"
-                               class="botao-expandir-tarefa">
+                                <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
+                                   class="botao-expandir-tarefa">
 
-                                <img src="/imagens/abrir.png"
-                                     alt="Abrir tarefa">
+                                    <img src="/imagens/abrir.png"
+                                         alt="Abrir tarefa">
 
-                            </a>
+                                </a>
 
-                        </button>
+                            </button>
+
+                        </div>
+
+
+                        <!-- ação de compartilhar -->
+
+                        <div class="acoes-card">
+
+                            <button type="button"
+                                    class="botao-compartilhar">
+
+                                Compartilhar
+
+                            </button>
+
+                        </div>
 
                     </div>
-
-
-                    <!-- ação de compartilhar -->
-
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-
-                            Compartilhar
-
-                        </button>
-
-                    </div>
-
-                </div>
+                }
 
             </div>
 
@@ -256,54 +265,56 @@
             <div class="corpo-coluna"
                  data-status="finalizada">
 
+                <!-- um card pra cada tarefa finalizada -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Finalizado"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <!-- card de tarefa -->
+                        <!-- conteúdo do card -->
 
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Tarefa da Equipe - Análise">
+                        <div class="conteudo-card">
 
-                    <!-- conteúdo do card -->
-
-                    <div class="conteudo-card">
-
-                        <p>
-                            Tarefa da Equipe - Análise
-                        </p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
 
-                        <!-- botão pra abrir a tarefa -->
+                            <!-- botão pra abrir a tarefa -->
 
-                        <button type="button"
-                                class="botao-expandir-tarefa">
+                            <button type="button"
+                                    class="botao-expandir-tarefa">
 
-                            <a href="/Tarefa/ExTarefaGestor"
-                               class="botao-expandir-tarefa">
+                                <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
+                                   class="botao-expandir-tarefa">
 
-                                <img src="/imagens/abrir.png"
-                                     alt="Abrir tarefa">
+                                    <img src="/imagens/abrir.png"
+                                         alt="Abrir tarefa">
 
-                            </a>
+                                </a>
 
-                        </button>
+                            </button>
+
+                        </div>
+
+
+                        <!-- ação de compartilhar -->
+
+                        <div class="acoes-card">
+
+                            <button type="button"
+                                    class="botao-compartilhar">
+
+                                Compartilhar
+
+                            </button>
+
+                        </div>
 
                     </div>
-
-
-                    <!-- ação de compartilhar -->
-
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-
-                            Compartilhar
-
-                        </button>
-
-                    </div>
-
-                </div>
+                }
 
             </div>
 

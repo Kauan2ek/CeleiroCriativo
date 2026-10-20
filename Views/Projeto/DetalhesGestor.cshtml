@@ -204,7 +204,7 @@
                                         @tarefa.Titulo
                                     </span>
 
-                                    <a href="/Tarefa/ExTarefaGestor?id=@tarefa.Codigo"
+                                    <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
                                        class="botao-expandir"
                                        title="Abrir tarefa">
                                         <img src="/imagens/abrir.png" alt="Abrir">
@@ -218,11 +218,11 @@
                     {
                         <div class="acoes-tarefas acoes-tarefas-links">
                             <!-- Página própria que lista todas as tarefas deste projeto. -->
-                            <a href="/Tarefa/GestorTarefa?id=@Model.Codigo" class="link-tarefas-projeto">
+                            <a href="/Tarefa/IndexGestor/@Model.Codigo" class="link-tarefas-projeto">
                                 Ver todas
                             </a>
 
-                            <a href="/Tarefa/ExTarefaGestor?projetoCodigo=@Model.Codigo"
+                            <a href="/Tarefa/DetalhesGestor?idProjeto=@Model.Codigo"
                                class="botao-documento"
                                title="Adicionar tarefa">
                                 <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">

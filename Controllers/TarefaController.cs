@@ -16,117 +16,78 @@ public class TarefaController : Controller
         repository = new TarefaSqlRepository();
     }
 
-    // abre a tela de tarefas do gestor
-    // segue a convenção: views/tarefa/gestortarefa.cshtml
-    public ActionResult GestorTarefa()
+    // abre o kanban com as tarefas de um projeto, pro gestor
+    // GET /Tarefa/IndexGestor/2 (aqui o id da url é o código do PROJETO, não da tarefa)
+    // segue a convenção: views/tarefa/indexgestor.cshtml
+    public ActionResult IndexGestor(int id)
     {
-        return View();
-    }
+        List<Tarefa> tarefas = repository.ReadAll(id);
+        repository.Dispose();
 
-    // abre a tela de exibição de uma tarefa para o gestor
-    // recebe o status e o nome da tarefa pela url
-    public ActionResult ExTarefaGestor(string status, string tarefa)
-    {
-        // guarda o status da tarefa pra usar na view
-        ViewBag.Status = status;
+        // o ReadAll não preenche o IdProjeto de cada tarefa,
+        // então o código do projeto vai pelo ViewBag pros links da tela (voltar e criar tarefa)
+        ViewBag.IdProjeto = id;
 
-        // guarda o nome da tarefa pra usar na view
-        ViewBag.Tarefa = tarefa;
-
-        // retorna a view da pasta exibicaotarefa
-        // o caminho completo é usado porque a view não está na pasta padrão
-        return View("~/Views/ExibicaoTarefa/ExTarefaGestor.cshtml");
-    }
-
-    // abre a tela de tarefas do funcionário
-    public ActionResult FuncionarioTarefa()
-    {
-        // caminho completo, sem depender da convenção de pastas
-        return View("~/Views/Tarefa/FuncionarioTarefa.cshtml");
-    }
-
-    // abre a tela de exibição de uma tarefa para o funcionário
-    // recebe o status e o nome da tarefa pela url
-    public ActionResult ExTarefaFuncionario(string status, string tarefa)
-    {
-        // guarda o status da tarefa pra usar na view
-        ViewBag.Status = status;
-
-        // guarda o nome da tarefa pra usar na view
-        ViewBag.Tarefa = tarefa;
-
-        // retorna a view da pasta exibicaotarefa
-        return View("~/Views/ExibicaoTarefa/ExTarefaFuncionario.cshtml");
-    }
-
-    // abre a tela de tarefas do cliente
-    public ActionResult ClienteTarefa()
-    {
-        // retorna a view específica do cliente
-        return View("~/Views/Tarefa/ClienteTarefa.cshtml");
-    }
-
-    // abre a tela de exibição de uma tarefa para o cliente
-    // recebe o status e o nome da tarefa pela url
-    public ActionResult ExTarefaCliente(string status, string tarefa)
-    {
-        // guarda o status da tarefa pra usar na view
-        ViewBag.Status = status;
-
-        // guarda o nome da tarefa pra usar na view
-        ViewBag.Tarefa = tarefa;
-
-        // retorna a view da pasta exibicaotarefa
-        return View("~/Views/ExibicaoTarefa/ExTarefaCliente.cshtml");
-    }
-
-
-
-    // Novas VIEWS()
-    // telas de detalhes da tarefa, uma por perfil
-    // seguem a convenção de nome: a action DetalhesGestor abre views/tarefa/detalhesgestor.cshtml
-
-    // tela de detalhes pro cliente
-    // por enquanto só abre a view, sem buscar a tarefa no banco
-    public ActionResult DetalhesCliente()
-    {
-
-        return View();
-    }
-
-    // tela de detalhes pro funcionário
-    // por enquanto só abre a view, sem buscar a tarefa no banco
-    public ActionResult DetalhesFuncionario()
-    {
-        return View();
+        return View(tarefas);
     }
 
     // tela de detalhes pro gestor, já com os dados reais da tarefa
     // GET /Tarefa/DetalhesGestor/5 (o 5 da url cai no parâmetro id)
-    public ActionResult DetalhesGestor(int id)
+    // o erro vem pela url quando outro controller redireciona pra cá (ex: o catch do ComentarioController)
+    // o "= null" deixa o erro opcional: os catch daqui chamam DetalhesGestor(id, idProjeto) sem ele
+    public ActionResult DetalhesGestor(int id, int idProjeto, string? erro = null)
     {
-        // busca a tarefa (com categoria e equipe) e já fecha a conexão
-        Tarefa? tarefa = repository.Read(id);
-        repository.Dispose();
-
-        // tarefa inexistente ou cancelada: responde 404
-        if (tarefa == null)
+        // só preenche quando veio erro pela url, pra não apagar o ViewBag.Erro que o catch do Create, Update ou Delete já colocou
+        if (erro != null)
         {
-            return NotFound();
+            ViewBag.Erro = erro;
         }
 
+        // tarefa nova: o objeto vazio só carrega o projeto que veio pela url (?idProjeto=2),
+        // que a view coloca no hidden IdProjeto pro Create saber em qual projeto gravar
+        Tarefa? tarefa = new Tarefa();
+        tarefa.IdProjeto = idProjeto;
+
+        // tarefa existente: o Read troca o objeto pelo do banco (com categoria, equipe, comentários e documentos)
+        // e o IdProjeto passa a vir da coluna projeto_codigo
+        if (id != 0)
+        {
+            tarefa = repository.Read(id);
+            repository.Dispose();
+
+            // tarefa inexistente ou cancelada: responde 404
+            if (tarefa == null)
+            {
+                return NotFound();
+            }
+
+        }
+        else
+        {
+            // tarefa nova: não buscou nada no banco, mas a conexão aberta no construtor também precisa ser fechada
+            repository.Dispose();
+        }
+
+        // todos os funcionários ativos, pra lista do modal de equipe (quem já está na tarefa aparece marcado)
+        FuncionarioSqlRepository funcionarioSqlRepository = new FuncionarioSqlRepository();
+        ViewBag.Funcionarios = funcionarioSqlRepository.ReadAll();
+        funcionarioSqlRepository.Dispose();
+
+        // todas as categorias, pras opções do select de categoria
         CategoriaSqlRepository categoriaSqlRepository = new CategoriaSqlRepository();
         ViewBag.Categorias = categoriaSqlRepository.ReadAll();
         categoriaSqlRepository.Dispose();
-
         // entrega a tarefa pra view, que acessa ela pelo @Model (por isso o "@model Tarefa" no topo do cshtml)
-        return View(tarefa);
+        // o nome da view vai escrito porque essa action também é chamada pelo catch do Create, Update e Delete:
+        // sem o nome, o asp.net procuraria uma view com o nome da action que chamou (ex: Update.cshtml)
+        return View("DetalhesGestor", tarefa);
     }
 
-
-
-    // CRUD: por enquanto aplicado com API
-    // as actions abaixo não devolvem tela, devolvem JSON (dá pra testar pelo Bruno ou pelo navegador)
+    // CRUD da tarefa
+    // Create, Update e Delete são chamados pelos formulários da tela DetalhesGestor:
+    // quando dá certo, redirecionam pra outra tela; quando o banco recusa, voltam pra tela da tarefa com o ViewBag.Erro
+    // Read e ReadAll continuam devolvendo JSON (dá pra testar pelo Bruno ou pelo navegador)
+    // o "return Json" antigo ficou comentado embaixo de cada redirecionamento, caso precise testar como API de novo
     // todas seguem o mesmo roteiro: chamam o repositório, fecham a conexão com o Dispose() e montam a resposta
     // o Dispose() é chamado antes de cada return, porque o que vem depois do return não executa
 
@@ -134,7 +95,8 @@ public class TarefaController : Controller
     // POST /Tarefa/Create
     // o parâmetro "tarefa" é montado sozinho pelo asp.net (model binding):
     // ele cria o objeto e preenche cada propriedade com o campo de mesmo nome que veio na requisição
-    // ex: Titulo=Teste, Categoria.Codigo=1 (objeto de dentro), Funcionarios[0].Codigo=2 (item de lista)
+    // ex: Titulo=Teste, Categoria.Codigo=1 (objeto de dentro), Funcionarios[2].Codigo=2 (item de lista)
+    // o IdProjeto vem do hidden do formulário, que a DetalhesGestor preencheu com o ?idProjeto= da url
     [HttpPost]
     public ActionResult Create(Tarefa tarefa)
     {
@@ -143,16 +105,23 @@ public class TarefaController : Controller
             bool resultado = repository.Create(tarefa);
 
             repository.Dispose();
-            // new { ... } cria um objeto sem classe, só pra virar o JSON {"sucesso": true}
-            return Json(new {sucesso = resultado});
+            // volta pra tela da própria tarefa recém-criada
+            // o new {id = ...} cria um objeto sem classe que preenche o {id} da rota: vira /Tarefa/DetalhesGestor/15
+            // atenção: o tarefa.Codigo só vem com o código novo se o repository.Create preencher ele depois do insert
+            // (tarefa.Codigo = IdTarefa); sem isso ele continua 0 e abre um formulário de tarefa nova vazio
+            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = tarefa.Codigo});
+            // return Json(new {sucesso = resultado});
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui
         // o e.Message traz a mensagem do SQL Server explicando o que deu errado
         // outros tipos de erro (ex: categoria vazia) não entram nesse catch
         catch (SqlException e)
         {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = e.Message});
+            // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
+            // quem fecha a conexão é a DetalhesGestor
+            ViewBag.Erro = e.Message;
+            return DetalhesGestor(tarefa.Codigo, tarefa.IdProjeto);
+            // return Json(new {sucesso = false, erro = e.Message});
         }
     }
 
@@ -199,7 +168,7 @@ public class TarefaController : Controller
     // altera uma tarefa que já existe
     // POST /Tarefa/Update
     // recebe os mesmos campos do Create, mais o Codigo da tarefa que vai ser alterada
-    // sucesso volta false quando não existe tarefa com esse código
+    // o resultado volta false quando não existe tarefa com esse código (mesmo assim redireciona pra tela da tarefa)
     [HttpPost]
     public ActionResult Update(Tarefa tarefa)
     {
@@ -208,33 +177,44 @@ public class TarefaController : Controller
             bool resultado = repository.Update(tarefa);
 
             repository.Dispose();
-            return Json(new {sucesso = resultado});
+            // volta pra tela da própria tarefa, já com os dados salvos: /Tarefa/DetalhesGestor/5
+            // o Codigo chega preenchido porque o formulário da tarefa sempre envia o hidden Codigo
+            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = tarefa.Codigo});
+            // return Json(new {sucesso = resultado});
         }
         catch (SqlException e)
         {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = e.Message});
+            // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
+            // quem fecha a conexão é a DetalhesGestor, depois de buscar a tarefa de novo
+            ViewBag.Erro = e.Message;
+            return DetalhesGestor(tarefa.Codigo, tarefa.IdProjeto);
+            // return Json(new {sucesso = false, erro = e.Message});
         }
     }
 
     // cancela uma tarefa (exclusão lógica: a linha continua no banco, só muda o status)
-    // GET /Tarefa/Delete/5
-    // está como GET pra facilitar o teste pelo navegador, mas apagar por GET não é boa prática:
-    // na versão final o certo é [HttpPost]
-    [HttpGet]
-    public ActionResult Delete(int id)
+    // POST /Tarefa/Delete, enviado pelo formulário do modal de exclusão da tela da tarefa
+    // recebe o código da tarefa (id) e o do projeto (idProjeto), que serve pra voltar pro kanban do projeto
+    // (a tarefa foi cancelada, então não tem mais tela dela pra voltar)
+    [HttpPost]
+    public ActionResult Delete(int id, int idProjeto)
     {
         try
         {
             bool resultado = repository.Delete(id);
 
             repository.Dispose();
-            return Json(new {sucesso = resultado});
+            // volta pro kanban do projeto: /Tarefa/IndexGestor/2
+            return RedirectToAction("IndexGestor", "Tarefa", new {id = idProjeto});
+            // return Json(new {sucesso = resultado});
         }
         catch (SqlException e)
         {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = e.Message});
+            // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
+            // quem fecha a conexão é a DetalhesGestor
+            ViewBag.Erro = e.Message;
+            return DetalhesGestor(id, idProjeto);
+            // return Json(new {sucesso = false, erro = e.Message});
         }
     }
 }

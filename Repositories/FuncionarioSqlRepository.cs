@@ -8,6 +8,7 @@ public class FuncionarioSqlRepository : DataConnection
 {
     // Lista funcionários. Por padrão mostra apenas os ativos, pois a exclusão
     // é lógica e usa a coluna Funcionarios.ativo.
+    // Na tela da tarefa, é essa lista que aparece no modal de equipe (ViewBag.Funcionarios).
     public List<Funcionario> ReadAll(bool incluirInativos = false)
     {
         SqlCommand cmd = new SqlCommand();
@@ -200,7 +201,11 @@ public class FuncionarioSqlRepository : DataConnection
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    // Lista os funcionários alocados em uma tarefa.
+    // Lista os funcionários alocados em uma tarefa (a equipe), em ordem alfabética.
+    // Usado pelo TarefaSqlRepository.Read pra mostrar a equipe na tela da tarefa,
+    // e pelo AtualizarFuncionarios pra saber quem já está na equipe.
+    // Atenção: enquanto não existe login, a tela usa o primeiro dessa lista como autor dos comentários,
+    // então o "primeiro" é o primeiro em ordem alfabética.
     public List<Funcionario> FuncionariosTarefa(int idTarefa)
     {
         SqlCommand cmd = new SqlCommand();
@@ -230,7 +235,10 @@ public class FuncionarioSqlRepository : DataConnection
         return funcionarios;
     }
 
-    // Deixa a equipe da tarefa exatamente igual à lista recebida.
+    // Deixa a equipe da tarefa exatamente igual à lista recebida (os marcados no modal da tela).
+    // Compara a lista atual do banco com a nova: quem está só na nova é inserido,
+    // quem está só na atual é removido, e quem está nas duas continua como está.
+    // Chamado pelo TarefaSqlRepository no Create e no Update.
     public void AtualizarFuncionarios(int idTarefa, List<Funcionario> funcionarios)
     {
         List<int> listaAtual = new List<int>();
@@ -263,8 +271,10 @@ public class FuncionarioSqlRepository : DataConnection
         }
 
         // Para remover um funcionário da equipe, primeiro apagamos os comentários
-        // escritos por ele naquela tarefa. Essa ordem corrige o erro de FK que havia
-        // no código anterior.
+        // escritos por ele naquela tarefa: a FK_Comentarios_TarefaFuncionario liga cada comentário
+        // ao par (funcionário, tarefa) da TarefaFuncionarios, então o banco não deixa apagar
+        // a linha da equipe enquanto existir comentário dela.
+        // Atenção: tirar alguém da equipe apaga os comentários dessa pessoa naquela tarefa.
         foreach (int codigo in remover)
         {
             SqlCommand cmd = new SqlCommand();

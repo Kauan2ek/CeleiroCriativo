@@ -5,7 +5,7 @@ create or alter procedure CadastrarPessoa
 (
 	@nome varchar(50), @telefone varchar(20), @documento varchar(20), @tipo_doc varchar(4), @tipo_pessoa varchar(15),
 
-    -- Dados do funcionário
+    -- Dados do funcionÃ¡rio
     @cargo_codigo int = NULL, @ativo bit = 1,
 
     -- Dados de acesso
@@ -27,12 +27,12 @@ begin
         insert into Pessoas (nome, telefone, documento, tipo_doc)
         values (@nome, @telefone, @documento, @tipo_doc)
 
-		-- Recupera o código gerado pela Pessoa --
+		-- Recupera o cï¿½digo gerado pela Pessoa --
         declare @pessoa_codigo int;
 
         set @pessoa_codigo = SCOPE_IDENTITY();
 
-		-- Verifica qual tipo de pessoa será cadastrado --
+		-- Verifica qual tipo de pessoa serï¿½ cadastrado --
         if @tipo_pessoa = 'FUNCIONARIO'
         begin
 
@@ -49,10 +49,10 @@ begin
 
         end
 
-        -- Confirma as operações --
+        -- Confirma as operaï¿½ï¿½es --
         commit
 
-        -- Retorna o código da pessoa cadastrada --
+        -- Retorna o cï¿½digo da pessoa cadastrada --
         select @pessoa_codigo as pessoa_codigo
 
     end try
@@ -117,7 +117,7 @@ begin
 end
 go
 
-create or alter procedure CadastrarProjeto -- Não sei se é necessário neste contexto --
+create or alter procedure CadastrarProjeto -- Nï¿½o sei se ï¿½ necessï¿½rio neste contexto --
     @cliente_codigo int, @titulo varchar(50), @descricao varchar(MAX) = NULL,
     @data_inicio date = NULL, @data_fim date = NULL, @data_prevista date = NULL,
     @status_codigo int = NULL
@@ -351,7 +351,7 @@ go
 
 -- Funcionarios --
 exec CadastrarPessoa
-    @nome = 'João da Silva',
+    @nome = 'Joï¿½o da Silva',
     @telefone = '17999999999',
     @documento = '12345678900',
     @tipo_doc = 'cpf',

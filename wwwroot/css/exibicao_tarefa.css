@@ -1185,6 +1185,18 @@ body {
     background: #48a800;
 }
 
+/* tarefa sem equipe: campo e botão do chat desabilitados */
+.formulario-chat input:disabled {
+    background: #f2f2f2;
+    cursor: not-allowed;
+}
+
+.enviar-comentario:disabled,
+.enviar-comentario:disabled:hover {
+    background: #b5b5b5;
+    cursor: not-allowed;
+}
+
 @media (max-width: 480px) {
     .modal-comentarios {
         padding: 10px;
@@ -1221,4 +1233,24 @@ body {
 
 .botao-excluir-arquivo:hover {
     opacity: 0.65;
+}
+
+/* mensagem de erro do Create, Update ou Delete (mesmo visual da tela do projeto) */
+.mensagem-crud {
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}
+
+/* aviso no lugar dos comentários quando a tarefa ainda não foi salva (mesmo visual do aviso de tarefas do projeto) */
+.aviso-comentarios-tarefa {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #777777;
 }
