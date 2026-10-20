@@ -1,14 +1,3 @@
-@model List<Tarefa>
-
-@{
-    Projeto projeto = ViewBag.Projeto;
-
-    // Separa as tarefas pelas três colunas já existentes no visual original.
-    List<Tarefa> tarefasAFazer = Model.FindAll(t => t.Status == "A fazer" || t.Status == "A Fazer");
-    List<Tarefa> tarefasAndamento = Model.FindAll(t => t.Status == "Em andamento");
-    List<Tarefa> tarefasFinalizadas = Model.FindAll(t => t.Status == "Finalizado");
-}
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,201 +5,317 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tarefa</title>
 
-    <!-- Ícone da aba. -->
+    <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
 
-    <!-- Mantém o mesmo CSS da primeira versão do projeto. -->
-    <link rel="stylesheet" href="/css/tarefa.css" />
+    <!-- css específico dessa tela -->
+    <link rel="stylesheet" href="~/css/tarefa.css" />
 </head>
 <body>
-    <!-- ==================== CABEÇALHO ==================== -->
-    <header class="cabecalho-tarefas">
-        <a href="/" class="logo-tarefas">
-            <img src="/imagens/logo.png" alt="Logo">
+
+
+<!-- ==================== CABEÇALHO ==================== -->
+
+<header class="cabecalho-tarefas">
+
+    <!-- logo que volta pra home -->
+   <a href="/" class="logo-tarefas">
+    <img src="/imagens/logo.png" alt="Logo">
+   </a>
+
+
+    <!-- atalho pra cadastrar funcionário -->
+    <a href="/CadastroFuncionario/CadastroFuncionario"
+       class="cadastrar-funcionario">
+
+        <img src="/imagens/criar_funcionario.png"
+             alt="Cadastrar funcionário">
+
+        <span>Cadastrar Funcionário</span>
+
+    </a>
+
+
+    <!-- informações do gestor logado -->
+    <div class="informacoes-gestor">
+
+        <span>Nome do Gestor</span>
+
+        <!-- link pro perfil do gestor -->
+        <a href="/Perfil/GestorPerfil"
+           class="link-perfil">
+
+            <img src="/imagens/Entrar.png"
+                 alt="Perfil do gestor">
+
         </a>
 
-        <!-- A rota continua sendo a rota funcional do CRUD atual. -->
-        <a href="/Funcionario/Criar" class="cadastrar-funcionario">
-            <img src="/imagens/criar_funcionario.png" alt="Cadastrar funcionário">
-            <span>Cadastrar Funcionário</span>
+    </div>
+
+</header>
+
+
+<!-- ==================== CONTEÚDO ==================== -->
+
+<main class="conteudo-tarefas">
+
+
+    <!-- título da página com botão de voltar -->
+
+    <div class="titulo-tarefas">
+
+        <!-- botão de voltar -->
+        <a href="/Projeto/ExProjetoGestor"
+           class="voltar-tarefas">
+
+            <img src="/imagens/voltar.png"
+                 alt="Voltar">
+
         </a>
 
-        <div class="informacoes-gestor">
-            <span>Nome do Gestor</span>
-            <a href="/Perfil/GestorPerfil" class="link-perfil">
-                <img src="/imagens/Entrar.png" alt="Perfil do gestor">
-            </a>
-        </div>
-    </header>
+        <h1>Tarefas do Projeto</h1>
 
-    <!-- ==================== CONTEÚDO ==================== -->
-    <main class="conteudo-tarefas">
-        @if (TempData["Sucesso"] != null)
-        {
-            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
-        }
+    </div>
 
-        @if (TempData["Erro"] != null)
-        {
-            <div class="mensagem-crud erro">@TempData["Erro"]</div>
-        }
 
-        <!-- Mantém o título simples, como na primeira versão visual. -->
-        <div class="titulo-tarefas">
-            <a href="@Url.Action("Detalhes", "Projeto", new { id = projeto.Codigo })"
-               class="voltar-tarefas">
-                <img src="/imagens/voltar.png" alt="Voltar">
-            </a>
 
-            <h1>Tarefas do Projeto</h1>
-        </div>
+    <!-- ==================== KANBAN ==================== -->
 
-        <!-- ==================== KANBAN ==================== -->
-        <div class="kanban-board">
-            <!-- ==================== A FAZER ==================== -->
-            <section class="coluna-tarefas coluna-analise">
-                <div class="cabecalho-coluna">
-                    <h2>Tarefas a Fazer</h2>
+    <!-- quadro kanban com três colunas de status -->
+    <div class="kanban-board">
 
-                    <!-- O botão volta à posição da primeira View, mas preserva
-                         o projeto atual para o cadastro funcionar corretamente. -->
-                    <a href="/Tarefa/ExTarefaGestor?projetoCodigo=@projeto.Codigo"
-                       class="botao-criar-tarefa">
-                        + Criar Tarefa
-                    </a>
+
+        <!-- ==================== A FAZER ==================== -->
+
+        <section class="coluna-tarefas coluna-analise">
+
+            <!-- cabeçalho da coluna com título e botão de criar -->
+
+            <div class="cabecalho-coluna">
+
+                <h2>Tarefas a Fazer</h2>
+
+                <!-- botão que leva pra tela de criação de tarefa -->
+                <a href="/Tarefa/ExTarefaGestor"
+                   class="botao-criar-tarefa">
+
+                    + Criar Tarefa
+
+                </a>
+
+            </div>
+
+
+            <!-- corpo da coluna, o data-status indica o status das tarefas -->
+            <div class="corpo-coluna"
+                 data-status="a_fazer">
+
+
+                <!-- card de tarefa -->
+                <!-- draggable=true, o gestor pode arrastar entre colunas -->
+
+                <div class="card-tarefa"
+                     draggable="true"
+                     data-tarefa="Texto da empresa...">
+
+                    <!-- conteúdo do card -->
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Texto da empresa...
+                        </p>
+
+
+                        <!-- botão pra abrir a tarefa -->
+                        <!-- tem um button envolvendo o link, meio redundante mas ok -->
+
+                        <button type="button"
+                                class="botao-expandir-tarefa">
+
+                            <a href="/Tarefa/ExTarefaGestor"
+                               class="botao-expandir-tarefa">
+
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
+
+                            </a>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- ação de compartilhar -->
+
+                    <div class="acoes-card">
+
+                        <button type="button"
+                                class="botao-compartilhar">
+
+                            Compartilhar
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="corpo-coluna" data-status="a_fazer">
-                    @if (tarefasAFazer.Count == 0)
-                    {
-                        <span class="sem-tarefas">Nenhuma tarefa.</span>
-                    }
+            </div>
 
-                    @foreach (Tarefa tarefa in tarefasAFazer)
-                    {
-                        <!-- O card mantém o comportamento atual de expandir na própria página,
-                             mas reutiliza a aparência e os botões da primeira versão. -->
-                        <div class="card-tarefa" data-tarefa="@tarefa.Titulo">
-                            <details class="expansao-card-tarefa">
-                                <summary class="conteudo-card">
-                                <p>@tarefa.Titulo</p>
+        </section>
 
-                                <span class="botao-expandir-tarefa" title="Exibir tarefa">
-                                    <img src="/imagens/abrir.png" alt="Exibir tarefa">
-                                </span>
-                                </summary>
 
-                                <div class="detalhes-card-tarefa">
-                                <p><strong>Categoria:</strong> @tarefa.Categoria.Descricao</p>
-                                <p><strong>Descrição:</strong> @tarefa.Descricao</p>
-                                <p><strong>Previsão:</strong> @(tarefa.DataHoraPrevista.HasValue ? tarefa.DataHoraPrevista.Value.ToString("dd/MM/yyyy") : "Não informada")</p>
-                                <p><strong>Visível ao cliente:</strong> @(tarefa.Visibilidade ? "Sim" : "Não")</p>
 
-                                <a href="/Tarefa/ExTarefaGestor?id=@tarefa.Codigo"
-                                   class="botao-editar-card">
-                                    Editar / ver detalhes
-                                </a>
-                                </div>
-                            </details>
+        <!-- ==================== EM ANDAMENTO ==================== -->
 
-                            <div class="acoes-card">
-                                <button type="button" class="botao-compartilhar">Compartilhar</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </section>
+        <section class="coluna-tarefas coluna-andamento">
 
-            <!-- ==================== EM ANDAMENTO ==================== -->
-            <section class="coluna-tarefas coluna-andamento">
-                <div class="cabecalho-coluna">
-                    <h2>Tarefas em Andamento</h2>
-                </div>
 
-                <div class="corpo-coluna" data-status="andamento">
-                    @if (tarefasAndamento.Count == 0)
-                    {
-                        <span class="sem-tarefas">Nenhuma tarefa.</span>
-                    }
+            <!-- cabeçalho da coluna -->
 
-                    @foreach (Tarefa tarefa in tarefasAndamento)
-                    {
-                        <div class="card-tarefa" data-tarefa="@tarefa.Titulo">
-                            <details class="expansao-card-tarefa">
-                                <summary class="conteudo-card">
-                                <p>@tarefa.Titulo</p>
+            <div class="cabecalho-coluna">
 
-                                <span class="botao-expandir-tarefa" title="Exibir tarefa">
-                                    <img src="/imagens/abrir.png" alt="Exibir tarefa">
-                                </span>
-                                </summary>
+                <h2>Tarefas em Andamento</h2>
 
-                                <div class="detalhes-card-tarefa">
-                                <p><strong>Categoria:</strong> @tarefa.Categoria.Descricao</p>
-                                <p><strong>Descrição:</strong> @tarefa.Descricao</p>
-                                <p><strong>Início:</strong> @(tarefa.DataHoraInicio.HasValue ? tarefa.DataHoraInicio.Value.ToString("dd/MM/yyyy") : "Não informado")</p>
-                                <p><strong>Previsão:</strong> @(tarefa.DataHoraPrevista.HasValue ? tarefa.DataHoraPrevista.Value.ToString("dd/MM/yyyy") : "Não informada")</p>
+            </div>
 
-                                <a href="/Tarefa/ExTarefaGestor?id=@tarefa.Codigo"
-                                   class="botao-editar-card">
-                                    Editar / ver detalhes
-                                </a>
-                                </div>
-                            </details>
 
-                            <div class="acoes-card">
-                                <button type="button" class="botao-compartilhar">Compartilhar</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </section>
+            <div class="corpo-coluna"
+                 data-status="andamento">
 
-            <!-- ==================== FINALIZADAS ==================== -->
-            <section class="coluna-tarefas coluna-finalizadas">
-                <div class="cabecalho-coluna">
-                    <h2>Tarefas Finalizadas</h2>
+
+                <!-- card de tarefa -->
+
+                <div class="card-tarefa"
+                     draggable="true"
+                     data-tarefa="Documentação da Equipe">
+
+                    <!-- conteúdo do card -->
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Documentação da Equipe
+                        </p>
+
+
+                        <!-- botão pra abrir a tarefa -->
+
+                        <button type="button"
+                                class="botao-expandir-tarefa">
+
+                            <a href="/Tarefa/ExTarefaGestor"
+                               class="botao-expandir-tarefa">
+
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
+
+                            </a>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- ação de compartilhar -->
+
+                    <div class="acoes-card">
+
+                        <button type="button"
+                                class="botao-compartilhar">
+
+                            Compartilhar
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="corpo-coluna" data-status="finalizada">
-                    @if (tarefasFinalizadas.Count == 0)
-                    {
-                        <span class="sem-tarefas">Nenhuma tarefa.</span>
-                    }
+            </div>
 
-                    @foreach (Tarefa tarefa in tarefasFinalizadas)
-                    {
-                        <div class="card-tarefa" data-tarefa="@tarefa.Titulo">
-                            <details class="expansao-card-tarefa">
-                                <summary class="conteudo-card">
-                                <p>@tarefa.Titulo</p>
+        </section>
 
-                                <span class="botao-expandir-tarefa" title="Exibir tarefa">
-                                    <img src="/imagens/abrir.png" alt="Exibir tarefa">
-                                </span>
-                                </summary>
 
-                                <div class="detalhes-card-tarefa">
-                                <p><strong>Categoria:</strong> @tarefa.Categoria.Descricao</p>
-                                <p><strong>Descrição:</strong> @tarefa.Descricao</p>
-                                <p><strong>Finalizada em:</strong> @(tarefa.DataHoraFim.HasValue ? tarefa.DataHoraFim.Value.ToString("dd/MM/yyyy") : "Não informada")</p>
 
-                                <a href="/Tarefa/ExTarefaGestor?id=@tarefa.Codigo"
-                                   class="botao-editar-card">
-                                    Editar / ver detalhes
-                                </a>
-                                </div>
-                            </details>
+        <!-- ==================== FINALIZADAS ==================== -->
 
-                            <div class="acoes-card">
-                                <button type="button" class="botao-compartilhar">Compartilhar</button>
-                            </div>
-                        </div>
-                    }
+        <section class="coluna-tarefas coluna-finalizadas">
+
+
+            <!-- cabeçalho da coluna -->
+
+            <div class="cabecalho-coluna">
+
+                <h2>Tarefas Finalizadas</h2>
+
+            </div>
+
+
+            <div class="corpo-coluna"
+                 data-status="finalizada">
+
+
+                <!-- card de tarefa -->
+
+                <div class="card-tarefa"
+                     draggable="true"
+                     data-tarefa="Tarefa da Equipe - Análise">
+
+                    <!-- conteúdo do card -->
+
+                    <div class="conteudo-card">
+
+                        <p>
+                            Tarefa da Equipe - Análise
+                        </p>
+
+
+                        <!-- botão pra abrir a tarefa -->
+
+                        <button type="button"
+                                class="botao-expandir-tarefa">
+
+                            <a href="/Tarefa/ExTarefaGestor"
+                               class="botao-expandir-tarefa">
+
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
+
+                            </a>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- ação de compartilhar -->
+
+                    <div class="acoes-card">
+
+                        <button type="button"
+                                class="botao-compartilhar">
+
+                            Compartilhar
+
+                        </button>
+
+                    </div>
+
                 </div>
-            </section>
-        </div>
-    </main>
 
+            </div>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<!-- js que cuida dos comportamentos dessa tela -->
+
+<script src="/js/tarefa.js"></script>
 </body>
-</html>
