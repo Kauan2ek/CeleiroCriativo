@@ -91,7 +91,8 @@ Pra resolver isso, criamos um **sistema web orientado a projetos** em que cada p
 
 Você vai precisar de um **SQL Server** disponível.
 
-1. Execute o script mais recente em `Database/Scripts/` (`Celeiro_Criativo_DDL_v4.sql`).
+1. Abra `Database/Scripts/Celeiro_Criativo_Completo.sql` no SSMS e aperte **F5** uma vez. Ele recria o banco `CeleiroCriativo` do zero (⚠️ apaga o que existir) com tabelas, functions, views, procedures e dados de teste.
+   > Esse arquivo junta os outros scripts da pasta. Ao alterar qualquer um deles, atualize também o `Celeiro_Criativo_Completo.sql`.
 2. Ajuste a conexão em `Repositories/DataConnection.cs` com o servidor, usuário e senha do seu SQL Server, usando `Database=CeleiroCriativo`.
 
 ## 🗺️ Modelo de dados

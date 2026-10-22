@@ -57,6 +57,27 @@ public class ClienteSqlRepository : DataConnection
         return cliente;
     }
 
+    // Cadastra Pessoa + Cliente e devolve o código gerado.
+    // TODO: implementar (dá pra usar a procedure CadastrarPessoa com @tipo_pessoa = 'CLIENTE').
+    public int Create(Cliente cliente)
+    {
+        throw new NotImplementedException();
+    }
+
+    // Altera os dados de Pessoa + Cliente. Devolve false se o cliente não existir.
+    // TODO: implementar.
+    public bool Update(Cliente cliente)
+    {
+        throw new NotImplementedException();
+    }
+
+    // Exclui o cliente. Devolve false se o cliente não existir.
+    // TODO: implementar (decidir entre exclusão física ou lógica; Clientes não tem coluna "ativo").
+    public bool Delete(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     // Método auxiliar para não repetir a montagem do objeto em todos os SELECTs.
     private Cliente MontarCliente(SqlDataReader reader)
     {

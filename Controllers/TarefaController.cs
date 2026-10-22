@@ -102,14 +102,14 @@ public class TarefaController : Controller
     {
         try
         {
-            bool resultado = repository.Create(tarefa);
+            int codigoTarefa = repository.Create(tarefa);
 
             repository.Dispose();
             // volta pra tela da própria tarefa recém-criada
             // o new {id = ...} cria um objeto sem classe que preenche o {id} da rota: vira /Tarefa/DetalhesGestor/15
             // atenção: o tarefa.Codigo só vem com o código novo se o repository.Create preencher ele depois do insert
             // (tarefa.Codigo = IdTarefa); sem isso ele continua 0 e abre um formulário de tarefa nova vazio
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = tarefa.Codigo});
+            return RedirectToAction("IndexGestor", "Tarefa", new {id = tarefa.IdProjeto});
             // return Json(new {sucesso = resultado});
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui

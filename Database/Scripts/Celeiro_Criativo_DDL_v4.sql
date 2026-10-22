@@ -1,3 +1,4 @@
+-- !!! AO ALTERAR ESTE ARQUIVO, ATUALIZE TAMBÉM O Celeiro_Criativo_Completo.sql !!!
 -- =====================================================================
 -- CELEIRO CRIATIVO - SCRIPT DE CRIAÇÃO DO BANCO (SQL Server)
 -- v4 - Baseado no DER de 2026-10-06 e no Celeiro_Criativo_DDL_v3.sql

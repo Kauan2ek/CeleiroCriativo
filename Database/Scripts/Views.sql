@@ -1,3 +1,4 @@
+-- !!! AO ALTERAR ESTE ARQUIVO, ATUALIZE TAMBÉM O Celeiro_Criativo_Completo.sql !!!
 create or alter view V_Tarefas
 as
 select A.codigo, A.titulo, A.descricao, A.datahora_inicio, A.datahora_prevista,

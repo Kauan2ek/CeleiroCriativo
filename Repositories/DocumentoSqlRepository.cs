@@ -1,10 +1,44 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
+using System.IO;
 
 // repositório dos documentos (arquivos) de uma tarefa
 // por enquanto só lê: o upload de arquivo ainda está pendente
 public class DocumentoSqlRepository : DataConnection
 {
+    public bool upload()
+    {
+        try
+        {
+            const string filePath = @"\uploads\docs";
+
+            // FileStream stream = new FileStream().Create();
+            // https://balta.io/articles/csharp-manipulacao-arquivos
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("Arquivo não encontrado");
+        }
+        catch (DirectoryNotFoundException)
+        {
+            Console.WriteLine("Diretório não encontrado");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Console.WriteLine("Acesso negado.");
+        }
+        return true;
+    }
+
+    public bool Create()
+    {
+        
+        return true;
+    }
+
+
+
+
     // lista os documentos anexados à tarefa informada
     // usado pelo TarefaSqlRepository.Read pra mostrar a coluna "Arquivos" da tela da tarefa
     // se a tarefa não tiver documento, retorna uma lista vazia (nunca null, apesar do ? no tipo)

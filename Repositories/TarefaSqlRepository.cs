@@ -14,7 +14,7 @@ public class TarefaSqlRepository: DataConnection
 {
     // cadastra uma tarefa nova e, se vier equipe, já vincula os funcionários a ela
     // retorna true se a tarefa foi criada
-    public bool Create(Tarefa tarefa)
+    public int Create(Tarefa tarefa)
     {
         // o comando tem duas partes: o insert da tarefa e um select que devolve o código gerado
         // o codigo não entra no insert porque é IDENTITY, o próprio banco gera
@@ -57,7 +57,7 @@ public class TarefaSqlRepository: DataConnection
 
         // ExecuteScalar retorna valor único (Codigo - Tarefa)
         // é o resultado do SELECT SCOPE_IDENTITY() lá do comando: o código da tarefa que acabou de ser criada
-        int IdTarefa = (int) cmd.ExecuteScalar();
+        tarefa.Codigo = (int) cmd.ExecuteScalar();
 
         // a equipe não fica na tabela Tarefas, cada funcionário vira uma linha em TarefaFuncionarios
         // por isso precisa do código da tarefa, que só existe depois do insert acima
@@ -66,7 +66,7 @@ public class TarefaSqlRepository: DataConnection
         // atenção: como ele não fica guardado em variável, ninguém chama o Dispose() dele e essa conexão não é fechada
         if (tarefa.Funcionarios != null)
         {
-            new FuncionarioSqlRepository().AtualizarFuncionarios(IdTarefa, tarefa.Funcionarios);
+            new FuncionarioSqlRepository().AtualizarFuncionarios(tarefa.Codigo, tarefa.Funcionarios);
         }
 
         // comentários não são gravados aqui: tarefa nova nem mostra o chat,
@@ -81,7 +81,7 @@ public class TarefaSqlRepository: DataConnection
             // Seguir a mesma lógica da lista de funcionários (pendente)
         }
 
-        return IdTarefa > 0; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
+        return tarefa.Codigo; // Se retornou o id da tarefa, é porque deu certo, então retorna true, senão false
     }
 
     // busca uma tarefa pelo código, já com a categoria, a equipe, os comentários e os documentos preenchidos

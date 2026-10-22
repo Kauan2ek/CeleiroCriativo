@@ -1,3 +1,4 @@
+-- !!! AO ALTERAR ESTE ARQUIVO, ATUALIZE TAMBÉM O Celeiro_Criativo_Completo.sql !!!
 CREATE OR ALTER FUNCTION dbo.F_FuncionariosDaTarefa (@tarefa INT)
 RETURNS TABLE
 AS

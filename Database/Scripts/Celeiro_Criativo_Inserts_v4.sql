@@ -1,3 +1,4 @@
+-- !!! AO ALTERAR ESTE ARQUIVO, ATUALIZE TAMBÉM O Celeiro_Criativo_Completo.sql !!!
 -- =====================================================================
 -- CELEIRO CRIATIVO - SCRIPT DE DADOS DE TESTE (SQL Server)
 -- Inserts para o banco criado pelo Celeiro_Criativo_DDL_v4.sql

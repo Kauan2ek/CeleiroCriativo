@@ -174,7 +174,7 @@ body {
 
 /* corta com "..." se o título for muito longo */
 .titulo {
-    width: 145px;
+    width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -184,12 +184,21 @@ body {
 /* ==================== CLIENTE ==================== */
 
 .cliente {
-    width: 145px;
+    width: 200px;
     display: flex;
     align-items: center;
     gap: 5px;
     padding-left: 8px;
     border-left: 1px solid #aaa;
+}
+
+/* corta com "..." se o nome do cliente for muito longo, igual ao título
+   o min-width: 0 deixa o texto encolher dentro do flex (sem ele o nome empurra a largura e não corta) */
+.cliente-nome {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cliente img {
