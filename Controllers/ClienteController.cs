@@ -33,7 +33,8 @@ public class ClienteController : Controller
             int codigoCliente = repository.Create(cliente);
 
             repository.Dispose();
-            return Json(new {sucesso = true, codigo = codigoCliente});
+            // return Json(new {sucesso = true, codigo = codigoCliente});
+            return View();
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui
         // o e.Message traz a mensagem do SQL Server explicando o que deu errado

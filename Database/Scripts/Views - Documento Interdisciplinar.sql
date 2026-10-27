@@ -3,120 +3,120 @@ go
 
 -- Views para cada tabela
 
--- 1. Visualização da tabela cargos
+-- 1. Visualizaï¿½ï¿½o da tabela cargos
 
 create or alter view v_cargos
 as
 	select codigo, descricao
 	from Cargos
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_cargos
 
--- 2. Visualização da tabela status
+-- 2. Visualizaï¿½ï¿½o da tabela status
 
 create or alter view v_status
 as
 	select codigo, descricao
 	from status
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_status
 
--- 3. Visualização da tabela Categorias
+-- 3. Visualizaï¿½ï¿½o da tabela Categorias
 
 create or alter view v_categorias
 as
 	select codigo, descricao, cor
 	from Categorias
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_categorias
 
--- 4. Visualização da tabela projetos
+-- 4. Visualizaï¿½ï¿½o da tabela projetos
 
 create or alter view v_projetos
 as
 	select codigo, cliente_codigo, titulo, descricao, data_inicio, data_fim, data_prevista, status_codigo
 	from Projetos
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_projetos
 
--- 5. Visualização da tabela
+-- 5. Visualizaï¿½ï¿½o da tabela
 
 create or alter view v_tarefas
 as
 	select codigo, projeto_codigo, categoria_codigo, titulo, descricao, status, datahora_inicio, datahora_fim, datahora_prevista, visibilidade
 	from Tarefas
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_tarefas
 
--- 6. Visualização da tabela TarefaFuncionarios
--- Obs: não sei se tabela N:N conta
+-- 6. Visualizaï¿½ï¿½o da tabela TarefaFuncionarios
+-- Obs: nï¿½o sei se tabela N:N conta
 
 create or alter view v_tarefafuncionarios
 as
 	select funcionario_codigo, tarefa_codigo
 	from TarefaFuncionarios
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_tarefafuncionarios
 
--- 7. Visualização da tabela Documentos
+-- 7. Visualizaï¿½ï¿½o da tabela Documentos
 
 create or alter view v_documentos
 as
 	select codigo, tarefa_codigo, descricao, extensao, diretorio
 	from Documentos
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_documentos
 
--- 8. Visualização da tabela Comentarios
+-- 8. Visualizaï¿½ï¿½o da tabela Comentarios
 
 create or alter view v_comentarios
 as
 	select codigo, tarefa_codigo, funcionario_codigo, descricao, data_hora
 	from Comentarios
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_comentarios
 
--- 9. Visualização da tabela Funcionários
+-- 9. Visualizaï¿½ï¿½o da tabela Funcionï¿½rios
 
 create or alter view v_funcionarios
 as
 	select pessoa_codigo, cargo_codigo, ativo, email, senha
 	from Funcionarios
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_funcionarios
 
--- 10. Visualização da tabela Clientes
+-- 10. Visualizaï¿½ï¿½o da tabela Clientes
 
 create or alter view v_clientes
 as
 	select pessoa_codigo, codigo_verificacao, email, senha
 	from Clientes
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_clientes
 
 -- Views usando join
 
--- 1. Visualização da tabela Funcionários com Pessoas
+-- 1. Visualizaï¿½ï¿½o da tabela Funcionï¿½rios com Pessoas
 
 create or alter view v_funcionarios2
 as
@@ -125,11 +125,11 @@ as
     inner join Pessoas as p on p.codigo = f.pessoa_codigo
     inner join Cargos as c on c.codigo = f.cargo_codigo
 go
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_funcionarios2
 
--- 2. Visualização da tabela Clientes com Pessoas
+-- 2. Visualizaï¿½ï¿½o da tabela Clientes com Pessoas
 
 create or alter view v_clientes2
 as
@@ -138,11 +138,11 @@ as
     inner join Pessoas as p on p.codigo = c.pessoa_codigo
 go
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from v_clientes2
 
--- 3. Visualização da tabela Tarefas com Categorias
+-- 3. Visualizaï¿½ï¿½o da tabela Tarefas com Categorias
 
 create or alter view V_Tarefas2
 as
@@ -155,11 +155,11 @@ inner join Categorias B on B.codigo = A.categoria_codigo
 where A.status <> 'Cancelada'
 GO
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from V_Tarefas2
 
--- 4. Visualização da tabela Funcionários com Pessoas e Cargos
+-- 4. Visualizaï¿½ï¿½o da tabela Funcionï¿½rios com Pessoas e Cargos
 
 CREATE OR ALTER VIEW V_FuncionariosCargos
 AS 
@@ -171,11 +171,11 @@ INNER JOIN Pessoas B ON A.pessoa_codigo = B.codigo
 INNER JOIN Cargos  C ON C.codigo        = A.cargo_codigo
 GO
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from V_FuncionariosCargos
 
--- 5. Visualização da tabela Comentários com Funcionários
+-- 5. Visualizaï¿½ï¿½o da tabela Comentï¿½rios com Funcionï¿½rios
 
 CREATE OR ALTER VIEW V_Comentarios2
 AS 
@@ -184,11 +184,11 @@ SELECT A.*,
 	   B.email funcionario_email,
 	   B.cargo_codigo, B.cargo_descricao
 FROM Comentarios A 
--- [autor-comentario] o join era "B.codigo = A.codigo" (código do comentário), o que trazia o funcionário errado
+-- [autor-comentario] o join era "B.codigo = A.codigo" (cï¿½digo do comentï¿½rio), o que trazia o funcionï¿½rio errado
 INNER JOIN V_FuncionariosCargos B ON B.codigo = A.funcionario_codigo
 GO
 
--- Teste de execução
+-- Teste de execuï¿½ï¿½o
 
 select * from V_Comentarios2
 
@@ -211,7 +211,7 @@ select * from V_Projetos_Clientes
 go
 
 
--- 7. Visualização da tabela Tarefas com Funcionarios, Pessoas, Tarefas e Projetos
+-- 7. Visualizaï¿½ï¿½o da tabela Tarefas com Funcionarios, Pessoas, Tarefas e Projetos
 
 create or alter view V_Tarefas_Funcionarios
 as
@@ -230,7 +230,7 @@ go
 select * from V_Tarefas_Funcionarios
 go
 
--- Anotações
+-- Anotaï¿½ï¿½es
 
 select * from v_cargos
 select * from v_status

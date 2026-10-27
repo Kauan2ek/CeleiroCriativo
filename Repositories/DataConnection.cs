@@ -19,7 +19,7 @@ public abstract class DataConnection
         TrustServerCertificate=true";*/
 
         // LAB 2
-        string strConn = @"Server=F121-LB2-N06;
+        string strConn = @"Server=F121-LB5-N14;
         User Id=aluno;
         Password=dba;
         Database=CeleiroCriativo;

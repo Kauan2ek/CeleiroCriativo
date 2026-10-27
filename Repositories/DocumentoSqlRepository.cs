@@ -6,33 +6,8 @@ using System.IO;
 // por enquanto só lê: o upload de arquivo ainda está pendente
 public class DocumentoSqlRepository : DataConnection
 {
-    public bool upload()
-    {
-        try
-        {
-            const string filePath = @"\uploads\docs";
-
-            // FileStream stream = new FileStream().Create();
-            // https://balta.io/articles/csharp-manipulacao-arquivos
-        }
-        catch (FileNotFoundException)
-        {
-            Console.WriteLine("Arquivo não encontrado");
-        }
-        catch (DirectoryNotFoundException)
-        {
-            Console.WriteLine("Diretório não encontrado");
-        }
-        catch (UnauthorizedAccessException)
-        {
-            Console.WriteLine("Acesso negado.");
-        }
-        return true;
-    }
-
     public bool Create()
-    {
-        
+    {       
         return true;
     }
 
