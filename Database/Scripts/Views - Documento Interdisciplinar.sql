@@ -118,7 +118,7 @@ select * from v_clientes
 
 -- 1. Visualização da tabela Funcionários com Pessoas
 
-create or alter view v_funcionarios2
+create or alter view v_funcionariosPessoas
 as
 	select f.pessoa_codigo, p.nome, p.telefone, p.documento, p.tipo_doc, f.cargo_codigo, c.descricao as cargo, f.ativo, f.email
     from Funcionarios as f
@@ -127,11 +127,11 @@ as
 go
 -- Teste de execução
 
-select * from v_funcionarios2
+select * from v_funcionariosPessoas
 
 -- 2. Visualização da tabela Clientes com Pessoas
 
-create or alter view v_clientes2
+create or alter view v_clientesPessoas
 as
 	select c.pessoa_codigo, p.nome, p.telefone, p.documento, p.tipo_doc, c.codigo_verificacao, c.email
     from Clientes as c
@@ -140,11 +140,11 @@ go
 
 -- Teste de execução
 
-select * from v_clientes2
+select * from v_clientespessoas
 
 -- 3. Visualização da tabela Tarefas com Categorias
 
-create or alter view V_Tarefas2
+create or alter view V_TarefasJoin
 as
 select A.codigo, A.titulo, A.descricao, A.datahora_inicio, A.datahora_prevista,
        A.datahora_fim, A.visibilidade, A.status,
@@ -157,7 +157,7 @@ GO
 
 -- Teste de execução
 
-select * from V_Tarefas2
+select * from V_TarefasJoin
 
 -- 4. Visualização da tabela Funcionários com Pessoas e Cargos
 
@@ -177,7 +177,7 @@ select * from V_FuncionariosCargos
 
 -- 5. Visualização da tabela Comentários com Funcionários
 
-CREATE OR ALTER VIEW V_Comentarios2
+CREATE OR ALTER VIEW V_ComentariosCompleto
 AS 
 SELECT A.*,
 	   B.nome funcionario_nome, B.Telefone funcionario_telefone,
@@ -190,11 +190,11 @@ GO
 
 -- Teste de execução
 
-select * from V_Comentarios2
+select * from V_ComentariosCompleto
 
 -- 6. Visualizacao da tabela Projetos com Clientes, Pessoas e Status
 
-create or alter view V_Projetos_Clientes
+create or alter view V_ProjetosClientes
 as
     select pr.codigo as projeto_codigo, pr.titulo as projeto_titulo, pr.descricao as projeto_descricao,
 		   pr.data_inicio, pr.data_fim, pr.data_prevista, c.pessoa_codigo as cliente_codigo, p.nome as cliente_nome,
@@ -207,13 +207,13 @@ go
 
 -- Teste de execucao
 
-select * from V_Projetos_Clientes
+select * from V_ProjetosClientes
 go
 
 
 -- 7. Visualização da tabela Tarefas com Funcionarios, Pessoas, Tarefas e Projetos
 
-create or alter view V_Tarefas_Funcionarios
+create or alter view V_TarefasFuncionarios
 as
     select tf.funcionario_codigo, p.nome as funcionario_nome, f.email as funcionario_email, tf.tarefa_codigo,
            t.titulo as tarefa_titulo, t.status as tarefa_status, t.datahora_inicio, t.datahora_prevista,
@@ -227,7 +227,7 @@ go
 
 -- Teste de execucao
 
-select * from V_Tarefas_Funcionarios
+select * from V_TarefasFuncionarios
 go
 
 -- Anotações
