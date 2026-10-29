@@ -37,7 +37,7 @@ CREATE TABLE Pessoas (
     codigo          INT IDENTITY(1,1) PRIMARY KEY,
     nome            VARCHAR(50) NOT NULL,
     telefone        VARCHAR(20) NULL,
-    documento       VARCHAR(20) NOT NULL,
+    documento       VARCHAR(20) NOT NULL UNIQUE,
     tipo_doc        VARCHAR(4) NOT NULL,
     CONSTRAINT CK_Pessoa_TipoDoc CHECK (tipo_doc IN ('cpf', 'cnpj'))
 );
@@ -67,7 +67,7 @@ CREATE TABLE Funcionarios (
     pessoa_codigo   INT PRIMARY KEY,
     cargo_codigo    INT NOT NULL,
     ativo           BIT NOT NULL DEFAULT 1,
-    email           VARCHAR(100) NOT NULL,
+    email           VARCHAR(100) NOT NULL UNIQUE,
     senha           VARCHAR(255) NOT NULL,
     CONSTRAINT FK_Funcionarios_Pessoa FOREIGN KEY (pessoa_codigo) REFERENCES Pessoas(codigo),
     CONSTRAINT FK_Funcionarios_Cargo  FOREIGN KEY (cargo_codigo)  REFERENCES Cargos(codigo)
@@ -76,7 +76,7 @@ CREATE TABLE Funcionarios (
 CREATE TABLE Clientes (
     pessoa_codigo       INT PRIMARY KEY,
     codigo_verificacao  VARCHAR(20) NULL,
-    email               VARCHAR(100) NOT NULL,
+    email               VARCHAR(100) NOT NULL UNIQUE,
     senha               VARCHAR(255) NULL, -- nullable no banco, mas o cadastro atual já permite salvar a senha
     CONSTRAINT FK_Clientes_Pessoa FOREIGN KEY (pessoa_codigo) REFERENCES Pessoas(codigo)
 );

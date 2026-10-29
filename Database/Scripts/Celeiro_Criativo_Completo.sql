@@ -24,7 +24,7 @@
 --   Atualizacao_CRUD_Gestor_20261016.sql (já incluído nos itens 3 e 5;
 --   serve só para atualizar um banco existente sem recriá-lo).
 --
--- Última sincronização: 22/10/2026
+-- Última sincronização: 28/10/2026
 -- =====================================================================
 
 USE master;
@@ -57,7 +57,7 @@ CREATE TABLE Pessoas (
     codigo          INT IDENTITY(1,1) PRIMARY KEY,
     nome            VARCHAR(50) NOT NULL,
     telefone        VARCHAR(20) NULL,
-    documento       VARCHAR(20) NOT NULL,
+    documento       VARCHAR(20) NOT NULL UNIQUE,
     tipo_doc        VARCHAR(4) NOT NULL,
     CONSTRAINT CK_Pessoa_TipoDoc CHECK (tipo_doc IN ('cpf', 'cnpj'))
 );
@@ -87,7 +87,7 @@ CREATE TABLE Funcionarios (
     pessoa_codigo   INT PRIMARY KEY,
     cargo_codigo    INT NOT NULL,
     ativo           BIT NOT NULL DEFAULT 1,
-    email           VARCHAR(100) NOT NULL,
+    email           VARCHAR(100) NOT NULL UNIQUE,
     senha           VARCHAR(255) NOT NULL,
     CONSTRAINT FK_Funcionarios_Pessoa FOREIGN KEY (pessoa_codigo) REFERENCES Pessoas(codigo),
     CONSTRAINT FK_Funcionarios_Cargo  FOREIGN KEY (cargo_codigo)  REFERENCES Cargos(codigo)
@@ -96,7 +96,7 @@ CREATE TABLE Funcionarios (
 CREATE TABLE Clientes (
     pessoa_codigo       INT PRIMARY KEY,
     codigo_verificacao  VARCHAR(20) NULL,
-    email               VARCHAR(100) NOT NULL,
+    email               VARCHAR(100) NOT NULL UNIQUE,
     senha               VARCHAR(255) NULL, -- nullable no banco, mas o cadastro atual já permite salvar a senha
     CONSTRAINT FK_Clientes_Pessoa FOREIGN KEY (pessoa_codigo) REFERENCES Pessoas(codigo)
 );
@@ -247,349 +247,675 @@ GO
 -- 4) PROCEDURES (Procedures.sql, sem a parte de testes)
 -- #####################################################################
 
-create or alter procedure CadastrarPessoa
-(
-	@nome varchar(50), @telefone varchar(20), @documento varchar(20), @tipo_doc varchar(4), @tipo_pessoa varchar(15),
-
-    -- Dados do funcionário
-    @cargo_codigo int = NULL, @ativo bit = 1,
-
-    -- Dados de acesso
-    @email varchar(100), @senha varchar(255),
-
-    -- Dados do cliente
-    @codigo_verificacao varchar(20) = NULL
-)
-as
-begin
-	SET NOCOUNT ON;
-	SET XACT_ABORT ON;
-
-    begin try
-
-        begin tran
-
-        -- Cadastra a pessoa --
-        insert into Pessoas (nome, telefone, documento, tipo_doc)
-        values (@nome, @telefone, @documento, @tipo_doc)
-
-		-- Recupera o código gerado pela Pessoa --
-        declare @pessoa_codigo int;
-
-        set @pessoa_codigo = SCOPE_IDENTITY();
-
-		-- Verifica qual tipo de pessoa será cadastrado --
-        if @tipo_pessoa = 'FUNCIONARIO'
-        begin
-
-            insert into Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha)
-            values (@pessoa_codigo, @cargo_codigo, @ativo, @email, @senha)
-
-        end
-
-        else if @tipo_pessoa = 'CLIENTE'
-        begin
-
-            insert into Clientes(pessoa_codigo, codigo_verificacao, email, senha)
-            values(@pessoa_codigo, @codigo_verificacao, @email, @senha)
-
-        end
-
-        -- Confirma as operações --
-        commit
-
-        -- Retorna o código da pessoa cadastrada --
-        select @pessoa_codigo as pessoa_codigo
-
-    end try
-
-	begin catch
-		-- Desfazer a transacao caso ocorra um erro --
-        if @@TRANCOUNT > 0
-            rollback;
-
-		throw
-
-	end catch
-end
-go
-
-create or alter procedure AlterarStatusProjeto
-    @projeto_codigo int, @status_codigo int = NULL
-as
-begin
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
-
-    begin try
-
-        -- Verificar se o projeto existe --
-        if not exists (
-            select 1 from Projetos where codigo = @projeto_codigo
-        )
-            throw 50011, 'Projeto nao encontrado.', 1;
-
-        -- Validar o status, se informado --
-        if @status_codigo is not null and not exists (
-               select 1 from Status where codigo = @status_codigo
-           )
-            throw 50012, 'Status informado nao encontrado.', 1;
-
-		-- Iniciar a transacao --
-        begin tran
-
-        -- Atualizar o status --
-        update Projetos
-        set status_codigo = @status_codigo
-        where codigo = @projeto_codigo;
-
-		-- Confirmar a transacao --
-        commit
-
-        -- Retornar os dados atualizados --
-        select p.codigo as projeto_codigo, p.titulo, p.status_codigo, s.descricao as status_descricao
-        from Projetos as p
-        LEFT JOIN Status as s on s.codigo = p.status_codigo
-        where p.codigo = @projeto_codigo;
-
-    end try
-    begin catch
-		-- Desfazer a transacao caso ocorra um erro --
-        if XACT_STATE() <> 0
-            rollback;
-
-        throw
-    end catch
-end
-go
-
-create or alter procedure CadastrarProjeto -- Não sei se é necessário neste contexto --
-    @cliente_codigo int, @titulo varchar(50), @descricao varchar(MAX) = NULL,
-    @data_inicio date = NULL, @data_fim date = NULL, @data_prevista date = NULL,
-    @status_codigo int = NULL
-as
-begin
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
-
-    begin try
-
-        -- Verificar se o titulo foi informado --
-        if NULLIF(LTRIM(RTRIM(@titulo)), '') IS NULL
-            throw 50001, 'Titulo do projeto e obrigatorio.', 1;
-
-        -- Verificar se o cliente existe --
-        if not exists (
-            select 1 from Clientes where pessoa_codigo = @cliente_codigo
-        )
-            throw 50002, 'Cliente nao encontrado.', 1;
-
-        -- Validar o status, se informado --
-        if @status_codigo is not null and not exists (
-               select 1 from Status where codigo = @status_codigo
-           )
-            throw 50003, 'Status informado nao encontrado.', 1;
-
-        -- Validar as datas --
-        if @data_inicio is not null and @data_fim is not null
-           and @data_fim < @data_inicio
-            throw 50004, 'A data final nao pode ser anterior a data inicial.', 1;
-
-        if @data_inicio is not null and @data_prevista is not null
-           and @data_prevista < @data_inicio
-            throw 50005, 'A data prevista nao pode ser anterior a data inicial.', 1;
-
-        -- Iniciar a transacao --
-        begin tran
-
-        -- Cadastrar o projeto --
-        insert into Projetos
-        (
-            cliente_codigo, titulo, descricao, data_inicio,
-            data_fim, data_prevista, status_codigo
-        )
-        values
-        (
-            @cliente_codigo, @titulo, @descricao, @data_inicio,
-            @data_fim, @data_prevista, @status_codigo
-        );
-
-        -- Recuperar o codigo gerado --
-        declare @projeto_codigo int;
-        set @projeto_codigo = SCOPE_IDENTITY();
-
-        -- Confirmar a transacao --
-        commit
-
-        -- Retornar os dados do projeto cadastrado --
-        select codigo, cliente_codigo, titulo, descricao, data_inicio,
-               data_fim, data_prevista, status_codigo
-        from Projetos
-        where codigo = @projeto_codigo;
-
-    end try
-    begin catch
-
-        -- Desfazer a transacao caso ocorra um erro --
-        if XACT_STATE() <> 0
-            rollback;
-
-        throw
-    end catch
-end
-go
-
-create or alter procedure CadastrarTarefa
-    @projeto_codigo int, @categoria_codigo int = NULL,
-    @titulo varchar(50), @descricao varchar(MAX) = NULL,
-    @status varchar(30), @datahora_inicio datetime = NULL,
-    @datahora_fim datetime = NULL, @datahora_prevista datetime = NULL,
-    @visibilidade bit = 1
-as
-begin
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
-
-    begin try
-
-        -- Verificar se o titulo foi informado --
-        if NULLIF(LTRIM(RTRIM(@titulo)), '') IS NULL
-            throw 50021, 'Titulo da tarefa e obrigatorio.', 1;
-
-        -- Verificar se o status foi informado --
-        if NULLIF(LTRIM(RTRIM(@status)), '') IS NULL
-            throw 50022, 'Status da tarefa e obrigatorio.', 1;
-
-        -- Verificar se o projeto existe --
-        if not exists (
-            select 1 from Projetos where codigo = @projeto_codigo
-        )
-            throw 50023, 'Projeto nao encontrado.', 1;
-
-        -- Verificar se a categoria existe, se informada --
-        if @categoria_codigo is not null and not exists (
-            select 1 from Categorias where codigo = @categoria_codigo
-        )
-            throw 50024, 'Categoria nao encontrada.', 1;
-
-        -- Validar as datas --
-        if @datahora_inicio is not null and @datahora_fim is not null
-           and @datahora_fim < @datahora_inicio
-            throw 50025, 'A data final nao pode ser anterior a data inicial.', 1;
-
-        if @datahora_inicio is not null and @datahora_prevista is not null
-           and @datahora_prevista < @datahora_inicio
-            throw 50026, 'A data prevista nao pode ser anterior a data inicial.', 1;
-
-        -- Iniciar a transacao --
-        begin tran;
-
-        -- Cadastrar a tarefa --
-        insert into Tarefas
-        (
-            projeto_codigo, categoria_codigo, titulo, descricao,
-            status, datahora_inicio, datahora_fim,
-            datahora_prevista, visibilidade
-        )
-        values
-        (
-            @projeto_codigo, @categoria_codigo, @titulo, @descricao,
-            @status, @datahora_inicio, @datahora_fim,
-            @datahora_prevista, @visibilidade
-        );
-
-        -- Recuperar o codigo gerado --
-        declare @tarefa_codigo int;
-        set @tarefa_codigo = SCOPE_IDENTITY();
-
-        -- Confirmar a transacao --
-        commit;
-
-        -- Retornar os dados da tarefa cadastrada --
-        select codigo, projeto_codigo, categoria_codigo, titulo,
-               descricao, status, datahora_inicio, datahora_fim,
-               datahora_prevista, visibilidade
-        from Tarefas
-        where codigo = @tarefa_codigo;
-
-    end try
-    begin catch
-
-        -- Desfazer a transacao caso ocorra um erro --
-        if XACT_STATE() <> 0
-            rollback;
-
-        throw
-    end catch
-end
-go
-
-create or alter procedure AtribuirFuncionarioTarefa
-    @funcionario_codigo int, @tarefa_codigo int
-as
-begin
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
-
-    begin try
-
-        -- Verificar se o funcionario existe --
-        if not exists (
-            select 1 from Funcionarios where pessoa_codigo = @funcionario_codigo
-        )
-            throw 50031, 'Funcionario nao encontrado.', 1;
-
-        -- Verificar se a tarefa existe --
-        if not exists (
-            select 1 from Tarefas where codigo = @tarefa_codigo
-        )
-            throw 50032, 'Tarefa nao encontrada.', 1;
-
-        -- Verificar se o funcionario ja esta atribuido a tarefa --
-        if exists (
-            select 1 from TarefaFuncionarios
-            where funcionario_codigo = @funcionario_codigo
-              and tarefa_codigo = @tarefa_codigo
-        )
-            throw 50033, 'Funcionario ja atribuido a esta tarefa.', 1;
-
-        -- Iniciar a transacao --
-        begin tran;
-
-        -- Atribuir o funcionario a tarefa --
-        insert into TarefaFuncionarios
-        (
-            funcionario_codigo, tarefa_codigo
-        )
-        values
-        (
-            @funcionario_codigo, @tarefa_codigo
-        );
-
-        -- Confirmar a transacao --
-        commit;
-
-        -- Retornar os dados da atribuicao --
-        select tf.funcionario_codigo, tf.tarefa_codigo,
-               p.nome as funcionario_nome, t.titulo as tarefa_titulo
-        from TarefaFuncionarios as tf
-        inner join Pessoas as p on p.codigo = tf.funcionario_codigo
-        inner join Tarefas as t on t.codigo = tf.tarefa_codigo
-        where tf.funcionario_codigo = @funcionario_codigo
-          and tf.tarefa_codigo = @tarefa_codigo;
-
-    end try
-    begin catch
-
-        -- Desfazer a transacao caso ocorra um erro --
-        if XACT_STATE() <> 0
-            rollback;
-
-        throw
-
-    end catch
-end
-go
+-- 1. Adicionar cargo
+CREATE OR ALTER PROCEDURE AdicionarCargo
+    @descricao VARCHAR(50)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO Cargos (descricao)
+        VALUES (@descricao);
+
+        DECLARE @cargo_codigo INT = SCOPE_IDENTITY();
+
+        COMMIT;
+
+        SELECT codigo, descricao
+        FROM Cargos
+        WHERE codigo = @cargo_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 2. Atualizar cargo
+CREATE OR ALTER PROCEDURE AtualizarCargo
+    @cargo_codigo INT,
+    @descricao VARCHAR(50)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE Cargos
+        SET descricao = @descricao
+        WHERE codigo = @cargo_codigo;
+
+        COMMIT;
+
+        SELECT codigo, descricao
+        FROM Cargos
+        WHERE codigo = @cargo_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 3. Adicionar status
+CREATE OR ALTER PROCEDURE AdicionarStatus
+    @descricao VARCHAR(50)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO Status (descricao)
+        VALUES (@descricao);
+        DECLARE @status_codigo INT = SCOPE_IDENTITY();
+        COMMIT;
+        SELECT codigo, descricao
+        FROM Status
+        WHERE codigo = @status_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 4. Alterar status
+CREATE OR ALTER PROCEDURE AlterarStatus
+    @status_codigo INT,
+    @descricao VARCHAR(50)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        UPDATE Status SET descricao = @descricao WHERE codigo = @status_codigo;
+        COMMIT;
+        SELECT codigo, descricao
+        FROM Status
+        WHERE codigo = @status_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 5. Adicionar categoria
+CREATE OR ALTER PROCEDURE AdicionarCategoria
+    @descricao VARCHAR(50),
+    @cor VARCHAR(20) = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        INSERT INTO Categorias (descricao, cor) VALUES (@descricao, @cor);
+        DECLARE @categoria_codigo INT = SCOPE_IDENTITY();
+        COMMIT;
+        SELECT codigo, descricao, cor
+        FROM Categorias
+        WHERE codigo = @categoria_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 6. Atualizar categoria
+CREATE OR ALTER PROCEDURE AtualizarCategoria
+    @categoria_codigo INT,
+    @descricao VARCHAR(50),
+    @cor VARCHAR(20)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        UPDATE Categorias
+        SET descricao = @descricao, cor = @cor  WHERE codigo = @categoria_codigo;
+        COMMIT;
+        SELECT codigo, descricao, cor
+        FROM Categorias
+        WHERE codigo = @categoria_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 7. Cadastrar funcionario
+CREATE OR ALTER PROCEDURE CadastrarFuncionario
+    @nome VARCHAR(50),
+    @documento VARCHAR(20),
+    @tipo_doc VARCHAR(20),
+    @cargo_codigo INT,
+    @email VARCHAR(100),
+    @senha VARCHAR(255),
+    @telefone VARCHAR(20) = NULL,
+    @ativo BIT = 1
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        DECLARE @codigo INT
+        SET @tipo_doc = LOWER(TRIM(@tipo_doc));
+        SET @documento = REPLACE(REPLACE(REPLACE(REPLACE(@documento, '.', ''), '-', ''),'/', ''), ' ', '');
+        SELECT  @codigo = (SELECT codigo FROM Pessoas WHERE documento = @documento)
+
+        IF @codigo is null
+        BEGIN
+            INSERT INTO Pessoas (nome, telefone, documento, tipo_doc)
+            VALUES (@nome, @telefone, @documento, @tipo_doc)
+            SET @codigo = SCOPE_IDENTITY()
+        END
+
+        INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha)
+        VALUES (@codigo, @cargo_codigo, @ativo, @email, @senha);
+
+        COMMIT;
+
+        SELECT p.codigo AS pessoa_codigo, p.nome, p.telefone,
+               p.documento, p.tipo_doc, f.cargo_codigo, f.ativo, f.email
+        FROM Pessoas AS p
+        INNER JOIN Funcionarios AS f ON f.pessoa_codigo = p.codigo
+        WHERE p.codigo = @codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 8. Atualizar funcionario
+CREATE OR ALTER PROCEDURE AtualizarFuncionario
+    @funcionario_codigo INT,
+    @nome VARCHAR(50),
+    @telefone VARCHAR(20),
+    @documento VARCHAR(20),
+    @tipo_doc VARCHAR(20),
+    @cargo_codigo INT,
+    @ativo BIT,
+    @email VARCHAR(100),
+    @senha VARCHAR(255) = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        IF NOT EXISTS (SELECT 1 FROM Funcionarios WHERE pessoa_codigo = @funcionario_codigo)
+            THROW 50002, 'Funcionário não encontrado.', 1;
+        SET @documento = REPLACE(REPLACE(REPLACE(REPLACE(@documento, '.', ''), '-', ''),'/', ''), ' ', '');
+        SET @tipo_doc = LOWER(LTRIM(RTRIM(@tipo_doc)));
+
+        UPDATE Pessoas
+        SET nome = @nome,
+            telefone = @telefone,
+            documento = @documento,
+            tipo_doc = @tipo_doc
+        WHERE codigo = @funcionario_codigo;
+
+        UPDATE Funcionarios
+        SET cargo_codigo = @cargo_codigo,
+            ativo = @ativo,
+            email = @email,
+            senha = COALESCE(NULLIF(@senha, ''), senha)
+        WHERE pessoa_codigo = @funcionario_codigo;
+
+        COMMIT;
+
+        SELECT p.codigo AS pessoa_codigo, p.nome, p.telefone,
+               p.documento, p.tipo_doc, f.cargo_codigo, f.ativo, f.email
+        FROM Pessoas AS p
+        INNER JOIN Funcionarios AS f ON f.pessoa_codigo = p.codigo
+        WHERE p.codigo = @funcionario_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 9. Cadastrar cliente
+CREATE OR ALTER PROCEDURE CadastrarCliente
+    @nome VARCHAR(50),
+    @documento VARCHAR(20),
+    @tipo_doc VARCHAR(20),
+    @email VARCHAR(100),
+    @telefone VARCHAR(20) = NULL,
+    @codigo_verificacao VARCHAR(20) = NULL,
+    @senha VARCHAR(255) = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        DECLARE @codigo INT
+        SET @tipo_doc = LOWER(LTRIM(RTRIM(@tipo_doc)))
+        SET @documento = REPLACE(REPLACE(REPLACE(REPLACE(@documento, '.', ''), '-', ''), '/', ''), ' ', '')
+        SET @codigo = (SELECT codigo FROM Pessoas WHERE documento = @documento)
+
+        IF @codigo is null
+        BEGIN
+            INSERT INTO Pessoas (nome, telefone, documento, tipo_doc)
+            VALUES (@nome, @telefone, @documento, @tipo_doc)
+            SET @codigo = SCOPE_IDENTITY()
+        END
+
+        INSERT INTO Clientes (pessoa_codigo, codigo_verificacao, email, senha)
+        VALUES (@codigo, @codigo_verificacao, @email, @senha)
+
+        COMMIT;
+
+        SELECT p.codigo AS pessoa_codigo, p.nome, p.telefone,
+               p.documento, p.tipo_doc, c.codigo_verificacao, c.email
+        FROM Pessoas AS p
+        INNER JOIN Clientes AS c ON c.pessoa_codigo = p.codigo
+        WHERE p.codigo = @codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END
+GO
+
+-- 10. Atualizar cliente
+CREATE OR ALTER PROCEDURE AtualizarCliente
+    @cliente_codigo INT,
+    @nome VARCHAR(50),
+    @telefone VARCHAR(20),
+    @documento VARCHAR(20),
+    @tipo_doc VARCHAR(20),
+    @email VARCHAR(100),
+    @codigo_verificacao VARCHAR(20),
+    @senha VARCHAR(255) = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        IF NOT EXISTS (SELECT 1 FROM Clientes WHERE pessoa_codigo = @cliente_codigo)
+            THROW 50002, 'Cliente não encontrado.', 1;
+
+        SET @documento = REPLACE(REPLACE(REPLACE(REPLACE(@documento, '.', ''), '-', ''),'/', ''), ' ', '');
+        SET @tipo_doc = LOWER(LTRIM(RTRIM(@tipo_doc)));
+
+        UPDATE Pessoas
+        SET nome = @nome,
+            telefone = @telefone,
+            documento = @documento,
+            tipo_doc = @tipo_doc
+        WHERE codigo = @cliente_codigo;
+
+        UPDATE Clientes
+        SET codigo_verificacao = @codigo_verificacao,
+            email = @email,
+            senha = COALESCE(NULLIF(@senha, ''), senha)
+        WHERE pessoa_codigo = @cliente_codigo;
+
+        COMMIT;
+
+        SELECT p.codigo AS pessoa_codigo, p.nome, p.telefone,
+               p.documento, p.tipo_doc, c.codigo_verificacao, c.email
+        FROM Pessoas AS p
+        INNER JOIN Clientes AS c ON c.pessoa_codigo = p.codigo
+        WHERE p.codigo = @cliente_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 11. Cadastrar projeto
+CREATE OR ALTER PROCEDURE CadastrarProjeto
+    @cliente_codigo INT,
+    @titulo VARCHAR(50),
+    @descricao VARCHAR(MAX) = NULL,
+    @data_inicio DATE = NULL,
+    @data_fim DATE = NULL,
+    @data_prevista DATE = NULL,
+    @status_codigo INT = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO Projetos (cliente_codigo, titulo, descricao, data_inicio, data_fim, data_prevista, status_codigo)
+        VALUES (@cliente_codigo, @titulo, @descricao, @data_inicio, @data_fim, @data_prevista, @status_codigo);
+
+        DECLARE @projeto_codigo INT = SCOPE_IDENTITY();
+
+        COMMIT;
+
+        SELECT codigo, cliente_codigo, titulo, descricao,
+               data_inicio, data_fim, data_prevista, status_codigo
+        FROM Projetos
+        WHERE codigo = @projeto_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 12. Atualizar projeto
+CREATE OR ALTER PROCEDURE AtualizarProjeto
+    @projeto_codigo INT,
+    @cliente_codigo INT,
+    @titulo VARCHAR(50),
+    @descricao VARCHAR(MAX) = NULL,
+    @data_inicio DATE = NULL,
+    @data_fim DATE = NULL,
+    @data_prevista DATE = NULL,
+    @status_codigo INT = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE Projetos
+        SET cliente_codigo = @cliente_codigo,
+            titulo = @titulo,
+            descricao = @descricao,
+            data_inicio = @data_inicio,
+            data_fim = @data_fim,
+            data_prevista = @data_prevista,
+            status_codigo = @status_codigo
+        WHERE codigo = @projeto_codigo;
+
+        COMMIT;
+
+        SELECT codigo, cliente_codigo, titulo, descricao,
+               data_inicio, data_fim, data_prevista, status_codigo
+        FROM Projetos
+        WHERE codigo = @projeto_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 13. Adicionar tarefa
+CREATE OR ALTER PROCEDURE AdicionarTarefa
+    @projeto_codigo INT,
+    @categoria_codigo INT,
+    @titulo VARCHAR(50),
+    @descricao VARCHAR(MAX),
+    @status VARCHAR(30),
+    @datahora_inicio DATETIME = NULL,
+    @datahora_fim DATETIME = NULL,
+    @datahora_prevista DATETIME = NULL,
+    @visibilidade BIT = 1
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO Tarefas (projeto_codigo, categoria_codigo, titulo, descricao, status,
+                             datahora_inicio, datahora_fim, datahora_prevista, visibilidade)
+        VALUES (@projeto_codigo, @categoria_codigo, @titulo, @descricao, @status,
+                @datahora_inicio, @datahora_fim, @datahora_prevista, @visibilidade);
+
+        DECLARE @tarefa_codigo INT = SCOPE_IDENTITY();
+
+        COMMIT;
+
+        SELECT codigo, projeto_codigo, categoria_codigo, titulo, descricao,
+               status, datahora_inicio, datahora_fim, datahora_prevista, visibilidade
+        FROM Tarefas
+        WHERE codigo = @tarefa_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 14. Atualizar tarefa
+CREATE OR ALTER PROCEDURE AtualizarTarefa
+    @tarefa_codigo INT,
+    @projeto_codigo INT,
+    @categoria_codigo INT,
+    @titulo VARCHAR(50),
+    @descricao VARCHAR(MAX),
+    @status VARCHAR(30),
+    @datahora_inicio DATETIME = NULL,
+    @datahora_fim DATETIME = NULL,
+    @datahora_prevista DATETIME = NULL,
+    @visibilidade BIT = 1
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE Tarefas
+        SET projeto_codigo = @projeto_codigo,
+            categoria_codigo = @categoria_codigo,
+            titulo = @titulo,
+            descricao = @descricao,
+            status = @status,
+            datahora_inicio = @datahora_inicio,
+            datahora_fim = @datahora_fim,
+            datahora_prevista = @datahora_prevista,
+            visibilidade = @visibilidade
+        WHERE codigo = @tarefa_codigo;
+
+        COMMIT;
+
+        SELECT codigo, projeto_codigo, categoria_codigo, titulo, descricao,
+               status, datahora_inicio, datahora_fim, datahora_prevista, visibilidade
+        FROM Tarefas
+        WHERE codigo = @tarefa_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 15. Atribuir funcionario a tarefa
+CREATE OR ALTER PROCEDURE AtribuirFuncionarioTarefa
+    @funcionario_codigo INT,
+    @tarefa_codigo INT
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO TarefaFuncionarios (funcionario_codigo, tarefa_codigo)
+        VALUES (@funcionario_codigo, @tarefa_codigo);
+
+        COMMIT;
+
+        SELECT funcionario_codigo, tarefa_codigo
+        FROM TarefaFuncionarios
+        WHERE funcionario_codigo = @funcionario_codigo AND tarefa_codigo = @tarefa_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 16. Atualizar atribuicao de funcionario a tarefa
+CREATE OR ALTER PROCEDURE AtualizarAtribuicaoFuncionarioTarefa
+    @funcionario_codigo_atual INT,
+    @tarefa_codigo_atual INT,
+    @funcionario_codigo_novo INT,
+    @tarefa_codigo_novo INT
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE TarefaFuncionarios
+        SET funcionario_codigo = @funcionario_codigo_novo,
+            tarefa_codigo = @tarefa_codigo_novo
+        WHERE funcionario_codigo = @funcionario_codigo_atual
+          AND tarefa_codigo = @tarefa_codigo_atual;
+
+        COMMIT;
+
+        SELECT funcionario_codigo, tarefa_codigo
+        FROM TarefaFuncionarios
+        WHERE funcionario_codigo = @funcionario_codigo_novo AND tarefa_codigo = @tarefa_codigo_novo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 17. Adicionar documento
+CREATE OR ALTER PROCEDURE AdicionarDocumento
+    @tarefa_codigo INT,
+    @descricao VARCHAR(MAX),
+    @extensao VARCHAR(10),
+    @diretorio VARCHAR(255)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        INSERT INTO Documentos (tarefa_codigo, descricao, extensao, diretorio)
+        VALUES (@tarefa_codigo, @descricao, @extensao, @diretorio);
+
+        DECLARE @documento_codigo INT = SCOPE_IDENTITY();
+
+        COMMIT;
+
+        SELECT codigo, tarefa_codigo, descricao, extensao, diretorio
+        FROM Documentos
+        WHERE codigo = @documento_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 18. Atualizar documento
+CREATE OR ALTER PROCEDURE AtualizarDocumento
+    @documento_codigo INT,
+    @tarefa_codigo INT,
+    @descricao VARCHAR(MAX),
+    @extensao VARCHAR(10),
+    @diretorio VARCHAR(255)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE Documentos
+        SET tarefa_codigo = @tarefa_codigo,
+            descricao = @descricao,
+            extensao = @extensao,
+            diretorio = @diretorio
+        WHERE codigo = @documento_codigo;
+
+        COMMIT;
+
+        SELECT codigo, tarefa_codigo, descricao, extensao, diretorio
+        FROM Documentos
+        WHERE codigo = @documento_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 19. Adicionar comentario
+CREATE OR ALTER PROCEDURE AdicionarComentario
+    @tarefa_codigo INT,
+    @funcionario_codigo INT,
+    @descricao VARCHAR(MAX),
+    @data_hora DATETIME = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+        INSERT INTO Comentarios (tarefa_codigo, funcionario_codigo, descricao, data_hora)
+        VALUES (@tarefa_codigo, @funcionario_codigo, @descricao, COALESCE(@data_hora, GETDATE()));
+
+        DECLARE @comentario_codigo INT = SCOPE_IDENTITY();
+        COMMIT;
+        SELECT codigo, tarefa_codigo, funcionario_codigo, descricao, data_hora
+        FROM Comentarios
+        WHERE codigo = @comentario_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
+
+-- 20. Atualizar comentario
+CREATE OR ALTER PROCEDURE AtualizarComentario
+    @comentario_codigo INT,
+    @tarefa_codigo INT,
+    @funcionario_codigo INT,
+    @descricao VARCHAR(MAX),
+    @data_hora DATETIME = NULL
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRAN;
+
+        UPDATE Comentarios
+        SET tarefa_codigo = @tarefa_codigo,
+            funcionario_codigo = @funcionario_codigo,
+            descricao = @descricao,
+            data_hora = COALESCE(@data_hora, data_hora)
+        WHERE codigo = @comentario_codigo;
+        COMMIT;
+
+        SELECT codigo, tarefa_codigo, funcionario_codigo, descricao, data_hora
+        FROM Comentarios
+        WHERE codigo = @comentario_codigo;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW; -- Repassa o erro original, sem validacoes personalizadas.
+    END CATCH
+END;
+GO
 
 
 -- #####################################################################
@@ -603,16 +929,16 @@ BEGIN TRANSACTION;
 
 -- Códigos 1 a 5 = funcionários | 6 a 10 = clientes
 INSERT INTO Pessoas (nome, telefone, documento, tipo_doc) VALUES
-    ('Helena Duarte',                '(17) 99999-0001', '111.111.111-11',     'cpf'),   -- 1
-    ('Rafael Monteiro',              '(17) 99999-0002', '222.222.222-22',     'cpf'),   -- 2
-    ('Bruno Carvalho',               '(17) 99999-0003', '333.333.333-33',     'cpf'),   -- 3
-    ('Larissa Nogueira',             '(17) 99999-0004', '444.444.444-44',     'cpf'),   -- 4
-    ('Tiago Ferraz',                 NULL,              '555.555.555-55',     'cpf'),   -- 5
-    ('Café Aurora Ltda',             '(17) 3333-0006',  '11.111.111/0001-11', 'cnpj'),  -- 6
-    ('EcoVerde Sustentabilidade',    '(17) 3333-0007',  '22.222.222/0001-22', 'cnpj'),  -- 7
-    ('TecNova Soluções',             '(17) 3333-0008',  '33.333.333/0001-33', 'cnpj'),  -- 8
-    ('Flores do Campo Floricultura', '(17) 3333-0009',  '44.444.444/0001-44', 'cnpj'),  -- 9
-    ('Marina Albuquerque',           '(17) 99999-0010', '666.666.666-66',     'cpf');   -- 10
+    ('Helena Duarte',                '(17) 99999-0001', '11111111111',    'cpf'),   -- 1
+    ('Rafael Monteiro',              '(17) 99999-0002', '22222222222',    'cpf'),   -- 2
+    ('Bruno Carvalho',               '(17) 99999-0003', '33333333333',    'cpf'),   -- 3
+    ('Larissa Nogueira',             '(17) 99999-0004', '44444444444',    'cpf'),   -- 4
+    ('Tiago Ferraz',                 NULL,              '55555555555',    'cpf'),   -- 5
+    ('Café Aurora Ltda',             '(17) 3333-0006',  '11111111000111', 'cnpj'),  -- 6
+    ('EcoVerde Sustentabilidade',    '(17) 3333-0007',  '22222222000122', 'cnpj'),  -- 7
+    ('TecNova Soluções',             '(17) 3333-0008',  '33333333000133', 'cnpj'),  -- 8
+    ('Flores do Campo Floricultura', '(17) 3333-0009',  '44444444000144', 'cnpj'),  -- 9
+    ('Marina Albuquerque',           '(17) 99999-0010', '77777777777',    'cpf');   -- 10
 
 INSERT INTO Cargos (descricao) VALUES
     ('Gestor'),             -- 1
@@ -626,7 +952,8 @@ INSERT INTO Status (descricao) VALUES
     ('Em análise'),         -- 1
     ('Em andamento'),       -- 2
     ('Finalizado'),         -- 3
-    ('Excluído');           -- 4 - usado para exclusão lógica de Projeto
+    ('Excluído'),           -- 4 - usado para exclusão lógica de Projeto
+    ('TESTE');              -- 5 - usado apenas para testes das procedures
 
 INSERT INTO Categorias (descricao, cor) VALUES
     ('Design',          '#4A90D9'),   -- 1

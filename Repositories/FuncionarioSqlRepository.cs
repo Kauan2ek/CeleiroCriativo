@@ -65,51 +65,25 @@ public class FuncionarioSqlRepository : DataConnection
         return funcionario;
     }
 
-    // Cria Pessoa e Funcionário na mesma transação.
-    // Se o segundo INSERT falhar, o primeiro também é desfeito.
+    // Cadastra Pessoa e Funcionário pela procedure CadastrarFuncionario.
+    // A transação fica dentro da procedure (BEGIN TRAN / COMMIT / ROLLBACK),
+    // por isso aqui não abrimos SqlTransaction.
     public int Create(Funcionario funcionario)
     {
-        SqlTransaction transaction = conn.BeginTransaction();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = "CadastrarFuncionario";
+        cmd.Parameters.AddWithValue("@nome", funcionario.Nome);
+        cmd.Parameters.AddWithValue("@documento", funcionario.Documento);
+        cmd.Parameters.AddWithValue("@tipo_doc", funcionario.TipoDocumento);
+        cmd.Parameters.AddWithValue("@cargo_codigo", funcionario.Cargo.Codigo);
+        cmd.Parameters.AddWithValue("@email", funcionario.Email);
+        cmd.Parameters.AddWithValue("@senha", funcionario.Senha);
+        cmd.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(funcionario.Telefone) ? DBNull.Value : funcionario.Telefone);
 
-        try
-        {
-            SqlCommand cmdPessoa = new SqlCommand();
-            cmdPessoa.Connection = conn;
-            cmdPessoa.Transaction = transaction;
-            cmdPessoa.CommandText = @"
-                INSERT INTO Pessoas (nome, telefone, documento, tipo_doc)
-                VALUES (@nome, @telefone, @documento, @tipoDocumento);
 
-                SELECT CAST(SCOPE_IDENTITY() AS INT);
-            ";
-            cmdPessoa.Parameters.AddWithValue("@nome", funcionario.Nome);
-            cmdPessoa.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(funcionario.Telefone) ? DBNull.Value : funcionario.Telefone);
-            cmdPessoa.Parameters.AddWithValue("@documento", funcionario.Documento);
-            cmdPessoa.Parameters.AddWithValue("@tipoDocumento", funcionario.TipoDocumento);
-
-            int codigoPessoa = (int)cmdPessoa.ExecuteScalar();
-
-            SqlCommand cmdFuncionario = new SqlCommand();
-            cmdFuncionario.Connection = conn;
-            cmdFuncionario.Transaction = transaction;
-            cmdFuncionario.CommandText = @"
-                INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha)
-                VALUES (@pessoa, @cargo, 1, @email, @senha)
-            ";
-            cmdFuncionario.Parameters.AddWithValue("@pessoa", codigoPessoa);
-            cmdFuncionario.Parameters.AddWithValue("@cargo", funcionario.Cargo.Codigo);
-            cmdFuncionario.Parameters.AddWithValue("@email", funcionario.Email);
-            cmdFuncionario.Parameters.AddWithValue("@senha", funcionario.Senha);
-            cmdFuncionario.ExecuteNonQuery();
-
-            transaction.Commit();
-            return codigoPessoa;
-        }
-        catch
-        {
-            transaction.Rollback();
-            throw;
-        }
+        return (int) cmd.ExecuteScalar();
     }
 
     // Atualiza os dados de Pessoa e Funcionário.

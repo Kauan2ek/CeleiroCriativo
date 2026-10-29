@@ -19,25 +19,22 @@
 USE CeleiroCriativo;
 GO
 
-SET XACT_ABORT ON;
-BEGIN TRANSACTION;
-
 -- ---------------------------------------------------------------------
 -- TABELAS SEM DEPENDÊNCIA
 -- ---------------------------------------------------------------------
 
 -- Códigos 1 a 5 = funcionários | 6 a 10 = clientes
 INSERT INTO Pessoas (nome, telefone, documento, tipo_doc) VALUES
-    ('Helena Duarte',                '(17) 99999-0001', '111.111.111-11',     'cpf'),   -- 1
-    ('Rafael Monteiro',              '(17) 99999-0002', '222.222.222-22',     'cpf'),   -- 2
-    ('Bruno Carvalho',               '(17) 99999-0003', '333.333.333-33',     'cpf'),   -- 3
-    ('Larissa Nogueira',             '(17) 99999-0004', '444.444.444-44',     'cpf'),   -- 4
-    ('Tiago Ferraz',                 NULL,              '555.555.555-55',     'cpf'),   -- 5
-    ('Café Aurora Ltda',             '(17) 3333-0006',  '11.111.111/0001-11', 'cnpj'),  -- 6
-    ('EcoVerde Sustentabilidade',    '(17) 3333-0007',  '22.222.222/0001-22', 'cnpj'),  -- 7
-    ('TecNova Soluções',             '(17) 3333-0008',  '33.333.333/0001-33', 'cnpj'),  -- 8
-    ('Flores do Campo Floricultura', '(17) 3333-0009',  '44.444.444/0001-44', 'cnpj'),  -- 9
-    ('Marina Albuquerque',           '(17) 99999-0010', '666.666.666-66',     'cpf');   -- 10
+    ('Helena Duarte',                '(17) 99999-0001', '11111111111',     'cpf'),   -- 1
+    ('Rafael Monteiro',              '(17) 99999-0002', '22222222222',     'cpf'),   -- 2
+    ('Bruno Carvalho',               '(17) 99999-0003', '33333333333',     'cpf'),   -- 3
+    ('Larissa Nogueira',             '(17) 99999-0004', '44444444444',     'cpf'),   -- 4
+    ('Tiago Ferraz',                 NULL,              '55555555555',     'cpf'),   -- 5
+    ('Café Aurora Ltda',             '(17) 3333-0006',  '11111111000111', 'cnpj'),  -- 6
+    ('EcoVerde Sustentabilidade',    '(17) 3333-0007',  '22222222000122', 'cnpj'),  -- 7
+    ('TecNova Soluções',             '(17) 3333-0008',  '33333333000133', 'cnpj'),  -- 8
+    ('Flores do Campo Floricultura', '(17) 3333-0009',  '44444444000144', 'cnpj'),  -- 9
+    ('Marina Albuquerque',           '(17) 99999-0010', '77777777777',     'cpf');   -- 10
 
 INSERT INTO Cargos (descricao) VALUES
     ('Gestor'),             -- 1
@@ -51,7 +48,8 @@ INSERT INTO Status (descricao) VALUES
     ('Em análise'),         -- 1
     ('Em andamento'),       -- 2
     ('Finalizado'),         -- 3
-    ('Excluído');           -- 4 - usado para exclusão lógica de Projeto
+    ('Excluído'),           -- 4 - usado para exclusão lógica de Projeto
+    ('TESTE');           -- 5 - usado apenas para testes das procedures
 
 INSERT INTO Categorias (descricao, cor) VALUES
     ('Design',          '#4A90D9'),   -- 1
@@ -201,5 +199,3 @@ INSERT INTO Comentarios (tarefa_codigo, funcionario_codigo, descricao, data_hora
     (10, 5, 'Encontrei dois preços divergentes, o cliente já confirmou os valores certos.', '2026-07-22T15:30:00'),
     (10, 5, 'Revisão concluída, catálogo pronto para a aprovação final.',                  '2026-07-24T10:50:00'),
     (10, 1, 'Revisão conferida, catálogo aprovado para entrega ao cliente.',               '2026-07-24T11:30:00');
-
-COMMIT TRANSACTION;
