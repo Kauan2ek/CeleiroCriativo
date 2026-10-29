@@ -7,4 +7,5 @@ public class Documento
     public string Descricao { get; set; } = "";
     public string Extensao { get; set; } = "";
     public string Diretorio { get; set; } = "";
+    public int IdTarefa { get; set; } = 0;
 }
