@@ -19,17 +19,17 @@ public abstract class DataConnection
         TrustServerCertificate=true";*/
 
         // LAB 2
-        string strConn = @"Server=F121-LB5-N14;
+        /*string strConn = @"Server=F121-LB5-N14;
         User Id=aluno;
         Password=dba;
         Database=CeleiroCriativo;
-        TrustServerCertificate=true";
+        TrustServerCertificate=true";*/
 
         // Kauan
-        /*string strConn = @"Server=(localdb)\MSSQLLocalDB;
+        string strConn = @"Server=(localdb)\MSSQLLocalDB;
         Database=CeleiroCriativo;
         Trusted_Connection=True;
-        TrustServerCertificate=true";*/
+        TrustServerCertificate=true";
 
         /*string strConn = @"Server=DESKTOP-0PQAFOH\SQLEXPRESS;
         Database=CeleiroCriativo;

@@ -55,3 +55,6 @@ Thumbs.db
 *.env
 appsettings.*.local.json
 secrets.json
+
+# Arquivos enviados pelo upload das tarefas
+wwwroot/uploads/

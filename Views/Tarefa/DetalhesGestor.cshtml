@@ -468,8 +468,10 @@
                                 <img src="/imagens/documento.png"
                                      alt="@documento.Extensao"
                                      class="icone-arquivo">
-
-                                <span class="nome-arquivo">
+                                     
+                                <!-- title: o nome completo aparece ao passar o mouse, já que o CSS corta com "..." -->
+                                <span class="nome-arquivo"
+                                      title="@($"{documento.Descricao}.{documento.Extensao}")">
                                     @($"{documento.Descricao}.{documento.Extensao}")
                                 </span>
 
@@ -481,18 +483,16 @@
                                     <img src="/imagens/abrir.png" alt="Abrir">
                                 </a>
 
-                                <!-- botão que exclui o arquivo (visual do CeleiroCriativo-master) -->
-                                <button type="button"
+                                <!-- botão que exclui o arquivo -->
+                                <!-- form="formExcluirDocumento-X": envia o form de exclusão desse documento (lá embaixo, fora do form da tarefa) -->
+                                <!-- o confirm pergunta antes; se clicar em "Cancelar", o return false impede o envio -->
+                                <button type="submit"
+                                        form="formExcluirDocumento-@documento.Codigo"
                                         class="botao-excluir-arquivo"
                                         title="Excluir arquivo"
-                                        onclick="excluirArquivo(this)">
+                                        onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
                                     <img src="/imagens/excluir_arquivo.png" alt="Excluir">
                                 </button>
-
-                                <form id="uploadForm">
-                                    <input type="file" id="fileInput" required />
-                                    <button type="submit">Enviar</button>
-                                </form>
                             </div>
                         }
                     }
@@ -505,18 +505,24 @@
 
 
                 <!-- botão de adicionar arquivo -->
+                @if (!novaTarefa)
+                {    
+                    <div class="acoes-arquivos">
+                        <input type="file" 
+                               id="arquivoTarefa" 
+                               name="arquivo" 
+                               form="formUploadDocumento"
+                               style="display: none"
+                               onchange="this.form.submit()">
 
-                <div class="acoes-arquivos">
-
-                    <button type="button"
-                            class="botao-adicionar-arquivo"
-                            title="Adicionar arquivo">
-
-                        +
-
-                    </button>
-
-                </div>
+                        <button type="button"
+                                class="botao-adicionar-arquivo"
+                                title="Adicionar arquivo"
+                                onclick="document.getElementById('arquivoTarefa').click()">
+                            +
+                        </button>
+                    </div>
+                }
 
                 <!-- a visibilidade ainda não tem campo na tela: o hidden devolve o mesmo valor que veio do banco, -->
                 <!-- pro Update não trocar sem querer (tarefa nova vai com false) -->
@@ -685,6 +691,35 @@
     </div>
 
 </main>
+
+<!-- form próprio do upload: fora do form da tarefa, porque form dentro de form não é permitido -->
+<!-- enctype="multipart/form-data" é obrigatório pra enviar arquivo -->
+<!-- não tem campo de arquivo aqui dentro: o input do botão "+" se liga a ele pelo form="formUploadDocumento" -->
+@if (!novaTarefa)
+{
+    <form id="formUploadDocumento"
+          method="post"
+          action="/Documento/Create"
+          enctype="multipart/form-data">
+        <input type="hidden" name="idTarefa" value="@Model.Codigo">
+    </form>
+}
+
+<!-- um form de exclusão pra cada documento, também fora do form da tarefa -->
+<!-- o botão de lixeira de cada arquivo aponta pro seu form pelo id (formExcluirDocumento-X) -->
+<!-- só vai o código do documento: o caminho do arquivo no disco o controller busca no banco -->
+@if (Model.Documentos != null)
+{
+    @foreach (var documento in Model.Documentos)
+    {
+        <form id="formExcluirDocumento-@documento.Codigo"
+              method="post"
+              action="/Documento/Delete">
+            <input type="hidden" name="id" value="@documento.Codigo">
+            <input type="hidden" name="idTarefa" value="@Model.Codigo">
+        </form>
+    }
+}
 
 <div id="modalExclusaoTarefa" class="modal-exclusao">
     <div class="caixa-exclusao">

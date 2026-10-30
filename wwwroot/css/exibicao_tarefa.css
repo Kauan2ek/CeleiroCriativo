@@ -234,9 +234,10 @@ body {
    ========================================================== */
 
 /* 3 colunas: info, prazos e arquivos */
+/* minmax(0, ...) fixa a largura: sem ele, um nome de arquivo comprido estica a coluna em vez de cortar com "..." */
 .colunas-tarefa {
     display: grid;
-    grid-template-columns: 1.15fr 0.9fr 1fr;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.9fr) minmax(0, 1fr);
     gap: 25px;
 }
 
@@ -664,7 +665,7 @@ body {
 @media (max-width: 900px) {
 
     .colunas-tarefa {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .cabecalho-tarefa {
