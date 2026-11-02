@@ -28,11 +28,20 @@ public class DocumentoController : Controller
     [HttpPost]
     public ActionResult Create(int idTarefa, IFormFile? arquivo)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // só gestor e funcionário sobem arquivo (o cliente só visualiza e baixa)
+        if (papel != "gestor" && papel != "funcionario")
+        {
+            repository.Dispose();
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa});
+        }
+
         // nenhum arquivo escolhido, ou arquivo vazio
         if (arquivo == null || arquivo.Length == 0)
         {
             repository.Dispose();
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa, erro = "Selecione um arquivo ao enviar."});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa, erro = "Selecione um arquivo ao enviar."});
         }
 
         // arquivo.PdF -> "pdf"
@@ -41,7 +50,7 @@ public class DocumentoController : Controller
         if (!extensoesPermitidas.Contains(extensao))
         {
             repository.Dispose();
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa, erro = "Extensão não permitida."});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa, erro = "Extensão não permitida."});
         }
 
         // 1) Salvar o arquivo no disco: wwwroot/uploads/tarefa-1/
@@ -72,7 +81,7 @@ public class DocumentoController : Controller
             repository.Create(documento);
             repository.Dispose();
             // volta pra tela da tarefa, que busca os documentos de novo e já mostra o novo na lista
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa});
         }
         // se o banco recusar (ex: tarefa não existe), a procedure lança o erro e ele "sobe" até aqui
         catch (SqlException e)
@@ -82,7 +91,7 @@ public class DocumentoController : Controller
             System.IO.File.Delete(path);
 
             repository.Dispose();
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa, erro = e.Message});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa, erro = e.Message});
         }
     }
 
@@ -92,6 +101,15 @@ public class DocumentoController : Controller
     [HttpPost]
     public ActionResult Delete(int id, int idTarefa)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // só gestor e funcionário excluem arquivo
+        if (papel != "gestor" && papel != "funcionario")
+        {
+            repository.Dispose();
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa});
+        }
+
         try
         {
             // busca o documento no banco pra saber onde o arquivo está no disco
@@ -101,7 +119,7 @@ public class DocumentoController : Controller
             if (documento == null)
             {
                 repository.Dispose();
-                return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa, erro = "Documento não encontrado."});
+                return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa, erro = "Documento não encontrado."});
             }
 
             // 1) APAGAR DO BANCO
@@ -118,12 +136,12 @@ public class DocumentoController : Controller
                 System.IO.File.Delete(path);
             }
 
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa});
         }
         catch (SqlException e)
         {
             repository.Dispose();
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = idTarefa, erro = e.Message});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = idTarefa, erro = e.Message});
         }
     }
 }

@@ -19,7 +19,7 @@
     <div class="pagina-perfil">
 
         <!-- link que volta pra tela de projetos do gestor -->
-        <a href="/Projeto/GestorProjeto" class="voltar-projetos">
+        <a href="/Projeto/IndexGestor" class="voltar-projetos">
             <img src="/imagens/voltar.png" alt="Voltar">
             Voltar para projetos
         </a>
@@ -132,14 +132,11 @@
 
             </button>
 
+            <button type="button" class="botao-perfil">Salvar</button>
 
-            <!-- botão salvar, chama a função js que redireciona -->
-            <button type="button" class="botao-perfil" onclick="salvarPerfil()">
-
-                Salvar
-
-            </button>
-
+            <form action="/Usuario/Sair" method="get">
+                <button type="submit" class="botao-perfil">Sair</button>
+            </form>
         </div>
 
     </div>
@@ -160,7 +157,7 @@
 
                 } else {
 
-                    window.location.href = "/Projeto/GestorProjeto";
+                    window.location.href = "/Projeto/IndexGestor";
 
                 }
 

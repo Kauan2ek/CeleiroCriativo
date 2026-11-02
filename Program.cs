@@ -4,6 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 // adiciona o suporte a MVC (controllers + views)
 // sem isso os controllers com ActionResult e as views não funcionam
 builder.Services.AddControllersWithViews();
+// ativa a sessão, onde guardamos quem está logado (codigo e papel)
+builder.Services.AddSession();
 
 // constrói a aplicação com as configurações que foram passadas
 var app = builder.Build();
@@ -15,6 +17,9 @@ app.UseStaticFiles();
 // ativa o sistema de rotas do asp.net core
 // necessário pra mapear url -> controller/action
 app.UseRouting();
+
+// libera o uso do HttpContext.Session nos controllers e views
+app.UseSession();
 
 // ativa a autorização
 // aqui não tem autenticação configurada, então é meio que decorativo por enquanto

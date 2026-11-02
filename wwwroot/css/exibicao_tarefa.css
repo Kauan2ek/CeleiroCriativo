@@ -230,6 +230,70 @@ body {
 
 
 /* ==========================================================
+   VISIBILIDADE PRO CLIENTE (slider)
+   ========================================================== */
+
+/* agrupa o slider e o status do lado direito da linha superior */
+.acoes-superiores-tarefa {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+}
+
+/* o label inteiro é clicável: clicar no texto ou no slider marca/desmarca o checkbox */
+.visibilidade-tarefa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #333333;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* o checkbox de verdade fica escondido, quem aparece é o .slider-visibilidade */
+.visibilidade-tarefa input[type="checkbox"] {
+    display: none;
+}
+
+/* trilho do slider (desligado: cinza) */
+.slider-visibilidade {
+    position: relative;
+    flex-shrink: 0;
+    width: 38px;
+    height: 20px;
+    background-color: #cfcfcf;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+/* bolinha do slider */
+.slider-visibilidade::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s;
+}
+
+/* ligado: o trilho fica verde e a bolinha vai pra direita */
+/* o "+" pega o span que vem logo depois do checkbox marcado */
+.visibilidade-tarefa input:checked + .slider-visibilidade {
+    background-color: #4caf50;
+}
+
+.visibilidade-tarefa input:checked + .slider-visibilidade::before {
+    transform: translateX(18px);
+}
+
+
+/* ==========================================================
    COLUNAS
    ========================================================== */
 

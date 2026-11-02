@@ -1,3 +1,8 @@
+@model Tarefa
+
+<!-- tela da tarefa pro cliente: só leitura -->
+<!-- o cliente vê tudo da tarefa (dados, equipe, arquivos e comentários), mas não altera nada -->
+<!-- a action DetalhesCliente só deixa chegar aqui tarefa visível (Visibilidade = true) de projeto do próprio cliente -->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -9,11 +14,10 @@
     <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
 
-    <!-- css específico dessa tela -->
+    <!-- css específico dessa tela (o mesmo da tela do gestor) -->
     <link rel="stylesheet" href="/css/exibicao_tarefa.css" />
 </head>
 <body>
-
 <!-- ==========================================================
      CABEÇALHO
      ========================================================== -->
@@ -22,20 +26,16 @@
 
     <!-- logo que volta pra home -->
     <a href="/" class="logo-tarefa">
-
-        <img src="/imagens/logo.png"
-             alt="Logo">
-
+        <img src="/imagens/logo.png" alt="Logo">
     </a>
 
 
-    <!-- informações do cliente logado -->
+    <!-- informações do cliente logado (o nome vem da sessão, gravada no login) -->
     <div class="informacoes-funcionario">
 
         <span>
-            Nome do Cliente
+            @Context.Session.GetString("nome")
         </span>
-
 
         <!-- link pro perfil do cliente -->
         <a href="/Perfil/ClientePerfil"
@@ -57,20 +57,12 @@
 
 <main class="conteudo-exibicao-tarefa">
 
+    <!-- o form não tem action nem botão de enviar: ele só mantém a mesma estrutura (e o mesmo visual) da tela do gestor -->
+    <!-- todos os campos estão disabled, então o cliente só lê -->
+    <form id="formTarefa">
 
-    <!-- ======================================================
-         FORMULÁRIO DA TAREFA
-         ====================================================== -->
-
-    <form>
-
-        <!-- guarda o nome da tarefa que veio do controller -->
-        <!-- o js usa isso depois pra saber qual tarefa tá aberta -->
-        <input type="hidden"
-               id="nomeTarefa"
-               name="Tarefa"
-               value="@ViewBag.Tarefa">
-
+        <!-- o exibicao_tarefa.js usa esse código pra saber que não é tarefa nova (e mostrar o status) -->
+        <input type="hidden" id="codigoTarefa" value="@Model.Codigo">
 
         <!-- ==================================================
              LINHA SUPERIOR
@@ -79,11 +71,12 @@
         <div class="linha-superior-tarefa">
 
 
-            <!-- título e botão voltar -->
+            <!-- título da página -->
+
             <div class="titulo-exibicao-tarefa">
 
-                <!-- volta pra tela de tarefas do cliente -->
-                <a href="/Tarefa/ClienteTarefa"
+                <!-- botão de voltar pro kanban do projeto dono da tarefa (/Tarefa/IndexCliente/2) -->
+                <a href="/Tarefa/IndexCliente/@Model.IdProjeto"
                    class="voltar-tarefa">
 
                     <img src="/imagens/voltar.png"
@@ -100,7 +93,7 @@
 
 
             <!-- ==================================================
-                 SITUAÇÃO / STATUS
+                 SITUAÇÃO / STATUS DA TAREFA
                  ================================================== -->
 
             <div class="situacao-tarefa"
@@ -110,25 +103,18 @@
                     Status:
                 </span>
 
-
-                <!-- o cliente só vê o status, não pode mexer -->
+                <!-- disabled: o cliente vê o status, mas não muda -->
                 <select id="situacaoTarefa"
-                        name="Status"
-                        class="status-cliente"
                         disabled>
-
-                    <option value="a_fazer">
+                    <option value="A fazer" selected="@(Model.Status == "A fazer")">
                         A Fazer
                     </option>
-
-                    <option value="andamento">
+                    <option value="Em andamento" selected="@(Model.Status == "Em andamento")">
                         Em Andamento
                     </option>
-
-                    <option value="finalizada">
+                    <option value="Finalizado" selected="@(Model.Status == "Finalizado")">
                         Finalizada
                     </option>
-
                 </select>
 
             </div>
@@ -145,6 +131,7 @@
 
             <!-- ==================================================
                  COLUNA ESQUERDA
+                 informações da tarefa
                  ================================================== -->
 
             <section class="coluna-info-tarefa">
@@ -158,15 +145,12 @@
                         Título da Tarefa
                     </label>
 
-
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- readonly porque o cliente só visualiza -->
                         <input type="text"
                                id="tituloTarefa"
-                               name="Titulo"
-                               placeholder="Título da Tarefa"
-                               readonly>
+                               value="@Model.Titulo"
+                               disabled>
 
                     </div>
 
@@ -181,78 +165,12 @@
                         Categoria
                     </label>
 
-
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- disabled também, só visualização -->
+                        <!-- só a categoria da tarefa: como o cliente não troca, não precisa da lista inteira (ViewBag.Categorias) -->
                         <select id="categoriaTarefa"
-                                name="Categoria"
                                 disabled>
-
-                            <option value=""
-                                    selected
-                                    disabled>
-
-                                Selecione uma categoria
-
-                            </option>
-
-                            <option value="planejamento">
-                                Planejamento
-                            </option>
-
-                            <option value="reuniao">
-                                Reunião
-                            </option>
-
-                            <option value="criacao_conteudo">
-                                Criação de Conteúdo
-                            </option>
-
-                            <option value="design">
-                                Design
-                            </option>
-
-                            <option value="redacao">
-                                Redação / Copywriting
-                            </option>
-
-                            <option value="social_media">
-                                Social Media
-                            </option>
-
-                            <option value="gravacao">
-                                Gravação
-                            </option>
-
-                            <option value="edicao_video">
-                                Edição de Vídeo
-                            </option>
-
-                            <option value="fotografia">
-                                Fotografia
-                            </option>
-
-                            <option value="campanha">
-                                Publicidade / Campanha
-                            </option>
-
-                            <option value="desenvolvimento_projeto">
-                                Desenvolvimento de Projeto
-                            </option>
-
-                            <option value="revisao">
-                                Revisão
-                            </option>
-
-                            <option value="aprovacao">
-                                Aprovação
-                            </option>
-
-                            <option value="entrega">
-                                Entrega
-                            </option>
-
+                            <option selected>@Model.Categoria.Descricao</option>
                         </select>
 
                     </div>
@@ -268,40 +186,36 @@
                         Descrição
                     </label>
 
-
                     <div class="campo-texto-tarefa">
 
-                        <!-- readonly, o cliente não edita a descrição -->
                         <textarea id="descricaoTarefa"
-                                  name="Descricao"
-                                  placeholder="Texto.."
-                                  readonly></textarea>
+                                  disabled
+                        >@Model.Descricao</textarea>
 
                     </div>
 
                 </div>
 
 
-                <!-- COMENTÁRIOS -->
-
+                <!-- CAMPO DE COMENTÁRIOS -->
+                <!-- mostra o último comentário (o js copia da última mensagem do chat, que foi montado no C#) -->
+                <!-- clicando no campo ou no ícone, abre a conversa completa (só pra ler) -->
                 <div class="campo-tarefa">
+                    <label for="comentariosTarefa">Comentários</label>
 
-                    <label for="comentariosTarefa">
-                        Comentários
-                    </label>
-
-
-                    <div class="campo-com-icone-tarefa">
-
-                        <!-- cliente só lê os comentários, não escreve -->
+                    <div class="campo-com-icone-tarefa campo-comentarios-chat">
                         <input type="text"
-                               id="comentariosTarefa"
-                               name="Comentarios"
-                               placeholder="Comentários"
-                               readonly>
+                            id="comentariosTarefa"
+                            placeholder="Nenhum comentário ainda"
+                            readonly
+                            title="Último comentário"
+                            value="">
 
+                        <img src="/imagens/editar.png"
+                            alt="Abrir comentários"
+                            id="iconeComentarios"
+                            title="Abrir conversa">
                     </div>
-
                 </div>
 
             </section>
@@ -309,6 +223,7 @@
 
             <!-- ==================================================
                  COLUNA CENTRAL
+                 prazos e funcionários
                  ================================================== -->
 
             <section class="coluna-prazos-tarefa">
@@ -322,13 +237,11 @@
                         Data de Início
                     </label>
 
-
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- disabled, só pra visualizar -->
                         <input type="date"
                                id="dataInicio"
-                               name="DataInicio"
+                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")"
                                disabled>
 
                     </div>
@@ -344,12 +257,11 @@
                         Previsão de Término
                     </label>
 
-
                     <div class="campo-com-icone-tarefa">
 
                         <input type="date"
                                id="previsaoTermino"
-                               name="PrevisaoTermino"
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")"
                                disabled>
 
                     </div>
@@ -365,12 +277,11 @@
                         Data de Entrega
                     </label>
 
-
                     <div class="campo-com-icone-tarefa">
 
                         <input type="date"
                                id="dataEntrega"
-                               name="DataEntrega"
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")"
                                disabled>
 
                     </div>
@@ -378,58 +289,43 @@
                 </div>
 
 
-                <!-- ==================================================
-                     EQUIPE
-                     ================================================== -->
+                <!-- FUNCIONÁRIOS -->
 
                 <h2 class="titulo-funcionarios">
-                    Equipe:
+                    Funcionário(s):
                 </h2>
 
-
+                <!-- equipe da tarefa, só pra o cliente saber quem está cuidando dela -->
                 <div class="area-funcionarios">
 
+                    @if (Model.Funcionarios != null && Model.Funcionarios.Count() > 0)
+                    {
+                        @foreach (var funcionario in Model.Funcionarios)
+                        {
+                            <div class="funcionario">
+                                <img src="/imagens/Entrar.png"
+                                     alt="Funcionário"
+                                     class="icone-funcionario">
 
-                    <!-- funcionário 1 (exemplo fixo) -->
-
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
-
-
-                    <!-- funcionário 2 (exemplo fixo) -->
-
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
+                                <span>
+                                    @funcionario.Nome - @funcionario.Cargo.Descricao
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>Ainda não há funcionários para essa tarefa...</span>
+                    }
 
                 </div>
-
-
-                <!-- o botão de baixar a equipe foi tirado -->
-                <!-- cliente não tem ação administrativa nessa tela -->
 
             </section>
 
 
             <!-- ==================================================
                  COLUNA DIREITA
+                 arquivos
                  ================================================== -->
 
             <section class="coluna-arquivos-tarefa">
@@ -438,119 +334,39 @@
                     Arquivos:
                 </h2>
 
-
+                <!-- o cliente abre/baixa os arquivos, mas não envia nem exclui -->
                 <div class="area-arquivos">
+                    @if (Model.Documentos != null && Model.Documentos.Count() > 0)
+                    {
+                        @foreach (var documento in Model.Documentos)
+                        {
+                            <div class="arquivo">
 
+                                <img src="/imagens/documento.png"
+                                     alt="@documento.Extensao"
+                                     class="icone-arquivo">
 
-                    <!-- arquivo word -->
+                                <span class="nome-arquivo"
+                                      title="@($"{documento.Descricao}.{documento.Extensao}")">
+                                    @($"{documento.Descricao}.{documento.Extensao}")
+                                </span>
 
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            doc_proj.docx
-                        </span>
-
-
-                        <!-- cliente só abre, não anexa nem troca -->
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- arquivo pdf -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            pdf_proj.pdf
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- outro word -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            doc(1)_proj.docx
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- outro pdf -->
-
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-
-                        <span class="nome-arquivo">
-                            pdf(1)_proj.pdf
-                        </span>
-
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
+                                <!-- botão que abre o arquivo -->
+                                <a href="@documento.Diretorio"
+                                   target="_blank"
+                                   class="botao-abrir-arquivo"
+                                   title="Abrir arquivo">
+                                    <img src="/imagens/abrir.png" alt="Abrir">
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>Ainda não há arquivos para essa tarefa...</span>
+                    }
 
                 </div>
-
-
-                <!-- o botão de "+" pra adicionar arquivo foi removido -->
-                <!-- cliente só visualiza, não envia arquivo -->
 
             </section>
 
@@ -560,8 +376,48 @@
 
 </main>
 
+<!-- ==========================================================
+     MODAL DE COMENTÁRIOS - CHAT (só leitura)
+     o cliente lê a conversa, e o campo de enviar aparece bloqueado (ele não está na equipe)
+     ========================================================== -->
+<div id="modalComentarios" class="modal-comentarios">
+    <div class="caixa-chat">
 
-<!-- js específico dessa tela -->
+        <div class="cabecalho-chat">
+            <div>
+                <h2>Comentários da tarefa</h2>
+                <span>Conversa entre os participantes</span>
+            </div>
+            <button type="button" id="fecharChat" class="fechar-chat">×</button>
+        </div>
+
+        <!-- as mensagens vêm do banco (Model.Comentarios, do mais antigo pro mais novo), montadas pelo C# -->
+        <div id="mensagensChat" class="mensagens-chat">
+            @if (Model.Comentarios != null && Model.Comentarios.Count() > 0) {
+                @foreach (var comentario in Model.Comentarios)
+                {
+                    <div class="mensagem mensagem-outra">
+                        <span class="nome-mensagem">(@comentario.Funcionario.Nome)</span>
+                        <p>@comentario.Descricao</p>
+                        <span class="horario-mensagem">@comentario.DataHora.ToString("dd/MM HH:mm")</span>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- mesmo campo de envio das outras telas, mas sempre bloqueado: -->
+        <!-- só quem está na equipe da tarefa comenta, e a equipe é formada só por funcionários -->
+        <!-- não tem action: com o campo e o botão disabled, não tem como enviar (e o ComentarioController também bloqueia o cliente) -->
+        <form class="formulario-chat">
+            <input type="text"
+                   placeholder="Só quem está na equipe da tarefa pode comentar"
+                   disabled>
+            <button type="button" class="enviar-comentario" disabled>Enviar</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- js específico dessa tela (o mesmo da tela do gestor) -->
 <script src="/js/exibicao_tarefa.js"></script>
 </body>
-</html>

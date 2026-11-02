@@ -19,4 +19,20 @@ public class PerfilController : Controller
     {
         return View("Cliente");
     }
+
+    public ActionResult Gestor()
+    {
+        return View();
+    }
+    
+    public ActionResult Funcionario()
+    {
+        return View();
+    }
+    
+    public ActionResult Cliente()
+    {
+        return View();
+    }
+
 }

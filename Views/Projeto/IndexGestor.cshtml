@@ -27,7 +27,7 @@
             </a>
 
             <!-- Login ainda não foi implementado; o nome permanece fixo nesta etapa. -->
-            <span>Nome do Gestor</span>
+            <span>@Context.Session.GetString("nome")</span>
 
             <a href="/Perfil/GestorPerfil" class="link-perfil">
                 <img src="/imagens/Entrar.png" alt="Usuário" class="icone-usuario">
@@ -37,14 +37,10 @@
 
     <!-- ==================== CONTEÚDO ==================== -->
     <main class="conteudo-projeto">
-        <!-- Mensagens vindas dos Controllers após criar, editar ou excluir. -->
-        @if (TempData["Sucesso"] != null)
+        <!-- mensagem de sucesso do Delete ou Negar -->
+        @if (ViewBag.Sucesso != null)
         {
-            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
-        }
-        @if (TempData["Erro"] != null)
-        {
-            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+            <div class="mensagem-crud sucesso">@ViewBag.Sucesso</div>
         }
 
         <section class="lista-projetos">
@@ -65,7 +61,8 @@
 
                 <span class="data">Data: --/--/----</span>
 
-                <a href="@Url.Action("Criar", "Projeto")" class="botao-criar">
+                <!-- sem id na url, a DetalhesGestor abre o formulário de projeto novo -->
+                <a href="/Projeto/DetalhesGestor" class="botao-criar">
                     Criar
                 </a>
             </div>
@@ -111,7 +108,7 @@
                         </span>
 
                         <!-- Abre as informações do Projeto e suas tarefas. -->
-                        <a href="@Url.Action("Detalhes", "Projeto", new { id = projeto.Codigo })"
+                        <a href="/Projeto/DetalhesGestor/@projeto.Codigo"
                            class="abrir-projeto"
                            title="Abrir projeto">
                             <img src="/imagens/abrir.png" alt="Abrir projeto">

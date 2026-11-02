@@ -11,13 +11,6 @@ public class HomeController : Controller
         return View();
     }
 
-    // Página de entrar
-    // renderiza o formulário de login
-    public ActionResult Entrar()
-    {
-        return View();
-    }
-
     // O cadastro fica dentro da própria landing page.
     // Enquanto o envio ao banco não faz parte desta etapa, esta rota apenas
     // leva o usuário até a seção correta em vez de procurar uma View inexistente.

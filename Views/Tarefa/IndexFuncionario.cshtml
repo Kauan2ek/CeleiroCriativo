@@ -1,3 +1,5 @@
+@model List<Tarefa>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,10 +25,11 @@
         <img src="/imagens/logo.png" alt="Logo">
     </a>
 
-    <!-- informações do funcionário logado -->
+
+    <!-- informações do funcionário logado (o nome vem da sessão, gravada no login) -->
     <div class="informacoes-funcionario">
 
-        <span>Nome do Funcionário</span>
+        <span>@Context.Session.GetString("nome")</span>
 
         <!-- link pro perfil do funcionário -->
         <a href="/Perfil/FuncionarioPerfil"
@@ -46,11 +49,13 @@
 
 <main class="conteudo-tarefas">
 
+
     <!-- título da página com botão de voltar -->
+
     <div class="titulo-tarefas">
 
-        <!-- volta pra tela de projetos do funcionário -->
-        <a href="/Projeto/FuncionarioProjeto"
+        <!-- botão de voltar: volta pra tela do projeto dono dessas tarefas -->
+        <a href="/Projeto/DetalhesFuncionario/@ViewBag.IdProjeto"
            class="voltar-tarefas">
 
             <img src="/imagens/voltar.png"
@@ -63,61 +68,72 @@
     </div>
 
 
+
     <!-- ==================== KANBAN ==================== -->
 
     <!-- quadro kanban com três colunas de status -->
-    <div class="kanban-board">
+    <!-- data-banco avisa o tarefa.js que os cards vêm do banco, então ele não mexe nos links nem nas colunas deles -->
+    <!-- o funcionário vê e edita todas as tarefas do projeto (só a equipe fica com o gestor) -->
+    <div class="kanban-board" data-banco="true">
 
 
         <!-- ==================== A FAZER ==================== -->
 
         <section class="coluna-tarefas coluna-analise">
 
+            <!-- cabeçalho da coluna com título e botão de criar -->
+
             <div class="cabecalho-coluna">
+
                 <h2>Tarefas a Fazer</h2>
+
+                <!-- o funcionário também cria tarefa; ela nasce sem equipe (quem monta a equipe é o gestor) -->
+                <a href="/Tarefa/DetalhesFuncionario?idProjeto=@ViewBag.IdProjeto"
+                   class="botao-criar-tarefa">
+
+                    + Criar Tarefa
+
+                </a>
+
             </div>
+
 
             <!-- corpo da coluna, o data-status indica o status das tarefas -->
             <div class="corpo-coluna"
                  data-status="a_fazer">
 
-                <!-- card de tarefa -->
-                <!-- draggable=true aqui, o funcionário pode arrastar entre colunas -->
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Texto da empresa...">
+                <!-- um card pra cada tarefa que não está em andamento nem finalizada -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status != "Em andamento" && t.Status != "Finalizado"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                    <div class="conteudo-card">
+                        <div class="conteudo-card">
 
-                        <p>Texto da empresa...</p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <!-- link que abre a tarefa na visão do funcionário -->
-                        <!-- passa o status e o nome da tarefa pela url -->
-                        <a href="@Url.Action("ExTarefaFuncionario", "Tarefa", new { status = "a_fazer", tarefa = "Texto da empresa..." })"
-                           class="botao-expandir-tarefa">
+                            <!-- link pra abrir a tarefa na visão do funcionário -->
+                            <a href="/Tarefa/DetalhesFuncionario/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        </a>
+                            </a>
 
-                    </div>
-
-                    <!-- ações do card -->
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-                            Compartilhar
-                        </button>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 
         </section>
+
 
 
         <!-- ==================== EM ANDAMENTO ==================== -->
@@ -125,45 +141,46 @@
         <section class="coluna-tarefas coluna-andamento">
 
             <div class="cabecalho-coluna">
+
                 <h2>Tarefas em Andamento</h2>
+
             </div>
+
 
             <div class="corpo-coluna"
                  data-status="andamento">
 
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Documentação da Equipe">
+                <!-- um card pra cada tarefa em andamento -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Em andamento"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                    <div class="conteudo-card">
+                        <div class="conteudo-card">
 
-                        <p>Documentação da Equipe</p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <!-- abre a tarefa na visão do funcionário -->
-                        <a href="@Url.Action("ExTarefaFuncionario", "Tarefa", new { status = "andamento", tarefa = "Documentação da Equipe" })"
-                           class="botao-expandir-tarefa">
+                            <a href="/Tarefa/DetalhesFuncionario/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        </a>
+                            </a>
 
-                    </div>
-
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-                            Compartilhar
-                        </button>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 
         </section>
+
 
 
         <!-- ==================== FINALIZADAS ==================== -->
@@ -171,45 +188,46 @@
         <section class="coluna-tarefas coluna-finalizadas">
 
             <div class="cabecalho-coluna">
+
                 <h2>Tarefas Finalizadas</h2>
+
             </div>
+
 
             <div class="corpo-coluna"
                  data-status="finalizada">
 
-                <div class="card-tarefa"
-                     draggable="true"
-                     data-tarefa="Tarefa da Equipe - Análise">
+                <!-- um card pra cada tarefa finalizada -->
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Finalizado"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                    <div class="conteudo-card">
+                        <div class="conteudo-card">
 
-                        <p>Tarefa da Equipe - Análise</p>
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <!-- abre a tarefa na visão do funcionário -->
-                        <a href="@Url.Action("ExTarefaFuncionario", "Tarefa", new { status = "finalizada", tarefa = "Tarefa da Equipe - Análise" })"
-                           class="botao-expandir-tarefa">
+                            <a href="/Tarefa/DetalhesFuncionario/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        </a>
+                            </a>
 
-                    </div>
-
-                    <div class="acoes-card">
-
-                        <button type="button"
-                                class="botao-compartilhar">
-                            Compartilhar
-                        </button>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 
         </section>
+
 
     </div>
 

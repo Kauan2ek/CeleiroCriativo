@@ -52,9 +52,19 @@
             <!-- linha decorativa embaixo do título -->
             <div class="linha-titulo"></div>
 
+            <!-- mensagem de erro do login (email ou senha incorreta) -->
+            <!-- só aparece quando o UsuarioController preenche o ViewBag.Erro -->
+            @if (ViewBag.Erro != null)
+            {
+                <div class="mensagem-erro-login">
+                    <span class="icone-erro">!</span>
+                    <span>@ViewBag.Erro</span>
+                </div>
+            }
+
 
             <!-- form de login -->
-            <form action="/Projeto/IndexGestor/">
+            <form action="/Usuario/Entrar" method="post">
 
                 <label for="email">
                     E-mail
@@ -63,6 +73,7 @@
                 <input
                     type="email"
                     id="email"
+                    name="Email"
                     placeholder="Digite seu e-mail"
                 >
 
@@ -74,17 +85,14 @@
                 <input
                     type="password"
                     id="senha"
+                    name="Senha"
                     placeholder="Digite sua senha"
                 >
 
-
                 <!-- botão entrar, por enquanto só redireciona pro gestor -->
                 <!-- ainda não tem validação de login de verdade -->
-                <button type="button"
-                        onclick="window.location.href='/Projeto/IndexGestor'">
-
+                <button type="submit">
                     Entrar
-
                 </button>
 
             </form>

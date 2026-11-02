@@ -8,6 +8,19 @@
     // sem equipe não tem autor válido pro comentário (a FK do banco exige alguém da equipe da tarefa)
     // usado pra desabilitar o campo e o botão do chat
     bool semEquipe = Model.Funcionarios == null || Model.Funcionarios.Count() < 1;
+    bool usuarioNaEquipe = false;
+
+    if (Model.Funcionarios != null || Model.Funcionarios?.Count() > 1)
+    {
+        foreach (var f in Model.Funcionarios)
+        {
+            if (f.Codigo == Context.Session.GetInt32("codigo"))
+            {
+                usuarioNaEquipe = true;
+                break;
+            }
+        }
+    }
 }
 
 <!DOCTYPE html>
@@ -135,6 +148,29 @@
             <!-- ==================================================
                  SITUAÇÃO / STATUS DA TAREFA
                  ================================================== -->
+            <!-- lado direito da linha: visibilidade + status, um do lado do outro -->
+            <div class="acoes-superiores-tarefa">
+
+            <!-- ==================================================
+                 VISIBILIDADE PRO CLIENTE (slider)
+                 ================================================== -->
+            <!-- o slider é um checkbox escondido: o que aparece é o span .slider-visibilidade, desenhado pelo css -->
+            <!-- checkbox desmarcado não é enviado no formulário, por isso o hidden logo abaixo, com o mesmo name: -->
+            <!-- marcado chega "true,false" e o model binding fica com o primeiro (true); desmarcado chega só o "false" do hidden -->
+            <!-- aparece também na tarefa nova, pra já criar a tarefa visível pro cliente -->
+            <label class="visibilidade-tarefa"
+                   title="Quando ligado, o cliente vê esta tarefa">
+                <span>Visível ao cliente</span>
+
+                <input type="checkbox"
+                       name="Visibilidade"
+                       value="true"
+                       checked="@Model.Visibilidade">
+
+                <span class="slider-visibilidade"></span>
+            </label>
+            <input type="hidden" name="Visibilidade" value="false">
+
             <!-- em tarefa nova o exibicao_tarefa.js esconde esse bloco de propósito: -->
             <!-- a tarefa nasce "A fazer" (opção que já vem selecionada) e o status só muda depois de salva -->
             <div class="situacao-tarefa"
@@ -161,6 +197,8 @@
                         Finalizada
                     </option>
                 </select>
+
+            </div>
 
             </div>
 
@@ -524,10 +562,6 @@
                     </div>
                 }
 
-                <!-- a visibilidade ainda não tem campo na tela: o hidden devolve o mesmo valor que veio do banco, -->
-                <!-- pro Update não trocar sem querer (tarefa nova vai com false) -->
-                <input type="hidden" name="Visibilidade" value="@(Model.Visibilidade ? "true" : "false")">
-
 
 
             </section>
@@ -792,15 +826,18 @@
             <!-- autor provisório: o primeiro funcionário da equipe (em ordem alfabética), enquanto não existe login -->
             <!-- atenção: o banco só aceita se esse funcionário estiver na equipe da tarefa -->
             <!-- se der erro, o ComentarioController volta pra cá com ?erro= na url e a mensagem aparece no topo da tela -->
-            <input type="hidden" name="Funcionario.Codigo" value="@(semEquipe ? 0 : Model.Funcionarios[0].Codigo)">
+            <input type="hidden" name="Funcionario.Codigo" value="@(semEquipe ? 0 : Context.Session.GetInt32("codigo"))">
 
             <!-- disabled="@semEquipe": igual ao selected/checked, com false o razor nem escreve o atributo -->
             <input type="text" id="novoComentario"
                    name="Descricao"
                    placeholder="@(semEquipe ? "Adicione alguém à equipe para comentar" : "Digite seu comentário...")"
                    autocomplete="off" maxlength="500" required
-                   disabled="@semEquipe">
-            <button type="submit" class="enviar-comentario" disabled="@semEquipe">Enviar</button>
+                   @* Esse Model.Funcionario.Any procura dentro dos funcionarios se o usuário logado está presente
+                      Só pode enviar comentários se estiver, senão, fica bloqueado o campo de texto
+                    *@
+                   disabled="@(semEquipe || !usuarioNaEquipe)">
+            <button type="submit" class="enviar-comentario" disabled="@(semEquipe || !usuarioNaEquipe)">Enviar</button>
         </form>
 
     </div>

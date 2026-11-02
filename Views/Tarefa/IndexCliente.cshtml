@@ -1,3 +1,5 @@
+@model List<Tarefa>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,14 +21,14 @@
 <header class="cabecalho-tarefas">
 
     <!-- logo que volta pra home -->
-      <a href="/" class="logo-tarefas">
+    <a href="/" class="logo-tarefas">
         <img src="/imagens/logo.png" alt="Logo">
-     </a>
+    </a>
 
-    <!-- informações do cliente logado -->
+    <!-- informações do cliente logado (o nome vem da sessão, gravada no login) -->
     <div class="informacoes-funcionario">
 
-        <span>Nome do Cliente</span>
+        <span>@Context.Session.GetString("nome")</span>
 
         <!-- link pro perfil do cliente -->
         <a href="/Perfil/ClientePerfil"
@@ -50,8 +52,8 @@
 
     <div class="titulo-tarefas">
 
-        <!-- volta pra tela de projetos do cliente -->
-        <a href="/Projeto/ClienteProjeto"
+        <!-- volta pra tela do projeto dono dessas tarefas -->
+        <a href="/Projeto/DetalhesCliente/@ViewBag.IdProjeto"
            class="voltar-tarefas">
 
             <img src="/imagens/voltar.png"
@@ -67,7 +69,9 @@
     <!-- ==================== KANBAN ==================== -->
 
     <!-- quadro kanban com três colunas de status -->
-    <div class="kanban-board">
+    <!-- data-banco avisa o tarefa.js que os cards vêm do banco, então ele não mexe nos links nem nas colunas deles -->
+    <!-- o cliente só vê as tarefas visíveis (o filtro é feito na action IndexCliente) e não cria tarefa -->
+    <div class="kanban-board" data-banco="true">
 
 
         <!-- ==================== A FAZER ==================== -->
@@ -85,34 +89,33 @@
             <div class="corpo-coluna"
                  data-status="a_fazer">
 
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status != "Em andamento" && t.Status != "Finalizado"))
+                {
+                    <!-- draggable=false porque o cliente não pode arrastar -->
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <!-- card de tarefa -->
-                <!-- draggable=false porque o cliente não pode arrastar -->
-                <div class="card-tarefa"
-                     draggable="false"
-                     data-tarefa="Texto da empresa...">
+                        <div class="conteudo-card">
 
-                    <div class="conteudo-card">
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <p>
-                            Texto da empresa...
-                        </p>
+                            <!-- link que abre a tarefa na visão do cliente -->
+                            <a href="/Tarefa/DetalhesCliente/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        <!-- link que abre a tarefa na visão do cliente -->
-                        <!-- passa o status e o nome da tarefa pela url -->
+                            </a>
 
-                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "a_fazer", tarefa = "Texto da empresa..." })"
-                           class="botao-expandir-tarefa">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
-
-                        </a>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 
@@ -133,31 +136,31 @@
             <div class="corpo-coluna"
                  data-status="andamento">
 
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Em andamento"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <div class="card-tarefa"
-                     draggable="false"
-                     data-tarefa="Documentação da Equipe">
+                        <div class="conteudo-card">
 
-                    <div class="conteudo-card">
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <p>
-                            Documentação da Equipe
-                        </p>
+                            <a href="/Tarefa/DetalhesCliente/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        <!-- abre a tarefa na visão do cliente -->
+                            </a>
 
-                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "andamento", tarefa = "Documentação da Equipe" })"
-                           class="botao-expandir-tarefa">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
-
-                        </a>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 
@@ -178,31 +181,31 @@
             <div class="corpo-coluna"
                  data-status="finalizada">
 
+                @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Finalizado"))
+                {
+                    <div class="card-tarefa"
+                         draggable="false"
+                         data-codigo="@tarefa.Codigo"
+                         data-tarefa="@tarefa.Titulo">
 
-                <div class="card-tarefa"
-                     draggable="false"
-                     data-tarefa="Tarefa da Equipe - Análise">
+                        <div class="conteudo-card">
 
-                    <div class="conteudo-card">
+                            <p>
+                                @tarefa.Titulo
+                            </p>
 
-                        <p>
-                            Tarefa da Equipe - Análise
-                        </p>
+                            <a href="/Tarefa/DetalhesCliente/@tarefa.Codigo"
+                               class="botao-expandir-tarefa">
 
+                                <img src="/imagens/abrir.png"
+                                     alt="Abrir tarefa">
 
-                        <!-- abre a tarefa na visão do cliente -->
+                            </a>
 
-                        <a href="@Url.Action("ExTarefaCliente", "Tarefa", new { status = "finalizada", tarefa = "Tarefa da Equipe - Análise" })"
-                           class="botao-expandir-tarefa">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir tarefa">
-
-                        </a>
+                        </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
 

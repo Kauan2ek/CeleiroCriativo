@@ -1,119 +1,90 @@
+@model List<Projeto>
+
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projetos - Cliente</title>
-
-    <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
-
-    <!-- css específico dessa tela -->
     <link rel="stylesheet" href="/css/projeto.css">
 </head>
-
 <body>
-
     <!-- ==================== CABEÇALHO ==================== -->
-
     <header class="cabecalho-projeto">
-
-        <!-- logo que volta pra home -->
         <a href="/" class="logo-projeto">
             <img src="/imagens/logo.png" alt="Logo">
         </a>
 
         <!-- informações do cliente logado -->
         <div class="informacoes-funcionario">
+            <span>Olá, @Context.Session.GetString("nome")!</span>
 
-            <span>
-                Nome do Cliente
-            </span>
-
-            <!-- link pro perfil do cliente -->
             <a href="/Perfil/ClientePerfil" class="link-perfil">
-                <img src="/imagens/Entrar.png"
-                     alt="Usuário"
-                     class="icone-usuario">
+                <img src="/imagens/Entrar.png" alt="Usuário" class="icone-usuario">
             </a>
-
         </div>
-
     </header>
 
-
     <!-- ==================== CONTEÚDO ==================== -->
-
     <main class="conteudo-projeto">
-
         <section class="lista-projetos">
-
-            <!-- cabeçalho da lista, com título e rótulo do status -->
-
             <div class="titulo-lista">
-
-                <h1>
-                    Exibição de Projetos
-                </h1>
-
-                <span>
-                    Status do Projeto
-                </span>
-
+                <h1>Exibição de Projetos</h1>
+                <span>Status do Projeto</span>
             </div>
 
+            <!-- ==================== PROJETOS DO BANCO ==================== -->
+            <!-- só aparecem os projetos do cliente logado -->
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="projeto">
+                    <span>Você ainda não possui projetos.</span>
+                </div>
+            }
+            else
+            {
+                @foreach (Projeto projeto in Model)
+                {
+                    // A classe controla a cor da situação no CSS.
+                    string statusClasse = "analise";
+                    if (projeto.Status.Descricao == "Em andamento")
+                    {
+                        statusClasse = "andamento";
+                    }
+                    else if (projeto.Status.Descricao == "Finalizado")
+                    {
+                        statusClasse = "finalizado";
+                    }
 
-            <!-- ==================== PROJETO 1 ==================== -->
+                    <div class="projeto">
+                        <span class="titulo" title="@projeto.Titulo">
+                            @projeto.Titulo
+                        </span>
 
-            <!-- item de projeto (por enquanto só um de exemplo) -->
+                        <span class="cliente" title="@projeto.Cliente.Nome">
+                            <img src="/imagens/Entrar.png" alt="Cliente">
+                            <span class="cliente-nome">@projeto.Cliente.Nome</span>
+                        </span>
 
-            <div class="projeto">
+                        <span class="data">
+                            Data: @(projeto.DataInicio.HasValue ? projeto.DataInicio.Value.ToString("dd/MM/yyyy") : "--/--/----")
+                        </span>
 
-                <span class="titulo">
-                    Título do Projeto
-                </span>
+                        <span class="status @statusClasse">
+                            @projeto.Status.Descricao
+                        </span>
 
-                <span class="cliente">
-
-                    <img src="/imagens/Entrar.png"
-                         alt="Cliente">
-
-                    Nome do Cliente
-
-                </span>
-
-                <span class="data">
-                    Data: ??/??/??
-                </span>
-
-                <!-- status do projeto, a classe muda conforme o estado -->
-                <span class="status andamento"
-                      id="statusProjeto">
-
-                    Em andamento
-
-                </span>
-
-                <!-- link que abre o projeto na visão do cliente -->
-                <a href="/ExibicaoProjeto/ExProjetoCliente"
-                   class="abrir-projeto">
-
-                    <img src="/imagens/abrir.png"
-                         alt="Abrir projeto">
-
-                </a>
-
-            </div>
-
+                        <!-- Abre as informações do Projeto e suas tarefas. -->
+                        <a href="/Projeto/DetalhesCliente/@projeto.Codigo"
+                           class="abrir-projeto"
+                           title="Abrir projeto">
+                            <img src="/imagens/abrir.png" alt="Abrir projeto">
+                        </a>
+                    </div>
+                }
+            }
         </section>
-
     </main>
-
-
-    <!-- js que cuida dos comportamentos dessa tela -->
-    <script src="/js/projeto.js"></script>
-
 </body>
-
 </html>

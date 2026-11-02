@@ -18,18 +18,33 @@ public class ComentarioController : Controller
     // POST /Comentario/Create, enviado pelo formulário do chat da tela da tarefa
     // o parâmetro "comentario" é montado sozinho pelo asp.net (model binding):
     // ex: Descricao=Texto, IdTarefa=10, Funcionario.Codigo=2 (objeto de dentro)
-    // o Funcionario.Codigo é o primeiro funcionário da equipe da tarefa (autor provisório, enquanto não existe login)
-    // se a tarefa não tem equipe, a tela desabilita o campo e o botão, então o formulário nem chega aqui
+    // o autor (Funcionario.Codigo) é trocado pelo código de quem está logado, lá embaixo
+    // quem não está na equipe da tarefa tem o campo e o botão desabilitados na tela, então o formulário nem chega aqui
     [HttpPost]
     public ActionResult Create(Comentario comentario)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // o cliente só lê os comentários, quem comenta é gestor e funcionário
+        if (papel != "gestor" && papel != "funcionario")
+        {
+            repository.Dispose();
+            return RedirectToAction("Detalhes", "Tarefa", new {id = comentario.IdTarefa});
+        }
+
+        // o autor do comentário é sempre quem está logado (gestor ou funcionário): o código vem da sessão, não do formulário,
+        // pra ninguém comentar no nome de outra pessoa trocando o hidden da tela
+        // se ele não estiver na equipe da tarefa, o banco recusa (FK_Comentarios_TarefaFuncionario) e cai no catch
+        comentario.Funcionario.Codigo = (int)HttpContext.Session.GetInt32("codigo");
+
         try
         {
             bool resultado = repository.Create(comentario);
 
             repository.Dispose();
             // volta pra tela da tarefa, que busca os comentários de novo e já mostra o novo no chat
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = comentario.IdTarefa});
+            // vai pela Detalhes, que escolhe a tela do papel de quem está logado
+            return RedirectToAction("Detalhes", "Tarefa", new {id = comentario.IdTarefa});
             // return Json(new {sucesso = resultado});
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui
@@ -42,7 +57,7 @@ public class ComentarioController : Controller
             // e o ViewBag se perde no redirecionamento: por isso a mensagem vai pela url (?erro=...)
             // e a action DetalhesGestor do TarefaController coloca ela no ViewBag.Erro
             repository.Dispose();
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = comentario.IdTarefa, erro = e.Message});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = comentario.IdTarefa, erro = e.Message});
             // return Json(new {sucesso = false, erro = e.Message});
         }
     }

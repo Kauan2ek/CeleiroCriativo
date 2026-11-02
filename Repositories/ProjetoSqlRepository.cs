@@ -39,6 +39,85 @@ public class ProjetoSqlRepository : DataConnection
         return projetos;
     }
 
+    // Lista os projetos de um cliente, pra tela de projetos do cliente.
+    // Mesmo SELECT do ReadAll, filtrando pelo cliente dono do projeto.
+    public List<Projeto> ReadAllCliente(int codigoCliente)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT PR.codigo, PR.titulo, PR.descricao,
+                   PR.data_inicio, PR.data_fim, PR.data_prevista,
+                   S.codigo AS status_codigo, S.descricao AS status_descricao,
+                   P.codigo AS cliente_codigo, P.nome AS cliente_nome,
+                   P.telefone AS cliente_telefone, P.documento AS cliente_documento,
+                   P.tipo_doc AS cliente_tipo_doc,
+                   C.email AS cliente_email, C.codigo_verificacao
+            FROM Projetos PR
+            INNER JOIN Clientes C ON C.pessoa_codigo = PR.cliente_codigo
+            INNER JOIN Pessoas P ON P.codigo = C.pessoa_codigo
+            LEFT JOIN Status S ON S.codigo = PR.status_codigo
+            WHERE PR.cliente_codigo = @cliente
+              AND ISNULL(S.descricao, '') <> 'Excluído'
+            ORDER BY PR.codigo DESC
+        ";
+        cmd.Parameters.AddWithValue("@cliente", codigoCliente);
+
+        List<Projeto> projetos = new List<Projeto>();
+        SqlDataReader reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            projetos.Add(MontarProjeto(reader));
+        }
+
+        reader.Close();
+        return projetos;
+    }
+
+    // Lista os projetos em que o funcionário está na equipe de pelo menos uma tarefa,
+    // pra tela de projetos do funcionário.
+    // O EXISTS evita repetir o projeto quando o funcionário está em mais de uma tarefa dele.
+    public List<Projeto> ReadAllFuncionario(int codigoFuncionario)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT PR.codigo, PR.titulo, PR.descricao,
+                   PR.data_inicio, PR.data_fim, PR.data_prevista,
+                   S.codigo AS status_codigo, S.descricao AS status_descricao,
+                   P.codigo AS cliente_codigo, P.nome AS cliente_nome,
+                   P.telefone AS cliente_telefone, P.documento AS cliente_documento,
+                   P.tipo_doc AS cliente_tipo_doc,
+                   C.email AS cliente_email, C.codigo_verificacao
+            FROM Projetos PR
+            INNER JOIN Clientes C ON C.pessoa_codigo = PR.cliente_codigo
+            INNER JOIN Pessoas P ON P.codigo = C.pessoa_codigo
+            LEFT JOIN Status S ON S.codigo = PR.status_codigo
+            WHERE ISNULL(S.descricao, '') <> 'Excluído'
+              AND EXISTS (
+                    SELECT 1
+                    FROM Tarefas T
+                    INNER JOIN TarefaFuncionarios TF ON TF.tarefa_codigo = T.codigo
+                    WHERE T.projeto_codigo = PR.codigo
+                      AND TF.funcionario_codigo = @funcionario
+              )
+            ORDER BY PR.codigo DESC
+        ";
+        cmd.Parameters.AddWithValue("@funcionario", codigoFuncionario);
+
+        List<Projeto> projetos = new List<Projeto>();
+        SqlDataReader reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            projetos.Add(MontarProjeto(reader));
+        }
+
+        reader.Close();
+        return projetos;
+    }
+
     // Busca um projeto pelo código.
     // Além dos dados do Projeto, também carrega suas tarefas para a tela de detalhes.
     public Projeto? Read(int id)

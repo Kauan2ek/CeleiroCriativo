@@ -47,31 +47,28 @@
 
     <!-- ==================== CONTEÚDO ==================== -->
     <main class="conteudo-exibicao">
-        @if (TempData["Sucesso"] != null)
+        <!-- mensagem de sucesso do Create, Update ou Aprovar -->
+        @if (ViewBag.Sucesso != null)
         {
-            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
-        }
-        @if (TempData["Erro"] != null)
-        {
-            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+            <div class="mensagem-crud sucesso">@ViewBag.Sucesso</div>
         }
 
-        <!--
-            O formulário sempre envia para Projeto/Salvar.
-            O Controller identifica se é criação ou edição pelo Código do projeto:
-            Código 0  -> cria um novo projeto.
-            Código > 0 -> atualiza um projeto existente.
+        <!-- mensagem de erro do Create, Update, Delete, Aprovar ou Negar -->
+        <!-- o ViewBag.Erro vem do catch das actions do projeto -->
+        @if (ViewBag.Erro != null)
+        {
+            <div class="mensagem-crud erro">@ViewBag.Erro</div>
+        }
 
-            Mantemos este fluxo igual ao cadastro de Funcionário, que já está
-            funcionando corretamente no projeto.
-        -->
-        <form method="post" action="/Projeto/Salvar">
+        <!-- projeto novo (Codigo 0) envia pro Create; projeto existente envia pro Update -->
+        <!-- os nomes dos campos são os nomes das propriedades da model Projeto (model binding) -->
+        <form method="post" action=@(Model.Codigo == 0 ? "/Projeto/Create" : "/Projeto/Update")>
             <input type="hidden" name="Codigo" value="@Model.Codigo">
 
             <!-- ==================== LINHA SUPERIOR ==================== -->
             <div class="linha-superior">
                 <div class="titulo-exibicao">
-                    <a href="@Url.Action("GestorProjeto", "Projeto")" class="voltar-projetos">
+                    <a href="/Projeto/IndexGestor" class="voltar-projetos">
                         <img src="/imagens/voltar.png" alt="Voltar">
                     </a>
                     <h1>@(novoProjeto ? "Criar Projeto" : "Exibição de Projeto")</h1>
@@ -80,7 +77,8 @@
                 <!-- Status é entidade própria para Projeto. -->
                 <div class="situacao @statusClasse" id="containerSituacao">
                     <span>Situação:</span>
-                    <select id="situacaoProjeto" name="StatusCodigo">
+                    <!-- name="Status.Codigo" preenche o projeto.Status.Codigo no Create/Update -->
+                    <select id="situacaoProjeto" name="Status.Codigo">
                         @foreach (Status status in ViewBag.StatusList)
                         {
                             if (Model.Status.Codigo == status.Codigo)
@@ -117,7 +115,8 @@
                     <div class="campo-projeto">
                         <label for="clienteProjeto">Cliente</label>
                         <div class="campo-com-icone">
-                            <select id="clienteProjeto" name="ClienteCodigo" required>
+                            <!-- name="Cliente.Codigo" preenche o projeto.Cliente.Codigo no Create/Update -->
+                            <select id="clienteProjeto" name="Cliente.Codigo" required>
                                 <option value="">Selecione o cliente</option>
                                 @foreach (Cliente cliente in ViewBag.Clientes)
                                 {
@@ -251,8 +250,9 @@
         @if (!novoProjeto)
         {
             <div class="acoes-secundarias-projeto">
-                <!-- Exclusão normal é lógica: Status = Excluído. -->
-                <form method="post" action="@Url.Action("Excluir", "Projeto")"
+                <!-- exclusão lógica: o status vira "Excluído" -->
+                <!-- o código vem do @Model e vai pro parâmetro id da action Delete -->
+                <form method="post" action="/Projeto/Delete"
                       onsubmit="return confirm('Tem certeza que deseja excluir este projeto?');">
                     <input type="hidden" name="id" value="@Model.Codigo">
                     <button type="submit" class="botao-excluir">Excluir Projeto</button>
@@ -261,13 +261,13 @@
                 @if (emAnalise)
                 {
                     <!-- Aprovar apenas muda o projeto para Em andamento. -->
-                    <form method="post" action="@Url.Action("Aprovar", "Projeto")">
+                    <form method="post" action="/Projeto/Aprovar">
                         <input type="hidden" name="id" value="@Model.Codigo">
                         <button type="submit" class="botao-aprovar">Aprovar</button>
                     </form>
 
                     <!-- Negar remove fisicamente a solicitação Em análise. -->
-                    <form method="post" action="@Url.Action("Negar", "Projeto")"
+                    <form method="post" action="/Projeto/Negar"
                           onsubmit="return confirm('Negar e remover este projeto?');">
                         <input type="hidden" name="id" value="@Model.Codigo">
                         <button type="submit" class="botao-negar">Negar</button>

@@ -1,304 +1,172 @@
+@model Projeto
+
+@{
+    // Só o gestor altera o projeto: aqui os campos são apenas de leitura.
+    string statusClasse = "analise";
+    if (Model.Status.Descricao == "Em andamento")
+    {
+        statusClasse = "andamento";
+    }
+    else if (Model.Status.Descricao == "Finalizado")
+    {
+        statusClasse = "finalizado";
+    }
+}
+
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-
-    <!-- faz a página se adaptar a celulares -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- título que aparece na aba do navegador -->
     <title>Projeto - Celeiro Criativo</title>
-
-    <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
-
-    <!-- css específico dessa tela -->
     <link rel="stylesheet" href="/css/exibicao_projeto.css" />
-
-    <!-- js que cuida do comportamento dessa tela -->
-    <script src="/js/projeto.js"></script>
 </head>
-
 <body>
-<!-- ==================== CABEÇALHO ==================== -->
-
-<header class="cabecalho-projeto">
-
-    <!-- Logo - volta para a tela de home -->
-    <a href="/" class="logo-projeto">
-        <img src="/imagens/logo.png"
-            alt="Logo">
-    </a>
-
-    <!-- Informações do gestor -->
-    <div class="informacoes-funcionario">
-
-        <!-- nome do funcionário logado (fixo por enquanto) -->
-        <span>Nome do Funcionário</span>
-
-        <!-- link que leva pro perfil do funcionário -->
-        <a href="/Perfil/FuncionarioPerfil"
-           class="link-perfil">
-
-            <img src="/imagens/Entrar.png"
-                 alt="Perfil do funcionario">
-
+    <!-- ==================== CABEÇALHO ==================== -->
+    <header class="cabecalho-projeto">
+        <a href="/" class="logo-projeto">
+            <img src="/imagens/logo.png" alt="Logo">
         </a>
 
-    </div>
+        <!-- informações do funcionário logado -->
+        <div class="informacoes-funcionario">
+            <span>@Context.Session.GetString("nome")</span>
+            <a href="/Perfil/FuncionarioPerfil" class="link-perfil">
+                <img src="/imagens/Entrar.png" alt="Perfil do funcionário">
+            </a>
+        </div>
+    </header>
 
-</header>
-
-<!-- ==================== CONTEÚDO ==================== -->
-
-<main class="conteudo-exibicao">
-
-    <!-- ==================== FORMULÁRIO ==================== -->
-
-    <!-- form que envia os dados do projeto pro controller -->
-    <form method="post"
-          action="/Projeto/Salvar">
-
+    <!-- ==================== CONTEÚDO ==================== -->
+    <main class="conteudo-exibicao">
         <!-- ==================== LINHA SUPERIOR ==================== -->
-
         <div class="linha-superior">
-
             <div class="titulo-exibicao">
-
-                <!-- botão de voltar pra tela de projetos do gestor -->
-                <a href="/Projeto/GestorProjeto"
-                   class="voltar-projetos">
-
-                    <img src="/imagens/voltar.png"
-                         alt="Voltar">
-
+                <a href="/Projeto/FuncionarioProjeto" class="voltar-projetos">
+                    <img src="/imagens/voltar.png" alt="Voltar">
                 </a>
-
                 <h1>Exibição de Projeto</h1>
-
             </div>
 
-            <!-- Situação -->
-            <div class="situacao analise">
-
+            <!-- Status só é exibido; quem muda a situação do projeto é o gestor. -->
+            <div class="situacao @statusClasse">
                 <span>Situação:</span>
-
-                <!-- select com os status possíveis do projeto -->
-                <select id="situacaoProjeto"
-                        name="Situacao"
-                        class="status-cliente-funcionario">
-
-                    <option value="analise" selected>
-                        Em análise
-                    </option>
-
-                    <option value="andamento">
-                        Em andamento
-                    </option>
-
-                    <option value="finalizado">
-                        Finalizado
-                    </option>
-
-                </select>
-
+                <strong>@Model.Status.Descricao</strong>
             </div>
-
         </div>
 
         <!-- ==================== COLUNAS ==================== -->
-
-        <!-- divide a tela em três colunas: esquerda, meio e direita -->
         <div class="colunas-projeto">
-
-            <!-- ==================== COLUNA ESQUERDA ==================== -->
-
+            <!-- Dados principais do Projeto. -->
             <section class="coluna-esquerda">
-
-                <!-- Título -->
                 <div class="campo-projeto">
-
-                    <label for="tituloProjeto">
-                        Título do Projeto
-                    </label>
-
+                    <label for="tituloProjeto">Título do Projeto</label>
                     <div class="campo-com-icone">
-
                         <input type="text"
                                id="tituloProjeto"
-                               name="Titulo"
-                               placeholder="Título do Projeto">
-
+                               value="@Model.Titulo"
+                               readonly>
                     </div>
-
                 </div>
 
-                <!-- Descrição -->
                 <div class="campo-projeto">
-
-                    <label for="descricaoProjeto">
-                        Descrição de Ideia:
-                    </label>
-
-                    <div class="campo-texto">
-
-                        <!-- textarea pra descrição, que costuma ser um texto maior -->
-                        <textarea id="descricaoProjeto"
-                                  name="Descricao"
-                                  placeholder="Texto.."></textarea>
-
-                    </div>
-
-                </div>
-
-                <!-- Comentários -->
-                <div class="campo-projeto">
-
-                    <label for="comentariosProjeto">
-                        Comentários
-                    </label>
-
+                    <label for="clienteProjeto">Cliente</label>
                     <div class="campo-com-icone">
-
                         <input type="text"
-                               id="comentariosProjeto"
-                               name="Comentarios"
-                               placeholder="Digite um comentário">
-
+                               id="clienteProjeto"
+                               value="@Model.Cliente.Nome"
+                               readonly>
                     </div>
-
                 </div>
 
+                <div class="campo-projeto">
+                    <label for="descricaoProjeto">Descrição da ideia</label>
+                    <div class="campo-texto">
+                        <textarea id="descricaoProjeto" readonly>@Model.Descricao</textarea>
+                    </div>
+                </div>
             </section>
 
-            <!-- ==================== COLUNA DO MEIO ==================== -->
-
+            <!-- Datas do Projeto. -->
             <section class="coluna-meio">
-
-                <!-- Data de início -->
                 <div class="campo-projeto">
-
-                    <label for="dataInicio">
-                        Data de Início
-                    </label>
-
+                    <label for="dataInicio">Data de Início</label>
                     <div class="campo-com-icone">
-
                         <input type="date"
                                id="dataInicio"
-                               name="DataInicio">
-
+                               value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")"
+                               readonly>
                     </div>
-
                 </div>
 
-                <!-- Previsão de término -->
                 <div class="campo-projeto">
-
-                    <label for="previsaoTermino">
-                        Previsão de Término
-                    </label>
-
+                    <label for="previsaoTermino">Previsão de Término</label>
                     <div class="campo-com-icone">
-
                         <input type="date"
                                id="previsaoTermino"
-                               name="PrevisaoTermino">
-
+                               value="@(Model.DataPrevista.HasValue ? Model.DataPrevista.Value.ToString("yyyy-MM-dd") : "")"
+                               readonly>
                     </div>
-
                 </div>
 
-                <!-- Data de entrega -->
                 <div class="campo-projeto">
-
-                    <label for="dataEntrega">
-                        Data de Entrega
-                    </label>
-
+                    <label for="dataEntrega">Data de Entrega</label>
                     <div class="campo-com-icone">
-
                         <input type="date"
                                id="dataEntrega"
-                               name="DataEntrega">
-
+                               value="@(Model.DataFim.HasValue ? Model.DataFim.Value.ToString("yyyy-MM-dd") : "")"
+                               readonly>
                     </div>
-
                 </div>
-
             </section>
 
-            <!-- ==================== COLUNA DIREITA ==================== -->
-
+            <!-- Resumo das tarefas do Projeto. -->
             <section class="coluna-tarefas">
-
                 <h2>Tarefas:</h2>
 
                 <div class="area-tarefas">
+                    @if (Model.tarefas == null || Model.tarefas.Count == 0)
+                    {
+                        <span>Este projeto ainda não possui tarefas.</span>
+                    }
+                    else
+                    {
+                        @foreach (Tarefa tarefa in Model.tarefas)
+                        {
+                            <div class="tarefa">
+                                <img src="/imagens/Entrar.png"
+                                     alt="Tarefa"
+                                     class="icone-responsavel">
 
-                    <!-- Tarefa -->
-                    <div class="tarefa">
+                                <span class="titulo-tarefa-projeto" title="@tarefa.Titulo">
+                                    @tarefa.Titulo
+                                </span>
 
-                        <!-- ícone do responsável pela tarefa -->
-                        <img src="/imagens/Entrar.png"
-                             alt="Responsável"
-                             class="icone-responsavel">
-
-                        <input type="text"
-                               id="tituloTarefa"
-                               name="Tarefa"
-                               placeholder="Título Tarefa">
-
-                        <!-- link que abre a tarefa na visão do funcionário -->
-                        <a href="/Tarefa/FuncionarioTarefa" class="botao-expandir">
-                            <img src="~/imagens/abrir.png" alt="Abrir">
-                        </a>
-
-                    </div>
-
+                                <a href="/Tarefa/DetalhesFuncionario/@tarefa.Codigo"
+                                   class="botao-expandir"
+                                   title="Abrir tarefa">
+                                    <img src="/imagens/abrir.png" alt="Abrir">
+                                </a>
+                            </div>
+                        }
+                    }
                 </div>
 
+                <!-- mesmo bloco da tela do gestor: abre o kanban do projeto e cria tarefa nova -->
+                <div class="acoes-tarefas acoes-tarefas-links">
+                    <a href="/Tarefa/IndexFuncionario/@Model.Codigo" class="link-tarefas-projeto">
+                        Ver todas
+                    </a>
+
+                    <a href="/Tarefa/DetalhesFuncionario?idProjeto=@Model.Codigo"
+                       class="botao-documento"
+                       title="Adicionar tarefa">
+                        <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
+                    </a>
+                </div>
             </section>
-
         </div>
-
-        <!-- ==================== AÇÕES DO PROJETO ==================== -->
-
-        <div class="acoes-projeto">
-
-            <!-- Botão Salvar -->
-            <!-- por enquanto só volta pra tela anterior via history.back() -->
-            <button type="button"
-                    class="botao-salvar"
-                    onclick="history.back()">
-                Salvar
-            </button>
-
-            <!-- Botões Aprovar e Negar -->
-            <div class="botoes-aprovacao"
-                 id="botoesAprovacao">
-
-                <button type="button"
-                        class="botao-aprovar">
-
-                    Aprovar
-
-                </button>
-
-                <button type="button"
-                        class="botao-negar">
-
-                    Negar
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </form>
-
-</main>
+    </main>
 </body>
 </html>

@@ -1,14 +1,28 @@
+@model Tarefa
+
+@{
+    // Código 0 significa que o formulário está criando uma nova Tarefa (igual ao novoProjeto da tela do projeto).
+    // Tarefa nova ainda não existe no banco, então ainda não pode receber comentários.
+    bool novaTarefa = Model.Codigo == 0;
+
+    // o banco só aceita comentário de quem está na equipe da tarefa (FK_Comentarios_TarefaFuncionario)
+    // então o chat confere se o funcionário logado está na equipe (o código dele vem da sessão)
+    // usado só pra habilitar ou não o envio de comentário; o resto da tarefa ele edita de qualquer jeito
+    int? codigoLogado = Context.Session.GetInt32("codigo");
+    bool naEquipe = Model.Funcionarios != null && Model.Funcionarios.Any(f => f.Codigo == codigoLogado);
+}
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exibição de Tarefa</title>
+    <title>@(novaTarefa ? "Nova Tarefa" : "Exibição de Tarefa")</title>
 
     <!-- ícone da aba -->
     <link rel="icon" type="image/png" href="/imagens/logo.png">
 
-    <!-- css específico dessa tela -->
+    <!-- css específico dessa tela (o mesmo da tela do gestor) -->
     <link rel="stylesheet" href="/css/exibicao_tarefa.css" />
 </head>
 <body>
@@ -20,15 +34,15 @@
 
     <!-- logo que volta pra home -->
     <a href="/" class="logo-tarefa">
-        <img src="/imagens/logo.png"
-             alt="Logo">
+        <img src="/imagens/logo.png" alt="Logo">
     </a>
 
-    <!-- informações do funcionário logado -->
+
+    <!-- informações do funcionário logado (o nome vem da sessão, gravada no login) -->
     <div class="informacoes-funcionario">
 
         <span>
-            Nome do Funcionário
+            @Context.Session.GetString("nome")
         </span>
 
         <!-- link pro perfil do funcionário -->
@@ -51,22 +65,27 @@
 
 <main class="conteudo-exibicao-tarefa">
 
+    <!-- mensagem de erro do Create, Update ou Delete -->
+    <!-- o ViewBag.Erro vem do catch das actions da tarefa, ou do ?erro= da url quando o comentário/arquivo falha -->
+    @if (ViewBag.Erro != null)
+    {
+        <div class="mensagem-crud erro">@ViewBag.Erro</div>
+    }
+
 
     <!-- ======================================================
          FORMULÁRIO DA TAREFA
          ====================================================== -->
 
-    <!-- form que manda os dados da tarefa pro controller -->
     <form method="post"
-          action="/Tarefa/SalvarFuncionario">
+          id="formTarefa"
+          action=@(novaTarefa ? "/tarefa/create" : "/tarefa/update")>
 
+        <!-- código 0 = tarefa nova (o form vai pro Create); maior que 0 = tarefa existente (vai pro Update) -->
+        <input type="hidden" id="codigoTarefa" name="Codigo" value="@Model.Codigo">
 
-        <!-- guarda o nome da tarefa que veio do controller -->
-        <input type="hidden"
-               id="nomeTarefa"
-               name="Tarefa"
-               value="@ViewBag.Tarefa">
-
+        <!-- tarefa nova: veio da url (?idProjeto=2); tarefa existente: veio do banco pelo Read -->
+        <input type="hidden" name="IdProjeto" value="@(Model.IdProjeto)">
 
         <!-- ==================================================
              LINHA SUPERIOR
@@ -75,17 +94,19 @@
         <div class="linha-superior-tarefa">
 
 
-            <!-- título e botão voltar -->
+            <!-- título da página -->
+
             <div class="titulo-exibicao-tarefa">
 
-                <!-- volta pra tela de tarefas do funcionário -->
-                <a href="/Tarefa/FuncionarioTarefa"
+                <!-- botão de voltar pro kanban do projeto dono da tarefa (/Tarefa/IndexFuncionario/2) -->
+                <a href="/Tarefa/IndexFuncionario/@Model.IdProjeto"
                    class="voltar-tarefa">
 
                     <img src="/imagens/voltar.png"
                          alt="Voltar">
 
                 </a>
+
 
                 <h1>
                     Exibição de Tarefa
@@ -94,34 +115,53 @@
             </div>
 
 
-            <!-- ==================================================
-                 SITUAÇÃO / STATUS
-                 ================================================== -->
+            <!-- lado direito da linha: visibilidade + status, um do lado do outro -->
+            <div class="acoes-superiores-tarefa">
 
-            <div class="situacao-tarefa"
-                 id="containerSituacao">
+                <!-- ==================================================
+                     VISIBILIDADE PRO CLIENTE (slider)
+                     ================================================== -->
+                <!-- mesmo slider da tela do gestor: checkbox escondido + hidden "false" com o mesmo name -->
+                <!-- marcado chega "true,false" e o model binding fica com o primeiro (true); desmarcado chega só o "false" -->
+                <label class="visibilidade-tarefa"
+                       title="Quando ligado, o cliente vê esta tarefa">
+                    <span>Visível ao cliente</span>
 
-                <span>
-                    Status:
-                </span>
+                    <input type="checkbox"
+                           name="Visibilidade"
+                           value="true"
+                           checked="@Model.Visibilidade">
 
-                <!-- funcionário pode alterar o status da tarefa -->
-                <select id="situacaoTarefa"
-                        name="Status">
+                    <span class="slider-visibilidade"></span>
+                </label>
+                <input type="hidden" name="Visibilidade" value="false">
 
-                    <option value="a_fazer">
-                        A Fazer
-                    </option>
 
-                    <option value="andamento">
-                        Em Andamento
-                    </option>
+                <!-- ==================================================
+                     SITUAÇÃO / STATUS DA TAREFA
+                     ================================================== -->
+                <!-- em tarefa nova o exibicao_tarefa.js esconde esse bloco (a tarefa nasce "A fazer") -->
+                <div class="situacao-tarefa"
+                     id="containerSituacao">
 
-                    <option value="finalizada">
-                        Finalizada
-                    </option>
+                    <span>
+                        Status:
+                    </span>
 
-                </select>
+                    <select id="situacaoTarefa"
+                            name="Status">
+                        <option value="A fazer" selected="@(Model.Status == "A fazer" || Model.Status == "" || Model.Status == null)">
+                            A Fazer
+                        </option>
+                        <option value="Em andamento" selected="@(Model.Status == "Em andamento")">
+                            Em Andamento
+                        </option>
+                        <option value="Finalizado" selected="@(Model.Status == "Finalizado")">
+                            Finalizada
+                        </option>
+                    </select>
+
+                </div>
 
             </div>
 
@@ -137,12 +177,14 @@
 
             <!-- ==================================================
                  COLUNA ESQUERDA
+                 informações da tarefa
                  ================================================== -->
 
             <section class="coluna-info-tarefa">
 
 
                 <!-- TÍTULO DA TAREFA -->
+
                 <div class="campo-tarefa">
 
                     <label for="tituloTarefa">
@@ -151,12 +193,14 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- readonly, o funcionário não muda o título -->
                         <input type="text"
                                id="tituloTarefa"
                                name="Titulo"
                                placeholder="Título da Tarefa"
-                               readonly>
+                               value="@Model.Titulo">
+
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
 
                     </div>
 
@@ -164,6 +208,7 @@
 
 
                 <!-- CATEGORIA -->
+
                 <div class="campo-tarefa">
 
                     <label for="categoriaTarefa">
@@ -172,72 +217,25 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- disabled, só visualização -->
+                        <!-- as opções vêm da ViewBag.Categorias; na tarefa existente, a categoria dela já vem selecionada -->
                         <select id="categoriaTarefa"
-                                name="Categoria"
-                                disabled>
-
+                                name="Categoria.Codigo">
                             <option value=""
                                     selected
                                     disabled>
+
                                 Selecione uma categoria
+
                             </option>
 
-                            <option value="planejamento">
-                                Planejamento
-                            </option>
-
-                            <option value="reuniao">
-                                Reunião
-                            </option>
-
-                            <option value="criacao_conteudo">
-                                Criação de Conteúdo
-                            </option>
-
-                            <option value="design">
-                                Design
-                            </option>
-
-                            <option value="redacao">
-                                Redação / Copywriting
-                            </option>
-
-                            <option value="social_media">
-                                Social Media
-                            </option>
-
-                            <option value="gravacao">
-                                Gravação
-                            </option>
-
-                            <option value="edicao_video">
-                                Edição de Vídeo
-                            </option>
-
-                            <option value="fotografia">
-                                Fotografia
-                            </option>
-
-                            <option value="campanha">
-                                Publicidade / Campanha
-                            </option>
-
-                            <option value="desenvolvimento_projeto">
-                                Desenvolvimento de Projeto
-                            </option>
-
-                            <option value="revisao">
-                                Revisão
-                            </option>
-
-                            <option value="aprovacao">
-                                Aprovação
-                            </option>
-
-                            <option value="entrega">
-                                Entrega
-                            </option>
+                            @foreach (var categoria in ViewBag.Categorias)
+                            {
+                                @if (!novaTarefa && Model.Categoria.Codigo == categoria.Codigo){
+                                    <option value="@categoria.Codigo" selected>@categoria.Descricao</option>
+                                } else {
+                                    <option value="@categoria.Codigo">@categoria.Descricao</option>
+                                }
+                            }
 
                         </select>
 
@@ -247,6 +245,7 @@
 
 
                 <!-- DESCRIÇÃO -->
+
                 <div class="campo-tarefa">
 
                     <label for="descricaoTarefa">
@@ -255,37 +254,45 @@
 
                     <div class="campo-texto-tarefa">
 
-                        <!-- readonly, funcionário não edita a descrição -->
                         <textarea id="descricaoTarefa"
                                   name="Descricao"
                                   placeholder="Texto.."
-                                  readonly></textarea>
+                        >@Model.Descricao</textarea>
+
+                        <img src="/imagens/editar.png"
+                             alt="Editar">
 
                     </div>
 
                 </div>
 
 
-                <!-- COMENTÁRIOS -->
+                <!-- CAMPO DE COMENTÁRIOS -->
+                <!-- mostra o último comentário (o js copia da última mensagem do chat, que foi montado no C#) -->
                 <div class="campo-tarefa">
+                    <label for="comentariosTarefa">Comentários</label>
 
-                    <label for="comentariosTarefa">
-                        Comentários
-                    </label>
+                    @if (novaTarefa)
+                    {
+                        <p class="aviso-comentarios-tarefa">Salve a tarefa antes de comentar.</p>
+                    }
+                    else
+                    {
+                        <div class="campo-com-icone-tarefa campo-comentarios-chat">
+                            <input type="text"
+                                id="comentariosTarefa"
+                                placeholder="Nenhum comentário ainda"
+                                readonly
+                                title="Último comentário"
+                                value="">
 
-                    <div class="campo-com-icone-tarefa">
-
-                        <!-- esse aqui o funcionário pode escrever -->
-                        <input type="text"
-                               id="comentariosTarefa"
-                               name="Comentarios"
-                               placeholder="Digite um comentário">
-
-                        <img src="/imagens/editar.png"
-                             alt="Comentários">
-
-                    </div>
-
+                            <!-- o lápis abre a conversa completa -->
+                            <img src="/imagens/editar.png"
+                                alt="Abrir comentários"
+                                id="iconeComentarios"
+                                title="Abrir conversa">
+                        </div>
+                    }
                 </div>
 
             </section>
@@ -293,12 +300,14 @@
 
             <!-- ==================================================
                  COLUNA CENTRAL
+                 prazos e funcionários
                  ================================================== -->
 
             <section class="coluna-prazos-tarefa">
 
 
                 <!-- DATA DE INÍCIO -->
+
                 <div class="campo-tarefa">
 
                     <label for="dataInicio">
@@ -307,11 +316,10 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <!-- disabled, só visualização -->
                         <input type="date"
                                id="dataInicio"
-                               name="DataInicio"
-                               disabled>
+                               name="DataHoraInicio"
+                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")">
 
                     </div>
 
@@ -319,6 +327,7 @@
 
 
                 <!-- PREVISÃO DE TÉRMINO -->
+
                 <div class="campo-tarefa">
 
                     <label for="previsaoTermino">
@@ -329,8 +338,8 @@
 
                         <input type="date"
                                id="previsaoTermino"
-                               name="PrevisaoTermino"
-                               disabled>
+                               name="DataHoraPrevista"
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")">
 
                     </div>
 
@@ -338,6 +347,7 @@
 
 
                 <!-- DATA DE ENTREGA -->
+
                 <div class="campo-tarefa">
 
                     <label for="dataEntrega">
@@ -348,63 +358,43 @@
 
                         <input type="date"
                                id="dataEntrega"
-                               name="DataEntrega"
-                               disabled>
+                               name="DataHoraFim"
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")">
 
                     </div>
 
                 </div>
 
 
-                <!-- ==================================================
-                     EQUIPE
-                     ================================================== -->
+                <!-- FUNCIONÁRIOS -->
 
                 <h2 class="titulo-funcionarios">
-                    Equipe:
+                    Funcionário(s):
                 </h2>
 
-
+                <!-- só mostra a equipe: o funcionário não adiciona nem remove ninguém (isso é só do gestor) -->
+                <!-- por isso aqui não tem o botão + nem o modal de funcionários da tela do gestor -->
                 <div class="area-funcionarios">
 
+                    @if (Model.Funcionarios != null && Model.Funcionarios.Count() > 0)
+                    {
+                        @foreach (var funcionario in Model.Funcionarios)
+                        {
+                            <div class="funcionario">
+                                <img src="/imagens/Entrar.png"
+                                     alt="Funcionário"
+                                     class="icone-funcionario">
 
-                    <!-- funcionário 1 (exemplo fixo) -->
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
-
-
-                    <!-- funcionário 2 (exemplo fixo) -->
-                    <div class="funcionario">
-
-                        <img src="/imagens/Entrar.png"
-                             alt="Funcionário"
-                             class="icone-funcionario">
-
-                        <span>
-                            Nome - Função
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <!-- botão de baixar a equipe -->
-                <div class="acoes-funcionarios">
-
-                    <button type="button"
-                            class="botao-download-funcionario"
-                            title="Baixar">
-                    </button>
+                                <span>
+                                    @funcionario.Nome - @funcionario.Cargo.Descricao
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>Ainda não há funcionários para essa tarefa...</span>
+                    }
 
                 </div>
 
@@ -413,6 +403,7 @@
 
             <!-- ==================================================
                  COLUNA DIREITA
+                 arquivos
                  ================================================== -->
 
             <section class="coluna-arquivos-tarefa">
@@ -421,114 +412,68 @@
                     Arquivos:
                 </h2>
 
-
                 <div class="area-arquivos">
+                    @if (Model.Documentos != null && Model.Documentos.Count() > 0)
+                    {
+                        @foreach (var documento in Model.Documentos)
+                        {
+                            <div class="arquivo">
 
+                                <img src="/imagens/documento.png"
+                                     alt="@documento.Extensao"
+                                     class="icone-arquivo">
 
-                    <!-- arquivo word -->
-                    <div class="arquivo">
+                                <span class="nome-arquivo"
+                                      title="@($"{documento.Descricao}.{documento.Extensao}")">
+                                    @($"{documento.Descricao}.{documento.Extensao}")
+                                </span>
 
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
+                                <!-- botão que abre o arquivo -->
+                                <a href="@documento.Diretorio"
+                                   target="_blank"
+                                   class="botao-abrir-arquivo"
+                                   title="Abrir arquivo">
+                                    <img src="/imagens/abrir.png" alt="Abrir">
+                                </a>
 
-                        <span class="nome-arquivo">
-                            doc_proj.docx
-                        </span>
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- arquivo pdf -->
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-                        <span class="nome-arquivo">
-                            pdf_proj.pdf
-                        </span>
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- outro word -->
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-                        <span class="nome-arquivo">
-                            doc(1)_proj.docx
-                        </span>
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
-
-
-                    <!-- outro pdf -->
-                    <div class="arquivo">
-
-                        <img src="/imagens/documento.png"
-                             alt="Docs"
-                             class="icone-arquivo">
-
-                        <span class="nome-arquivo">
-                            pdf(1)_proj.pdf
-                        </span>
-
-                        <a href="#"
-                           class="botao-abrir-arquivo"
-                           title="Abrir arquivo">
-
-                            <img src="/imagens/abrir.png"
-                                 alt="Abrir">
-
-                        </a>
-
-                    </div>
+                                <!-- botão que exclui o arquivo (envia o form de exclusão desse documento, lá embaixo) -->
+                                <button type="submit"
+                                        form="formExcluirDocumento-@documento.Codigo"
+                                        class="botao-excluir-arquivo"
+                                        title="Excluir arquivo"
+                                        onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
+                                    <img src="/imagens/excluir_arquivo.png" alt="Excluir">
+                                </button>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>Ainda não há arquivos para essa tarefa...</span>
+                    }
 
                 </div>
 
 
-                <!-- botão de adicionar arquivo -->
-                <div class="acoes-arquivos">
+                <!-- botão de adicionar arquivo: só em tarefa já salva (precisa do código da tarefa) -->
+                @if (!novaTarefa)
+                {
+                    <div class="acoes-arquivos">
+                        <input type="file"
+                               id="arquivoTarefa"
+                               name="arquivo"
+                               form="formUploadDocumento"
+                               style="display: none"
+                               onchange="this.form.submit()">
 
-                    <button type="button"
-                            class="botao-adicionar-arquivo"
-                            title="Adicionar arquivo">
-                        +
-                    </button>
-
-                </div>
+                        <button type="button"
+                                class="botao-adicionar-arquivo"
+                                title="Adicionar arquivo"
+                                onclick="document.getElementById('arquivoTarefa').click()">
+                            +
+                        </button>
+                    </div>
+                }
 
             </section>
 
@@ -536,23 +481,147 @@
 
 
         <!-- ==================================================
-             BOTÃO SALVAR
+             BOTÕES
              ================================================== -->
 
-        <div class="acoes-exibicao-tarefa">
+        @if (novaTarefa) // Create
+        {
+            <div class="acoes-exibicao-tarefa">
+                <button type="submit"
+                        class="botao-salvar-tarefa">
+                    Nova Tarefa
+                </button>
+            </div>
+        }
+        else // Update e Delete
+        {
+            <div class="acoes-exibicao-tarefa">
+                <button type="button"
+                        class="botao-excluir-tarefa"
+                        onclick="confirmarExclusaoTarefa()">
+                    Excluir tarefa
+                </button>
 
-            <!-- por enquanto só redireciona de volta pra lista de tarefas -->
-            <button type="button"
-                    class="botao-salvar-tarefa"
-                    onclick="window.location.href='/Tarefa/FuncionarioTarefa'">
-                Salvar
-            </button>
-        </div>
+                <button type="submit"
+                        class="botao-salvar-tarefa">
+                    Salvar
+                </button>
+            </div>
+        }
 
     </form>
 
 </main>
 
-<!-- js específico dessa tela -->
+<!-- form próprio do upload: fora do form da tarefa, porque form dentro de form não é permitido -->
+@if (!novaTarefa)
+{
+    <form id="formUploadDocumento"
+          method="post"
+          action="/Documento/Create"
+          enctype="multipart/form-data">
+        <input type="hidden" name="idTarefa" value="@Model.Codigo">
+    </form>
+}
+
+<!-- um form de exclusão pra cada documento, também fora do form da tarefa -->
+@if (Model.Documentos != null)
+{
+    @foreach (var documento in Model.Documentos)
+    {
+        <form id="formExcluirDocumento-@documento.Codigo"
+              method="post"
+              action="/Documento/Delete">
+            <input type="hidden" name="id" value="@documento.Codigo">
+            <input type="hidden" name="idTarefa" value="@Model.Codigo">
+        </form>
+    }
+}
+
+<!-- modal de exclusão da tarefa -->
+@if (!novaTarefa)
+{
+<div id="modalExclusaoTarefa" class="modal-exclusao">
+    <div class="caixa-exclusao">
+        <h2>Excluir tarefa?</h2>
+
+        <p>Tem certeza que deseja excluir esta tarefa?</p>
+
+        <div class="acoes-exclusao">
+            <button type="button"
+                    class="botao-voltar-tarefa"
+                    onclick="fecharModalExclusao()">
+                Voltar para tarefa
+            </button>
+
+            <form method="post" action="/Tarefa/Delete">
+                <input type="hidden" name="id" value="@Model.Codigo">
+                <input type="hidden" name="idProjeto" value="@Model.IdProjeto">
+
+                <button type="submit"
+                        class="botao-confirmar-exclusao">
+                    Excluir tarefa
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ==========================================================
+     MODAL DE COMENTÁRIOS - CHAT
+     só existe pra tarefa já salva
+     ========================================================== -->
+@if (!novaTarefa)
+{
+<div id="modalComentarios" class="modal-comentarios">
+    <div class="caixa-chat">
+
+        <div class="cabecalho-chat">
+            <div>
+                <h2>Comentários da tarefa</h2>
+                <span>Conversa entre os participantes</span>
+            </div>
+            <button type="button" id="fecharChat" class="fechar-chat">×</button>
+        </div>
+
+        <!-- as mensagens vêm do banco (Model.Comentarios, do mais antigo pro mais novo), montadas pelo C# -->
+        <div id="mensagensChat" class="mensagens-chat">
+            @if (Model.Comentarios != null && Model.Comentarios.Count() > 0) {
+                @foreach (var comentario in Model.Comentarios)
+                {
+                    <div class="mensagem mensagem-outra">
+                        <span class="nome-mensagem">(@comentario.Funcionario.Nome)</span>
+                        <p>@comentario.Descricao</p>
+                        <span class="horario-mensagem">@comentario.DataHora.ToString("dd/MM HH:mm")</span>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- envia o comentário pra action Create do ComentarioController -->
+        <form id="formularioChat" class="formulario-chat"
+              method="post" action="/Comentario/Create">
+
+            <!-- tarefa dona do comentário -->
+            <input type="hidden" name="IdTarefa" value="@Model.Codigo">
+
+            <!-- autor: o funcionário logado (o ComentarioController também pega da sessão, pra ninguém trocar esse valor) -->
+            <input type="hidden" name="Funcionario.Codigo" value="@codigoLogado">
+
+            <!-- o banco só aceita comentário de quem está na equipe: fora dela, o campo e o botão ficam desabilitados -->
+            <input type="text" id="novoComentario"
+                   name="Descricao"
+                   placeholder="@(naEquipe ? "Digite seu comentário..." : "Só quem está na equipe da tarefa pode comentar")"
+                   autocomplete="off" maxlength="500" required
+                   disabled="@(!naEquipe)">
+            <button type="submit" class="enviar-comentario" disabled="@(!naEquipe)">Enviar</button>
+        </form>
+
+    </div>
+</div>
+}
+
+<!-- js específico dessa tela (o mesmo da tela do gestor) -->
 <script src="/js/exibicao_tarefa.js"></script>
 </body>

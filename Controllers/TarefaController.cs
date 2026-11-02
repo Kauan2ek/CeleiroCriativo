@@ -16,11 +16,41 @@ public class TarefaController : Controller
         repository = new TarefaSqlRepository();
     }
 
+    // porta de entrada do kanban: cada papel vê a sua tela (igual à Index do ProjetoController)
+    // GET /Tarefa/Index/2 (o id é o código do PROJETO)
+    // o Create e o Delete voltam pra cá, assim cada um cai no kanban do seu papel
+    public ActionResult Index(int id)
+    {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        if (papel == "gestor")      { return IndexGestor(id);      }
+        if (papel == "funcionario") { return IndexFuncionario(id); }
+        if (papel == "cliente")     { return IndexCliente(id);     }
+
+        return RedirectToAction("Entrar", "Usuario");
+    }
+
+    // porta de entrada da tela da tarefa: cada papel vê a sua tela
+    // GET /Tarefa/Detalhes/5 (o id é o código da TAREFA)
+    // o Update, o ComentarioController e o DocumentoController voltam pra cá
+    public ActionResult Detalhes(int id, int idProjeto, string? erro = null)
+    {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        if (papel == "gestor")      { return DetalhesGestor(id, idProjeto, erro);      }
+        if (papel == "funcionario") { return DetalhesFuncionario(id, idProjeto, erro); }
+        if (papel == "cliente")     { return DetalhesCliente(id);                      }
+
+        return RedirectToAction("Entrar", "Usuario");
+    }
+
     // abre o kanban com as tarefas de um projeto, pro gestor
     // GET /Tarefa/IndexGestor/2 (aqui o id da url é o código do PROJETO, não da tarefa)
     // segue a convenção: views/tarefa/indexgestor.cshtml
     public ActionResult IndexGestor(int id)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return Index(id); }
+
         List<Tarefa> tarefas = repository.ReadAll(id);
         repository.Dispose();
 
@@ -28,7 +58,48 @@ public class TarefaController : Controller
         // então o código do projeto vai pelo ViewBag pros links da tela (voltar e criar tarefa)
         ViewBag.IdProjeto = id;
 
-        return View(tarefas);
+        // o nome da view vai escrito porque essa action também é chamada pela Index:
+        // sem o nome, o asp.net procuraria uma view com o nome da action que chamou (Index.cshtml)
+        return View("IndexGestor", tarefas);
+    }
+
+    // kanban pro funcionário: vê (e edita) todas as tarefas do projeto (decisão do grupo)
+    // GET /Tarefa/IndexFuncionario/2 (o id é o código do PROJETO)
+    public ActionResult IndexFuncionario(int id)
+    {
+        if (HttpContext.Session.GetString("papel") != "funcionario") { return Index(id); }
+
+        List<Tarefa> tarefas = repository.ReadAll(id);
+        repository.Dispose();
+
+        ViewBag.IdProjeto = id;
+
+        return View("IndexFuncionario", tarefas);
+    }
+
+    // kanban pro cliente: só do projeto dele, e só as tarefas marcadas como visíveis
+    // GET /Tarefa/IndexCliente/2 (o id é o código do PROJETO)
+    public ActionResult IndexCliente(int id)
+    {
+        if (HttpContext.Session.GetString("papel") != "cliente") { return Index(id); }
+
+        // cliente não pode abrir o kanban de projeto de outro cliente trocando o número na url
+        if (!ProjetoDoCliente(id))
+        {
+            repository.Dispose();
+            return RedirectToAction("Index", "Projeto");
+        }
+
+        List<Tarefa> tarefas = repository.ReadAll(id);
+        repository.Dispose();
+
+        // o Where filtra a lista: fica só quem tem Visibilidade = true (o mesmo Where que a view do gestor usa nas colunas)
+        // o ToList transforma o resultado do Where de volta em List<Tarefa>
+        tarefas = tarefas.Where(t => t.Visibilidade).ToList();
+
+        ViewBag.IdProjeto = id;
+
+        return View("IndexCliente", tarefas);
     }
 
     // tela de detalhes pro gestor, já com os dados reais da tarefa
@@ -37,6 +108,8 @@ public class TarefaController : Controller
     // o "= null" deixa o erro opcional: os catch daqui chamam DetalhesGestor(id, idProjeto) sem ele
     public ActionResult DetalhesGestor(int id, int idProjeto, string? erro = null)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return Detalhes(id, idProjeto, erro); }
+
         // só preenche quando veio erro pela url, pra não apagar o ViewBag.Erro que o catch do Create, Update ou Delete já colocou
         if (erro != null)
         {
@@ -83,6 +156,69 @@ public class TarefaController : Controller
         return View("DetalhesGestor", tarefa);
     }
 
+    // tela da tarefa pro funcionário: igual à do gestor, mas sem mexer na equipe (equipe é só do gestor)
+    // ele edita, exclui e sobe arquivo em qualquer tarefa do projeto
+    // GET /Tarefa/DetalhesFuncionario/5
+    // GET /Tarefa/DetalhesFuncionario?idProjeto=2 (sem id, abre o formulário de tarefa nova)
+    public ActionResult DetalhesFuncionario(int id, int idProjeto, string? erro = null)
+    {
+        if (HttpContext.Session.GetString("papel") != "funcionario") { return Detalhes(id, idProjeto, erro); }
+
+        if (erro != null)
+        {
+            ViewBag.Erro = erro;
+        }
+
+        Tarefa? tarefa = new Tarefa();
+        tarefa.IdProjeto = idProjeto;
+
+        if (id != 0)
+        {
+            tarefa = repository.Read(id);
+            repository.Dispose();
+
+            if (tarefa == null)
+            {
+                return NotFound();
+            }
+        }
+        else
+        {
+            repository.Dispose();
+        }
+
+        // todas as categorias, pras opções do select de categoria
+        // (o ViewBag.Funcionarios não vem aqui: o funcionário não tem o modal de equipe)
+        CategoriaSqlRepository categoriaSqlRepository = new CategoriaSqlRepository();
+        ViewBag.Categorias = categoriaSqlRepository.ReadAll();
+        categoriaSqlRepository.Dispose();
+
+        return View("DetalhesFuncionario", tarefa);
+    }
+
+    // tela da tarefa pro cliente: só leitura, mas com tudo da tarefa (equipe, comentários e arquivos)
+    // GET /Tarefa/DetalhesCliente/5
+    public ActionResult DetalhesCliente(int id)
+    {
+        if (HttpContext.Session.GetString("papel") != "cliente") { return Detalhes(id, 0); }
+
+        Tarefa? tarefa = repository.Read(id);
+        repository.Dispose();
+
+        if (tarefa == null)
+        {
+            return NotFound();
+        }
+
+        // tarefa escondida do cliente, ou de projeto de outro cliente: volta pra lista de projetos dele
+        if (!tarefa.Visibilidade || !ProjetoDoCliente(tarefa.IdProjeto))
+        {
+            return RedirectToAction("Index", "Projeto");
+        }
+
+        return View("DetalhesCliente", tarefa);
+    }
+
     // CRUD da tarefa
     // Create, Update e Delete são chamados pelos formulários da tela DetalhesGestor:
     // quando dá certo, redirecionam pra outra tela; quando o banco recusa, voltam pra tela da tarefa com o ViewBag.Erro
@@ -100,16 +236,20 @@ public class TarefaController : Controller
     [HttpPost]
     public ActionResult Create(Tarefa tarefa)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // só gestor e funcionário criam tarefa (o cliente só visualiza)
+        // a tarefa criada pelo funcionário nasce sem equipe: quem monta a equipe é o gestor
+        if (papel != "gestor" && papel != "funcionario") { return Index(tarefa.IdProjeto); }
+
         try
         {
             int codigoTarefa = repository.Create(tarefa);
 
             repository.Dispose();
-            // volta pra tela da própria tarefa recém-criada
-            // o new {id = ...} cria um objeto sem classe que preenche o {id} da rota: vira /Tarefa/DetalhesGestor/15
-            // atenção: o tarefa.Codigo só vem com o código novo se o repository.Create preencher ele depois do insert
-            // (tarefa.Codigo = IdTarefa); sem isso ele continua 0 e abre um formulário de tarefa nova vazio
-            return RedirectToAction("IndexGestor", "Tarefa", new {id = tarefa.IdProjeto});
+            // volta pro kanban do projeto, pela Index, que escolhe a tela do papel de quem está logado
+            // o new {id = ...} cria um objeto sem classe que preenche o {id} da rota: vira /Tarefa/Index/2
+            return RedirectToAction("Index", "Tarefa", new {id = tarefa.IdProjeto});
             // return Json(new {sucesso = resultado});
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui
@@ -118,51 +258,11 @@ public class TarefaController : Controller
         catch (SqlException e)
         {
             // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
-            // quem fecha a conexão é a DetalhesGestor
+            // quem fecha a conexão é a tela de detalhes do papel (chamada pela Detalhes)
             ViewBag.Erro = e.Message;
-            return DetalhesGestor(tarefa.Codigo, tarefa.IdProjeto);
+            return Detalhes(tarefa.Codigo, tarefa.IdProjeto);
             // return Json(new {sucesso = false, erro = e.Message});
         }
-    }
-
-    // busca uma tarefa pelo código, com a categoria e a equipe
-    // GET /Tarefa/Read/5 (o 5 da url cai no parâmetro id, por causa da rota padrão do Program.cs)
-    public ActionResult Read(int id)
-    {
-        // Adicionar try catch depois
-        // o resultado é guardado numa variável pra dar tempo de fechar a conexão antes do return
-        Tarefa? tarefa = repository.Read(id);
-
-        // o repositório devolve null quando não existe tarefa com esse código (ou ela está cancelada)
-        if (tarefa == null)
-        {
-            repository.Dispose();
-            // responde com o status http 404, sem JSON
-            return NotFound();
-        }
-        repository.Dispose();
-        // escrever só "tarefa" é o mesmo que "tarefa = tarefa": a propriedade do JSON pega o nome da variável
-        return Json(new {sucesso = true, tarefa});
-    }
-
-
-    // lista as tarefas de um projeto (sem a equipe de cada uma)
-    // GET /Tarefa/ReadAll/2 (aqui o id da url é o código do PROJETO, não da tarefa)
-    [HttpGet]
-    public ActionResult ReadAll(int id)
-    {
-        // Adicionar try catch depois
-        List<Tarefa> tarefas = repository.ReadAll(id);
-
-        // lista vazia: o projeto não tem tarefa (ou o código do projeto não existe)
-        if (tarefas.Count() == 0)
-        {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = "Nenhuma tarefa encontrada"});
-        }
-        repository.Dispose();
-        // atenção: aqui as tarefas foram encontradas, então o sucesso deveria ser true
-        return Json(new {sucesso = false, tarefas});
     }
 
     // altera uma tarefa que já existe
@@ -172,22 +272,41 @@ public class TarefaController : Controller
     [HttpPost]
     public ActionResult Update(Tarefa tarefa)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // só gestor e funcionário alteram tarefa
+        if (papel != "gestor" && papel != "funcionario") { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
+
+        // a tela do funcionário não tem o modal de equipe (equipe é só do gestor), então a equipe chega vazia no formulário
+        // e o repository.Update apagaria todo mundo da tarefa: por isso a equipe que vale é a que já está no banco
+        if (papel == "funcionario")
+        {
+            Tarefa? atual = repository.Read(tarefa.Codigo);
+
+            if (atual == null)
+            {
+                return Detalhes(tarefa.Codigo, tarefa.IdProjeto);
+            }
+
+            tarefa.Funcionarios = atual.Funcionarios;
+        }
+
         try
         {
             bool resultado = repository.Update(tarefa);
 
             repository.Dispose();
-            // volta pra tela da própria tarefa, já com os dados salvos: /Tarefa/DetalhesGestor/5
+            // volta pra tela da própria tarefa, já com os dados salvos: /Tarefa/Detalhes/5
             // o Codigo chega preenchido porque o formulário da tarefa sempre envia o hidden Codigo
-            return RedirectToAction("DetalhesGestor", "Tarefa", new {id = tarefa.Codigo});
+            return RedirectToAction("Detalhes", "Tarefa", new {id = tarefa.Codigo});
             // return Json(new {sucesso = resultado});
         }
         catch (SqlException e)
         {
             // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
-            // quem fecha a conexão é a DetalhesGestor, depois de buscar a tarefa de novo
+            // quem fecha a conexão é a tela de detalhes do papel, depois de buscar a tarefa de novo
             ViewBag.Erro = e.Message;
-            return DetalhesGestor(tarefa.Codigo, tarefa.IdProjeto);
+            return Detalhes(tarefa.Codigo, tarefa.IdProjeto);
             // return Json(new {sucesso = false, erro = e.Message});
         }
     }
@@ -199,22 +318,44 @@ public class TarefaController : Controller
     [HttpPost]
     public ActionResult Delete(int id, int idProjeto)
     {
+        string? papel = HttpContext.Session.GetString("papel");
+
+        // só gestor e funcionário excluem tarefa
+        if (papel != "gestor" && papel != "funcionario") { return Detalhes(id, idProjeto); }
+
         try
         {
             bool resultado = repository.Delete(id);
 
             repository.Dispose();
-            // volta pro kanban do projeto: /Tarefa/IndexGestor/2
-            return RedirectToAction("IndexGestor", "Tarefa", new {id = idProjeto});
+            // volta pro kanban do projeto, pela Index, que escolhe a tela do papel: /Tarefa/Index/2
+            return RedirectToAction("Index", "Tarefa", new {id = idProjeto});
             // return Json(new {sucesso = resultado});
         }
         catch (SqlException e)
         {
             // volta pra tela da tarefa mostrando o erro (o ViewBag chega porque não tem redirecionamento)
-            // quem fecha a conexão é a DetalhesGestor
+            // quem fecha a conexão é a tela de detalhes do papel
             ViewBag.Erro = e.Message;
-            return DetalhesGestor(id, idProjeto);
+            return Detalhes(id, idProjeto);
             // return Json(new {sucesso = false, erro = e.Message});
         }
+    }
+
+    // ==================== MÉTODOS AUXILIARES ====================
+
+    // confere se o projeto é do cliente logado (mesma regra da DetalhesCliente do ProjetoController)
+    private bool ProjetoDoCliente(int idProjeto)
+    {
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Projeto? projeto = projetoSqlRepository.Read(idProjeto);
+        projetoSqlRepository.Dispose();
+
+        if (projeto == null)
+        {
+            return false;
+        }
+
+        return projeto.Cliente.Codigo == HttpContext.Session.GetInt32("codigo");
     }
 }

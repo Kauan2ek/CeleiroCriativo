@@ -54,11 +54,27 @@
 
             </nav>
 
+            @{
+                // Bloco para verificar qual é o tipo de usuário
+
+            }
             <!-- área de login no canto -->
              <div class="entrar">
                  <!-- link pra tela de entrar -->
-                 <a href="/Home/Entrar">Entrar</a>
-                 <img src="/imagens/Entrar.png" alt="Entrar">
+                @if (Context.Session.GetInt32("codigo") == null)
+                {
+                    <a href="/Usuario/Entrar">Entrar</a>
+                }
+
+                <a href="@( // Se já estiver logado, vai para o perfil, senão vai para a tela de login
+                            Context.Session.GetString("papel") != null 
+                            ? $"/Perfil/{Context.Session.GetString("papel")}" 
+                            : $"/Usuario/Entrar"
+                        )"
+                class="link-perfil">
+                    <img src="/imagens/Entrar.png" alt="Entrar">
+                </a>
+                
 
             </div>
 
@@ -386,7 +402,7 @@
                 <!-- link pra quem já tem conta -->
                 <div class="cadastroentrar">
                      <p>Já tem cadastro?</p>
-                     <a href="/Home/Entrar">Entrar</a>
+                     <a href="/Usuario/Entrar">Entrar</a>
                 </div>
 
             </div>
