@@ -50,7 +50,7 @@
 
 
     <!-- atalho pra cadastrar funcionário -->
-    <a href="/CadastroFuncionario/CadastroFuncionario"
+    <a href="/Funcionario/Criar"
        class="cadastrar-funcionario">
 
         <img src="/imagens/criar_funcionario.png"
@@ -833,9 +833,10 @@
                    name="Descricao"
                    placeholder="@(semEquipe ? "Adicione alguém à equipe para comentar" : "Digite seu comentário...")"
                    autocomplete="off" maxlength="500" required
-                   @* Esse Model.Funcionario.Any procura dentro dos funcionarios se o usuário logado está presente
-                      Só pode enviar comentários se estiver, senão, fica bloqueado o campo de texto
-                    *@
+                   @* 
+                    Esse Model.Funcionario.Any procura dentro dos funcionarios se o usuário logado está presente
+                    Só pode enviar comentários se estiver, senão, fica bloqueado o campo de texto
+                   *@
                    disabled="@(semEquipe || !usuarioNaEquipe)">
             <button type="submit" class="enviar-comentario" disabled="@(semEquipe || !usuarioNaEquipe)">Enviar</button>
         </form>

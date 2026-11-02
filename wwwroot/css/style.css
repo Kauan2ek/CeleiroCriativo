@@ -864,6 +864,48 @@ html {
     75%      { transform: translateX(-3px); }
 }
 
+/* mensagem de sucesso do cadastro (aparece na tela de login) */
+/* mesma caixa da mensagem de erro, mas verde e com bordinha em volta toda */
+.mensagem-sucesso-login {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    padding: 12px 16px;
+    background-color: #ecfdf3;
+    color: #067647;
+    border: 2px solid #17b26a;
+    border-left: 5px solid #17b26a;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    animation: brilho-sucesso 1.6s ease-out 2;
+}
+
+/* bolinha verde com o "✓" */
+.mensagem-sucesso-login .icone-sucesso {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: #17b26a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* brilho verde que sai da borda e se espalha ao redor da caixa (roda 2 vezes) */
+/* a primeira sombra é a mesma do erro, a segunda é o brilho */
+@keyframes brilho-sucesso {
+    0%   { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 0 0 rgba(23, 178, 106, 0.55); }
+    70%  { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 0 10px rgba(23, 178, 106, 0); }
+    100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 0 0 rgba(23, 178, 106, 0); }
+}
+
 
 /* ==================== ÁREA DE CADASTRO ==================== */
 

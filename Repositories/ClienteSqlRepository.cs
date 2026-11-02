@@ -6,6 +6,72 @@ using Microsoft.Data.SqlClient;
 // na criação/edição de um Projeto.
 public class ClienteSqlRepository : DataConnection
 {
+    // Cadastra Pessoa + Cliente e devolve o código gerado.
+    // TODO: implementar (dá pra usar a procedure CadastrarPessoa com @tipo_pessoa = 'CLIENTE').
+    public bool Create(Cliente cliente, Projeto projeto)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = "CadastrarCliente";
+        cmd.Parameters.AddWithValue("@nome", cliente.Nome);
+        cmd.Parameters.AddWithValue("@documento", cliente.Documento);
+        cmd.Parameters.AddWithValue("@tipo_doc", cliente.TipoDocumento);
+        cmd.Parameters.AddWithValue("@email", cliente.Email);
+        cmd.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(cliente.Telefone) ? DBNull.Value : cliente.Telefone);
+        cmd.Parameters.AddWithValue("@senha", cliente.Senha);
+
+        SqlDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
+        {
+            cliente.Codigo = reader.GetInt32("pessoa_codigo");
+            projeto.Cliente = cliente;
+
+            ProjetoSqlRepository repProjeto = new ProjetoSqlRepository();
+            repProjeto.Create(projeto);
+            repProjeto.Dispose();
+        } else
+        {
+            reader.Close();
+            return false;
+        }
+
+        reader.Close();
+        return true;
+    }
+
+    // Altera os dados de Pessoa + Cliente pela procedure AtualizarCliente.
+    // A transação fica dentro da procedure, e a senha em branco mantém a senha atual (COALESCE(NULLIF(@senha, ''), senha)).
+    // A procedure devolve a linha do cliente alterado; se não devolver nada, o Update retorna false.
+    public bool Update(Cliente cliente)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = "AtualizarCliente";
+        cmd.Parameters.AddWithValue("@cliente_codigo", cliente.Codigo);
+        cmd.Parameters.AddWithValue("@nome", cliente.Nome);
+        cmd.Parameters.AddWithValue("@telefone", string.IsNullOrWhiteSpace(cliente.Telefone) ? DBNull.Value : cliente.Telefone);
+        cmd.Parameters.AddWithValue("@documento", cliente.Documento);
+        cmd.Parameters.AddWithValue("@tipo_doc", cliente.TipoDocumento);
+        cmd.Parameters.AddWithValue("@email", cliente.Email);
+        cmd.Parameters.AddWithValue("@codigo_verificacao", cliente.CodigoVerificacao == null ? DBNull.Value : cliente.CodigoVerificacao);
+        cmd.Parameters.AddWithValue("@senha", string.IsNullOrWhiteSpace(cliente.Senha) ? DBNull.Value : cliente.Senha);
+
+        SqlDataReader reader = cmd.ExecuteReader();
+        bool resultado = reader.Read();
+
+        reader.Close();
+        return resultado;
+    }
+
+    // Exclui o cliente. Devolve false se o cliente não existir.
+    // TODO: implementar (decidir entre exclusão física ou lógica; Clientes não tem coluna "ativo").
+    public bool Delete(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     // Lista todos os clientes cadastrados no banco.
     public List<Cliente> ReadAll()
     {
@@ -57,27 +123,6 @@ public class ClienteSqlRepository : DataConnection
         return cliente;
     }
 
-    // Cadastra Pessoa + Cliente e devolve o código gerado.
-    // TODO: implementar (dá pra usar a procedure CadastrarPessoa com @tipo_pessoa = 'CLIENTE').
-    public int Create(Cliente cliente)
-    {
-        throw new NotImplementedException();
-    }
-
-    // Altera os dados de Pessoa + Cliente. Devolve false se o cliente não existir.
-    // TODO: implementar.
-    public bool Update(Cliente cliente)
-    {
-        throw new NotImplementedException();
-    }
-
-    // Exclui o cliente. Devolve false se o cliente não existir.
-    // TODO: implementar (decidir entre exclusão física ou lógica; Clientes não tem coluna "ativo").
-    public bool Delete(int id)
-    {
-        throw new NotImplementedException();
-    }
-
     // Método auxiliar para não repetir a montagem do objeto em todos os SELECTs.
     private Cliente MontarCliente(SqlDataReader reader)
     {
@@ -91,5 +136,21 @@ public class ClienteSqlRepository : DataConnection
         cliente.Email = reader.GetString("email");
         cliente.Senha = reader.IsDBNull("senha") ? null : reader.GetString("senha");
         return cliente;
+    }
+
+    // confere se o e-mail já está em uso por algum cliente OU funcionário
+    // o login procura nas duas tabelas, então o e-mail não pode se repetir em nenhuma delas
+    public bool EmailExiste(string email)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT COUNT(*)
+            FROM (SELECT email FROM Clientes UNION ALL SELECT email FROM Funcionarios) E
+            WHERE E.email = @email
+        ";
+        cmd.Parameters.AddWithValue("@email", email);
+
+        return (int) cmd.ExecuteScalar() > 0;
     }
 }

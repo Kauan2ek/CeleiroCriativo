@@ -29,3 +29,18 @@ Anotado em 19/10/2026. Pontos encontrados na revisão da tela de tarefa que fica
 - **Onde:** `<script src="/js/exibicao_tarefa.js">` e o `<link>` do CSS no `DetalhesGestor.cshtml`.
 - **Por quê:** foi a causa do comentário que "não gravava" (o navegador rodava o JS antigo, com `preventDefault()`).
 - **Correção:** acrescentar `?v=2` no endereço e trocar o número a cada mudança no arquivo.
+
+## 6. Perfil: falta regra de senha (CT-10 / DEF-08 do documento)
+
+Anotado em 02/11/2026.
+
+- **Onde:** `Controllers/PerfilController.cs`, actions `SalvarFuncionario` e `SalvarCliente`, logo depois do `if` que compara `Senha` com `ConfirmarSenha`.
+- **Por quê:** o CT-10 ("Editar perfil com senha inválida") foi reprovado porque o sistema aceitou a senha `123`. Hoje o perfil só confere se a senha e a confirmação são iguais.
+- **Decidir:** qual é o padrão (ex.: mínimo de 6 caracteres, ou mínimo de 8 com letra e número). Lembrar que os usuários de teste usam `123456`.
+- **Aplicar também:** no cadastro do cliente (`ClienteController.Create`) e do funcionário (`FuncionarioController.Salvar`), pra regra ser a mesma em todo lugar.
+
+## 7. Perfil: gestor pode desativar a si mesmo
+
+- **Onde:** `Controllers/PerfilController.cs`, action `Desativar`.
+- **Por quê:** se o único gestor se desativar, ninguém mais consegue entrar como gestor (o login bloqueia `ativo = 0`). Só dá pra reativar direto no banco (`UPDATE Funcionarios SET ativo = 1 WHERE pessoa_codigo = X`).
+- **Decidir:** se o botão Desativar deve sumir do perfil do gestor ou se basta o aviso do `confirm`.

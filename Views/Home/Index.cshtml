@@ -352,52 +352,62 @@
             <div class="formulario">
 
                 <h2>Cadastre-se</h2>
-
-                <!-- nome -->
-                <label for="nome">Nome:</label>
-                <input type="text"
-                       id="nome"
-                       placeholder="Digite seu nome">
-
-
-                <!-- telefone -->
-                <label for="telefone">Telefone:</label>
-                <input type="tel"
-                       id="telefone"
-                       placeholder="(99) 99999-9999">
+                <form action="/Cliente/Create" method="post">
+                    <!-- nome -->
+                    <label for="nome">Nome:</label>
+                    <input type="text"
+                        id="nome"
+                        name="Nome"
+                        placeholder="Digite seu nome"
+                        required>
 
 
-                <!-- email -->
-                <label for="email">Email:</label>
-                <input type="email"
-                       id="email"
-                       placeholder="exemplo@email.com">
+                    <!-- telefone -->
+                    <label for="telefone">Telefone:</label>
+                    <input type="tel"
+                        id="telefone"
+                        name="Telefone"
+                        placeholder="(99) 99999-9999">
 
 
-                <!-- cpf ou cnpj -->
-                <label for="documento">CPF ou CNPJ:</label>
-                <input type="text"
-                       id="documento"
-                       placeholder="Digite seu CPF ou CNPJ">
+                    <!-- email -->
+                    <label for="email">Email:</label>
+                    <input type="email"
+                        id="email"
+                        name="Email"
+                        placeholder="exemplo@email.com"
+                        required>
 
 
-                <!-- senha -->
-                <label for="senha">Senha:</label>
-                <input type="password"
-                       id="senha"
-                       placeholder="Digite sua senha">
+                    <!-- cpf ou cnpj -->
+                    <label for="documento">CPF ou CNPJ:</label>
+                    <input type="text"
+                        id="documento"
+                        name="Documento"
+                        placeholder="Digite seu CPF ou CNPJ"
+                        required>
 
 
-                <!-- campo pra contar a ideia do projeto -->
-                <label for="ideia">Ideia:</label>
-                <textarea id="ideia"
-                          placeholder="Conte sua ideia..."></textarea>
+                    <!-- senha -->
+                    <label for="senha">Senha:</label>
+                    <input type="password"
+                        id="senha"
+                        name="Senha"
+                        placeholder="Digite sua senha"
+                        required>
 
 
-                <!-- botão que chama a função cadastrar() do js -->
-                <button type="button" onclick="cadastrar()">
-                    Cadastrar
-                </button>
+                    <!-- campo pra contar a ideia do projeto -->
+                    <label for="ideia">Ideia:</label>
+                    <textarea id="ideia"
+                            name="Ideia"
+                            placeholder="Conte sua ideia..."
+                            required></textarea>
+
+                
+                    <!-- botão que chama a função cadastrar() do js -->
+                    <button type="submit">Cadastrar</button>
+                </form>
 
                 <!-- link pra quem já tem conta -->
                 <div class="cadastroentrar">

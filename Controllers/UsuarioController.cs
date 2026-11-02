@@ -20,6 +20,7 @@ public class UsuarioController : Controller
     public ActionResult Entrar(Usuario model)
     {
         Usuario? usuario = repository.Entrar(model);
+        repository.Dispose();
 
         if (usuario == null)
         {

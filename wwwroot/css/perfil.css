@@ -137,6 +137,34 @@ body {
     border-color: #777777;
 }
 
+/* campos bloqueados (documento e cargo) ficam acinzentados */
+.campo-perfil input:disabled {
+    background-color: #eeeeee;
+    color: #777777;
+    cursor: not-allowed;
+}
+
+
+/* ==================== MENSAGENS ==================== */
+
+/* mensagens de sucesso e erro do Salvar/Desativar (mesmo visual da tela de projeto) */
+.mensagem-crud {
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-crud.sucesso {
+    background-color: #dff4d5;
+    border: 1px solid #9fd28d;
+}
+
+.mensagem-crud.erro {
+    background-color: #ffdede;
+    border: 1px solid #e5a5a5;
+}
+
 
 /* ==================== BOTÕES ==================== */
 

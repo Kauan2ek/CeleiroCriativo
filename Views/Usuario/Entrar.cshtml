@@ -52,6 +52,17 @@
             <!-- linha decorativa embaixo do título -->
             <div class="linha-titulo"></div>
 
+            <!-- mensagem de sucesso do cadastro do cliente -->
+            <!-- só aparece quando o ClienteController preenche o ViewBag.Sucesso -->
+            @if (ViewBag.Sucesso != null)
+            {
+                <div class="mensagem-sucesso-login">
+                    <span class="icone-sucesso">✓</span>
+                    <span>@ViewBag.Sucesso</span>
+                    <br>
+                </div>
+            }
+
             <!-- mensagem de erro do login (email ou senha incorreta) -->
             <!-- só aparece quando o UsuarioController preenche o ViewBag.Erro -->
             @if (ViewBag.Erro != null)
@@ -96,34 +107,6 @@
                 </button>
 
             </form>
-
-
-            <!-- ==================== TESTE DE USUÁRIOS ==================== -->
-
-            <!-- atalhos só pra testar as telas de cada tipo de usuário -->
-          <div class="entrar-como">
-
-                <p>Entrar como:</p>
-
-                <!-- botão que entra direto como gestor -->
-                <button type="button"
-                        onclick="window.location.href='/Projeto/IndexGestor'">
-                    Gestor
-                </button>
-
-                <!-- botão que entra direto como funcionário -->
-                <button type="button"
-                        onclick="window.location.href='/Projeto/FuncionarioProjeto'">
-                    Funcionário
-                </button>
-
-                <!-- botão que entra direto como cliente -->
-                <button type="button"
-                        onclick="window.location.href='/Projeto/ClienteProjeto'">
-                    Cliente
-                </button>
-
-            </div>
 
             <!-- link pra quem ainda não tem conta -->
             <div class="entrarcadastro">

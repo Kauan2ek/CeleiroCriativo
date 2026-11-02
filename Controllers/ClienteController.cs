@@ -26,84 +26,54 @@ public class ClienteController : Controller
     // o parâmetro "cliente" é montado sozinho pelo asp.net (model binding):
     // ex: Nome=Café Aurora, Documento=11.111.111/0001-11, TipoDocumento=cnpj, Email=contato@cafe.com
     [HttpPost]
-    public ActionResult Create(Cliente cliente)
+    public ActionResult Create(Cliente cliente, string ideia)
     {
         try
         {
-            int codigoCliente = repository.Create(cliente);
+            if (repository.EmailExiste(cliente.Email))
+            {
+                repository.Dispose();
+                ViewBag.Erro = "Este e-mail já está cadastrado. Entre com ele ou use outro e-mail.";
+                return View("~/Views/Usuario/Entrar.cshtml");
+            }
+
+            // Limpar o documento (deixar só números)
+            cliente.Documento = cliente.Documento.Replace(".", "").Replace("-", "")
+                                                 .Replace("/", "").Replace(" ", "");
+            cliente.TipoDocumento = cliente.Documento.Length > 11 ? "cnpj" : "cpf";
+
+            // Montando o projeto
+            Projeto projeto = new Projeto
+            {
+                Titulo = "Aguardando aprovação...",
+                Descricao = ideia,
+                DataInicio = null,
+                DataFim = null,
+                DataPrevista = null,
+                Status = {Codigo=1, Descricao="Em Análise"},
+                tarefas = new List<Tarefa>(),
+                Cliente = cliente
+            };
+ 
+            repository.Create(cliente, projeto);
+            
 
             repository.Dispose();
             // return Json(new {sucesso = true, codigo = codigoCliente});
-            return View();
+            ViewBag.Sucesso = "Cadastro realizado com sucesso! Sua ideia já foi enviada para análise. Entre para acompanhar seu projeto.";
+            return View("~/Views/Usuario/Entrar.cshtml");
         }
         // se o banco recusar o comando, o repositório lança SqlException e ela "sobe" até aqui
         // o e.Message traz a mensagem do SQL Server explicando o que deu errado
         catch (SqlException e)
         {
             repository.Dispose();
-            return Json(new {sucesso = false, erro = e.Message});
+            ViewBag.Erro = "Não foi possível concluir o cadastro. Verifique se o CPF/CNPJ já não está cadastrado.";
+            return View("~/Views/Usuario/Entrar.cshtml");
         }
     }
 
-    // busca um cliente pelo código
-    // GET /Cliente/Read/6 (o 6 da url cai no parâmetro id, por causa da rota padrão do Program.cs)
-    public ActionResult Read(int id)
-    {
-        // Adicionar try catch depois
-        // o resultado é guardado numa variável pra dar tempo de fechar a conexão antes do return
-        Cliente? cliente = repository.Read(id);
-
-        // o repositório devolve null quando não existe cliente com esse código
-        if (cliente == null)
-        {
-            repository.Dispose();
-            // responde com o status http 404, sem JSON
-            return NotFound();
-        }
-        repository.Dispose();
-        return Json(new {sucesso = true, cliente});
-    }
-
-    // lista todos os clientes
-    // GET /Cliente/ReadAll
-    [HttpGet]
-    public ActionResult ReadAll()
-    {
-        // Adicionar try catch depois
-        List<Cliente> clientes = repository.ReadAll();
-
-        // lista vazia: nenhum cliente cadastrado
-        if (clientes.Count() == 0)
-        {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = "Nenhum cliente encontrado"});
-        }
-        repository.Dispose();
-        return Json(new {sucesso = true, clientes});
-    }
-
-    // altera um cliente que já existe
-    // POST /Cliente/Update
-    // recebe os mesmos campos do Create, mais o Codigo do cliente que vai ser alterado
-    // o resultado volta false quando não existe cliente com esse código
-    [HttpPost]
-    public ActionResult Update(Cliente cliente)
-    {
-        try
-        {
-            bool resultado = repository.Update(cliente);
-
-            repository.Dispose();
-            return Json(new {sucesso = resultado});
-        }
-        catch (SqlException e)
-        {
-            repository.Dispose();
-            return Json(new {sucesso = false, erro = e.Message});
-        }
-    }
-
-    // exclui um cliente
+    // exclui um cliente // Atualmente não está implementado
     // POST /Cliente/Delete/6
     // atenção: cliente com projeto não pode ser apagado (FK_Projetos_Cliente), aí o banco recusa e cai no catch
     [HttpPost]
