@@ -2,12 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 // CRUD de Funcionário utilizado pelo Gestor.
+// toda action começa conferindo o papel da sessão: quem não é gestor (ou não está logado) volta pra Projeto/Index,
+// que manda cada papel pra sua tela (ou pro login)
+// o if vem antes de criar o repositório, assim a conexão nem chega a ser aberta
 public class FuncionarioController : Controller
 {
     // Lista os funcionários ativos.
     [HttpGet]
     public ActionResult IndexGestor()
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return RedirectToAction("Index", "Projeto"); }
+
         FuncionarioSqlRepository repository = new FuncionarioSqlRepository();
         List<Funcionario> funcionarios = repository.ReadAll();
         repository.Dispose();
@@ -19,6 +24,8 @@ public class FuncionarioController : Controller
     [HttpGet]
     public ActionResult Criar()
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return RedirectToAction("Index", "Projeto"); }
+
         CarregarCargos();
         ViewBag.ModoEdicao = false;
         return View(new Funcionario());
@@ -28,6 +35,8 @@ public class FuncionarioController : Controller
     [HttpGet]
     public ActionResult Editar(int id)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return RedirectToAction("Index", "Projeto"); }
+
         FuncionarioSqlRepository repository = new FuncionarioSqlRepository();
         Funcionario? funcionario = repository.Read(id);
         repository.Dispose();
@@ -46,6 +55,8 @@ public class FuncionarioController : Controller
     [HttpPost]
     public ActionResult Salvar(Funcionario funcionario, int CargoCodigo, string? ConfirmarSenha)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return RedirectToAction("Index", "Projeto"); }
+
         bool editando = funcionario.Codigo > 0;
 
         if (string.IsNullOrWhiteSpace(funcionario.Nome) ||
@@ -115,6 +126,8 @@ public class FuncionarioController : Controller
     [HttpPost]
     public ActionResult Excluir(int id)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return RedirectToAction("Index", "Projeto"); }
+
         FuncionarioSqlRepository repository = new FuncionarioSqlRepository();
         bool resultado = repository.Delete(id);
         repository.Dispose();

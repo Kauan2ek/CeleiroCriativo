@@ -961,16 +961,16 @@ INSERT INTO Categorias (descricao, cor) VALUES
     ('Vídeo',           '#D0021B'),   -- 3
     ('Redação',         '#F5A623'),   -- 4
     ('Revisão',         '#9013FE');   -- 5
-
+    
 INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha) VALUES
-    (1, 1, 1, 'helena@celeirocriativo.com',  '123456'),   -- Gestor
-    (2, 2, 1, 'rafael@celeirocriativo.com',  '123456'),   -- Designer
+    (1, 1, 1, 'gestor@celeirocriativo.com',  '123456'),   -- Gestor
+    (2, 2, 1, 'funcionario@celeirocriativo.com',  '123456'),   -- Designer
     (3, 3, 1, 'bruno@celeirocriativo.com',   '123456'),   -- Programador
     (4, 4, 1, 'larissa@celeirocriativo.com', '123456'),   -- Editor de Vídeo
     (5, 5, 1, 'tiago@celeirocriativo.com',   '123456');   -- Redator
 
 INSERT INTO Clientes (pessoa_codigo, codigo_verificacao, email, senha) VALUES
-    (6,  'A1B2C3', 'contato@cafeaurora.exemplo.com',    '123456'),
+    (6,  'A1B2C3', 'cliente@gmail.com',    '123456'),
     (7,  'D4E5F6', 'contato@ecoverde.exemplo.com',      '123456'),
     (8,  'G7H8I9', 'contato@tecnova.exemplo.com',       '123456'),
     (9,  'J1K2L3', 'contato@floresdocampo.exemplo.com', '123456'),

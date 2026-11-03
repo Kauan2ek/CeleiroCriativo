@@ -112,6 +112,8 @@ public class ProjetoController : Controller
     [HttpPost]
     public ActionResult Create(Projeto projeto)
     {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return Index();}
+
         try
         {
             int codigoProjeto = repository.Create(projeto);
