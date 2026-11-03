@@ -58,3 +58,5 @@ secrets.json
 
 # Arquivos enviados pelo upload das tarefas
 wwwroot/uploads/
+
+Anotações/documentacao.pdf
