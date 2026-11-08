@@ -806,6 +806,53 @@ html {
     box-sizing: border-box;
 }
 
+/* div que segura o input de senha + o olhinho */
+.campo-senha {
+    position: relative;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+/* o espaçamento agora fica na div, e sobra espaço à direita pro olhinho */
+.caixa-login .campo-senha input {
+    flex: 1;
+    margin-bottom: 0;
+    padding-right: 44px;
+}
+
+/* botão do olhinho, por cima do canto direito do input */
+/* usa .caixa-login na frente pra vencer o estilo de .caixa-login button (o botão escuro) */
+.caixa-login .botao-olho {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 32px;
+    width: 32px;
+    margin: 0;
+    padding: 0;
+    background: none;
+    color: #555;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.caixa-login .botao-olho:hover {
+    background-color: #eee;
+    color: #222;
+}
+
+/* risco do olho: escondido por padrão, aparece quando a senha está visível */
+.botao-olho .risco-olho {
+    display: none;
+}
+
+.botao-olho.senha-visivel .risco-olho {
+    display: inline;
+}
+
 /* botão principal escuro */
 .caixa-login button {
     height: 44px;

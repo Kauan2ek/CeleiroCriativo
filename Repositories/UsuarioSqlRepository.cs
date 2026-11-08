@@ -69,4 +69,62 @@ public class UsuarioSqlRepository : DataConnection
         reader.Close();
         return usuarioRetorno; 
     }
+
+    public void GerarCodigo(string email)
+    {
+        Random rnd = new Random();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"UPDATE Clientes SET codigo_verificacao = @codigoVerificacao WHERE email = @email";
+        cmd.Parameters.AddWithValue("codigoVerificacao", rnd.Next(100000, 1000000));
+        cmd.Parameters.AddWithValue("email", email);
+
+        cmd.ExecuteNonQuery();
+    }
+
+    public bool ValidarCodigo (string codigo, string email)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"SELECT COUNT(*)
+            FROM (SELECT codigo_verificacao, email FROM Clientes) C
+            WHERE C.codigo_verificacao = @codigoVerificacao AND C.email = @email";
+        cmd.Parameters.AddWithValue("codigoVerificacao", codigo);
+        cmd.Parameters.AddWithValue("email", email);
+
+        if ((int) cmd.ExecuteScalar() > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool RedefinirSenha (string email, string senha)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"UPDATE Clientes SET senha = @senha, codigo_verificacao = NULL WHERE email = @email";
+        cmd.Parameters.AddWithValue("email", email);
+        cmd.Parameters.AddWithValue("senha", senha);
+
+        if (cmd.ExecuteNonQuery() > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool EmailExiste(string email)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT COUNT(*)
+            FROM Clientes
+            WHERE email = @email
+        ";
+        cmd.Parameters.AddWithValue("@email", email);
+
+        return (int) cmd.ExecuteScalar() > 0;
+    }
 }

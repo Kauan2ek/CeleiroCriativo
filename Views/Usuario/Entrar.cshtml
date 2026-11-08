@@ -94,13 +94,35 @@
                     Senha
                 </label>
 
-                <input
-                    type="password"
-                    id="senha"
-                    name="Senha"
-                    required
-                    placeholder="Digite sua senha"
-                >
+                <!-- div que segura o campo + o olhinho por cima dele -->
+                <div class="campo-senha">
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="Senha"
+                        required
+                        placeholder="Digite sua senha"
+                    >
+
+                    <!-- botão do olhinho: type="button" pra NÃO enviar o form ao clicar -->
+                    <button type="button"
+                            class="botao-olho"
+                            onclick="mostrarSenha(this)"
+                            aria-label="Mostrar senha">
+
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <!-- risco que aparece quando a senha está visível -->
+                            <line class="risco-olho" x1="3" y1="3" x2="21" y2="21"></line>
+                        </svg>
+
+                    </button>
+
+                </div>
 
                 <!-- botão entrar, por enquanto só redireciona pro gestor -->
                 <!-- ainda não tem validação de login de verdade -->
@@ -114,6 +136,15 @@
             <div class="entrarcadastro">
 
                 <p>
+                    Esqueceu a senha?
+                </p>
+
+                <!-- manda pra seção de cadastro na home -->
+                <a href="/Usuario/Recuperar/">
+                    Recuperar senha
+                </a>
+
+                <p>
                     Ainda não tem cadastro?
                 </p>
 
@@ -122,12 +153,34 @@
                     Cadastre-se
                 </a>
 
+
             </div>
 
 
         </div>
 
     </main>
+
+
+    <script>
+        // alterna o campo de senha entre escondido (password) e visível (text)
+        function mostrarSenha(botao) {
+
+            // o input fica logo antes do botão, dentro da div .campo-senha
+            const campo = botao.previousElementSibling;
+
+            if (campo.type === "password") {
+                campo.type = "text";
+                botao.classList.add("senha-visivel");
+                botao.setAttribute("aria-label", "Esconder senha");
+            } else {
+                campo.type = "password";
+                botao.classList.remove("senha-visivel");
+                botao.setAttribute("aria-label", "Mostrar senha");
+            }
+
+        }
+    </script>
 
 </body>
 

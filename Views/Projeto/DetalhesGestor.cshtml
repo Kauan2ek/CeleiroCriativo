@@ -152,7 +152,9 @@
                             <input type="date"
                                    id="dataInicio"
                                    name="DataInicio"
-                                   value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")">
+                                   value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")"
+                                   @(Model.Codigo == 0 ? "disable" : "")
+                                   >
                         </div>
                     </div>
 

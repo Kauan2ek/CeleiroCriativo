@@ -1,0 +1,193 @@
+@model string
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <!-- codificação de caracteres, pra acentos funcionarem -->
+    <meta charset="UTF-8">
+
+    <!-- garante que a página se adapte ao tamanho da tela -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- título que aparece na aba do navegador -->
+    <title>Recuperação de senha</title>
+
+    <!-- ícone que aparece na aba -->
+    <link rel="icon"
+          type="image/png"
+          href="/imagens/logo.png">
+
+    <!-- css principal do site -->
+    <link rel="stylesheet"
+          href="/css/style.css">
+
+</head>
+
+
+<body>
+
+    <!-- container principal da tela de login -->
+    <main class="tela-entrar">
+
+        <div class="caixa-login">
+
+
+            <!-- botão de voltar pra home -->
+
+            <div class="voltar-home">
+
+                <a href="/Usuario/Recuperar">
+
+                    <img src="/imagens/voltar.png"
+                         alt="Voltar para a página inicial">
+
+                </a>
+
+            </div>
+
+
+            <h1>Recuperação de senha</h1>
+
+            <!-- linha decorativa embaixo do título -->
+            <div class="linha-titulo"></div>
+
+            <!-- mensagem de sucesso do cadastro do cliente -->
+            <!-- só aparece quando o ClienteController preenche o ViewBag.Sucesso -->
+            @if (ViewBag.Sucesso != null)
+            {
+                <div class="mensagem-sucesso-login">
+                    <span class="icone-sucesso">✓</span>
+                    <span>@ViewBag.Sucesso</span>
+                    <br>
+                </div>
+            }
+
+            <!-- mensagem de erro do login (email ou senha incorreta) -->
+            <!-- só aparece quando o UsuarioController preenche o ViewBag.Erro -->
+            @if (ViewBag.Erro != null)
+            {
+                <div class="mensagem-erro-login">
+                    <span class="icone-erro">!</span>
+                    <span>@ViewBag.Erro</span>
+                </div>
+            }
+
+
+            <!-- form de login -->
+            <form action="@(Model == null ? "/Usuario/Recuperar" : "/Usuario/RedefinirSenha")" method="post">
+
+                <label for="email">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="Digite seu e-mail"
+                    value="@(Model)"
+                >
+
+                @* Terminar a confirmação de senha *@
+                @if (Model != null)
+                {
+                    <label for="recuperacao">Código de verificação</label>
+                    <input
+                        type="text"
+                        id="recuperacao"
+                        name="codigoVerificacao"
+                        required
+                        placeholder="Digite o código de verificação"
+                    >
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <!-- div que segura o campo + o olhinho por cima dele -->
+                    <div class="campo-senha">
+
+                        <input
+                            type="password"
+                            id="senha"
+                            name="Senha"
+                            required
+                            placeholder="Digite a nova sua senha"
+                        >
+
+                        <!-- botão do olhinho: type="button" pra NÃO enviar o form ao clicar -->
+                        <button type="button"
+                                class="botao-olho"
+                                onclick="mostrarSenha(this)"
+                                aria-label="Mostrar senha">
+
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <!-- risco que aparece quando a senha está visível -->
+                                <line class="risco-olho" x1="3" y1="3" x2="21" y2="21"></line>
+                            </svg>
+
+                        </button>
+
+                    </div>
+                }
+
+                <!-- botão entrar, por enquanto só redireciona pro gestor -->
+                <!-- ainda não tem validação de login de verdade -->
+                <button type="submit">
+                    @(Model == null ? "Enviar código" : "Confirmar")
+                </button>
+
+            </form>
+
+            <!-- link pra quem ainda não tem conta -->
+            <div class="entrarcadastro">
+
+                <p>
+                    Não sabe qual é o código?
+                </p>
+
+                <!-- manda pra seção de cadastro na home -->
+                <a style="text-decoration: none;">
+                    Entre em contato com o gestor para consegui-lo
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+    <script>
+        // alterna o campo de senha entre escondido (password) e visível (text)
+        function mostrarSenha(botao) {
+
+            // o input fica logo antes do botão, dentro da div .campo-senha
+            const campo = botao.previousElementSibling;
+
+            if (campo.type === "password") {
+                campo.type = "text";
+                botao.classList.add("senha-visivel");
+                botao.setAttribute("aria-label", "Esconder senha");
+            } else {
+                campo.type = "password";
+                botao.classList.remove("senha-visivel");
+                botao.setAttribute("aria-label", "Mostrar senha");
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>

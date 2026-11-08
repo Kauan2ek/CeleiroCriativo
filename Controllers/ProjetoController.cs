@@ -50,7 +50,7 @@ public class ProjetoController : Controller
     // GET /Projeto/DetalhesGestor (sem id, o id fica 0 e abre o formulário de projeto novo)
     public ActionResult DetalhesGestor(int id)
     {
-        if (HttpContext.Session.GetString("papel") != "gestor") { return Index();}
+        if (HttpContext.Session.GetString("papel") != "gestor") { return Index(); }
         // projeto novo: o objeto vazio só carrega o status inicial
         // um projeto criado pelo gestor começa como "Em andamento" (o código é buscado pela descrição no banco)
         Projeto? projeto = new Projeto();
@@ -141,7 +141,15 @@ public class ProjetoController : Controller
     [HttpPost]
     public ActionResult Update(Projeto projeto)
     {
-        if (HttpContext.Session.GetString("papel") != "gestor") { return Index();}
+        if (HttpContext.Session.GetString("papel") != "gestor") {
+            ViewBag.Erro = "Você não tem permissão para acessar essa página!"; 
+            return Index();
+        }
+
+        // Validações
+        if (projeto.Titulo == "Aguardando aprovação..." || projeto.Titulo == "") { ViewBag.Erro = "Altere o título do projeto!"; }
+        if (projeto.DataInicio > projeto.DataFim)      { ViewBag.Erro = "A data de término não pode ser maior que a de início";  }
+        if (projeto.DataInicio > projeto.DataPrevista) { ViewBag.Erro = "A data prevista não pode ser maior que a de início";    }
 
         try
         {

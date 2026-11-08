@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 
 public class UsuarioController : Controller
@@ -12,6 +13,12 @@ public class UsuarioController : Controller
     // Página de entrar
     // renderiza o formulário de login
     public ActionResult Entrar()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public ActionResult Recuperar()
     {
         return View();
     }
@@ -40,5 +47,38 @@ public class UsuarioController : Controller
     {
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    public ActionResult Recuperar(string email)
+    {
+        if (!repository.EmailExiste(email))
+        {
+            ViewBag.Erro = "Este e-mail não está cadastrado.";
+            repository.Dispose();
+            return View("Recuperar");
+        }
+        repository.GerarCodigo(email);
+        repository.Dispose();
+
+        return View("Recuperar", email);
+    }
+
+    [HttpPost]
+    public ActionResult RedefinirSenha(string codigoVerificacao, string email, string senha)
+    {
+        if (repository.ValidarCodigo(codigoVerificacao, email))
+        {
+            repository.RedefinirSenha(email, senha);
+        } else
+        {
+            ViewBag.Erro = "Código de verificação incorreto!";
+            repository.Dispose();
+            return View("Recuperar", email);
+        }
+        repository.Dispose();
+        ViewBag.Sucesso = "Senha alterada! Entre com sua nova senha.";
+
+        return View("Entrar");
     }
 }
