@@ -1313,6 +1313,12 @@ body {
     border: 1px solid #e5a5a5;
 }
 
+/* aviso de tarefa travada (finalizada ou de projeto finalizado): mesmo formato, em azul */
+.mensagem-crud.aviso {
+    background-color: #deebff;
+    border: 1px solid #a5c3e5;
+}
+
 /* aviso no lugar dos comentários quando a tarefa ainda não foi salva (mesmo visual do aviso de tarefas do projeto) */
 .aviso-comentarios-tarefa {
     margin-top: 10px;

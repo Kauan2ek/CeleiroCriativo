@@ -5,6 +5,11 @@
     bool novoProjeto = Model.Codigo == 0;
     bool emAnalise = !novoProjeto && Model.Status.Descricao == "Em análise";
 
+    // trava da regra de negócio: projeto finalizado ou em análise não pode ser alterado
+    // (projeto novo nasce "Em andamento", então fica editável)
+    // usado no disabled dos campos e pra esconder o botão Salvar
+    bool editavel = !emAnalise && Model.Status.Descricao != "Finalizado";
+
     string statusClasse = "analise";
     if (Model.Status.Descricao == "Em andamento")
     {
@@ -60,6 +65,12 @@
             <div class="mensagem-crud erro">@ViewBag.Erro</div>
         }
 
+        <!-- aviso de projeto travado (azul): o ViewBag.Aviso vem da DetalhesGestor do ProjetoController -->
+        @if (ViewBag.Aviso != null)
+        {
+            <div class="mensagem-crud aviso">@ViewBag.Aviso</div>
+        }
+
         <!-- projeto novo (Codigo 0) envia pro Create; projeto existente envia pro Update -->
         <!-- os nomes dos campos são os nomes das propriedades da model Projeto (model binding) -->
         <form method="post" action=@(Model.Codigo == 0 ? "/Projeto/Create" : "/Projeto/Update")>
@@ -78,7 +89,7 @@
                 <div class="situacao @statusClasse" id="containerSituacao">
                     <span>Situação:</span>
                     <!-- name="Status.Codigo" preenche o projeto.Status.Codigo no Create/Update -->
-                    <select id="situacaoProjeto" name="Status.Codigo">
+                    <select id="situacaoProjeto" name="Status.Codigo" disabled="@(!editavel)">
                         @foreach (Status status in ViewBag.StatusList)
                         {
                             if (Model.Status.Codigo == status.Codigo)
@@ -107,7 +118,8 @@
                                    value="@Model.Titulo"
                                    maxlength="50"
                                    required
-                                   placeholder="Título do Projeto">
+                                   placeholder="Título do Projeto"
+                                   disabled="@(!editavel)">
                             <img src="/imagens/editar.png" alt="Editar">
                         </div>
                     </div>
@@ -116,7 +128,7 @@
                         <label for="clienteProjeto">Cliente</label>
                         <div class="campo-com-icone">
                             <!-- name="Cliente.Codigo" preenche o projeto.Cliente.Codigo no Create/Update -->
-                            <select id="clienteProjeto" name="Cliente.Codigo" required>
+                            <select id="clienteProjeto" name="Cliente.Codigo" required disabled="@(!editavel)">
                                 <option value="">Selecione o cliente</option>
                                 @foreach (Cliente cliente in ViewBag.Clientes)
                                 {
@@ -138,7 +150,8 @@
                         <div class="campo-texto">
                             <textarea id="descricaoProjeto"
                                       name="Descricao"
-                                      placeholder="Descreva o projeto...">@Model.Descricao</textarea>
+                                      placeholder="Descreva o projeto..."
+                                      disabled="@(!editavel)">@Model.Descricao</textarea>
                             <img src="/imagens/editar.png" alt="Editar">
                         </div>
                     </div>
@@ -154,6 +167,7 @@
                                    name="DataInicio"
                                    value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")"
                                    @(Model.Codigo == 0 ? "disable" : "")
+                                   disabled="@(!editavel)"
                                    >
                         </div>
                     </div>
@@ -164,7 +178,8 @@
                             <input type="date"
                                    id="previsaoTermino"
                                    name="DataPrevista"
-                                   value="@(Model.DataPrevista.HasValue ? Model.DataPrevista.Value.ToString("yyyy-MM-dd") : "")">
+                                   value="@(Model.DataPrevista.HasValue ? Model.DataPrevista.Value.ToString("yyyy-MM-dd") : "")"
+                                   disabled="@(!editavel)">
                         </div>
                     </div>
 
@@ -174,7 +189,8 @@
                             <input type="date"
                                    id="dataEntrega"
                                    name="DataFim"
-                                   value="@(Model.DataFim.HasValue ? Model.DataFim.Value.ToString("yyyy-MM-dd") : "")">
+                                   value="@(Model.DataFim.HasValue ? Model.DataFim.Value.ToString("yyyy-MM-dd") : "")"
+                                   disabled="@(!editavel)">
                         </div>
                     </div>
                 </section>
@@ -241,11 +257,15 @@
                 O botão está dentro do próprio formulário, por isso basta usar
                 type="submit". Não é necessário informar o atributo form.
             -->
-            <div class="acoes-projeto">
-                <button type="submit" class="botao-salvar">
-                    @(novoProjeto ? "Criar Projeto" : "Salvar Alterações")
-                </button>
-            </div>
+            <!-- projeto travado (editavel = false): o botão Salvar nem aparece -->
+            @if (editavel)
+            {
+                <div class="acoes-projeto">
+                    <button type="submit" class="botao-salvar">
+                        @(novoProjeto ? "Criar Projeto" : "Salvar Alterações")
+                    </button>
+                </div>
+            }
         </form>
 
         <!-- ==================== AÇÕES FORA DO FORM PRINCIPAL ==================== -->

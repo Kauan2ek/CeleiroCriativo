@@ -731,6 +731,12 @@ body {
     border: 1px solid #e5a5a5;
 }
 
+/* aviso de projeto travado (finalizado ou em análise): mesmo formato, em azul */
+.mensagem-crud.aviso {
+    background-color: #deebff;
+    border: 1px solid #a5c3e5;
+}
+
 /* Select de cliente usa o mesmo visual dos inputs. */
 #clienteProjeto {
     width: 100%;

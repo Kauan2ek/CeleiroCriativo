@@ -150,6 +150,23 @@ public class TarefaController : Controller
         CategoriaSqlRepository categoriaSqlRepository = new CategoriaSqlRepository();
         ViewBag.Categorias = categoriaSqlRepository.ReadAll();
         categoriaSqlRepository.Dispose();
+
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(tarefa.IdProjeto); 
+        projetoSqlRepository.Dispose();
+
+        ViewBag.StatusProjeto = statusProjeto?.Descricao;
+
+        if (statusProjeto?.Descricao == "Finalizado")
+        {
+            ViewBag.Aviso = "Não é possível editar tarefa com projeto finalizado.";
+        } 
+        
+        if (tarefa.Status == "Finalizado")
+        {
+            ViewBag.Aviso = "Não é possível editar tarefa finalizada.";
+        }
+
         // entrega a tarefa pra view, que acessa ela pelo @Model (por isso o "@model Tarefa" no topo do cshtml)
         // o nome da view vai escrito porque essa action também é chamada pelo catch do Create, Update e Delete:
         // sem o nome, o asp.net procuraria uma view com o nome da action que chamou (ex: Update.cshtml)
@@ -192,6 +209,25 @@ public class TarefaController : Controller
         CategoriaSqlRepository categoriaSqlRepository = new CategoriaSqlRepository();
         ViewBag.Categorias = categoriaSqlRepository.ReadAll();
         categoriaSqlRepository.Dispose();
+
+        // mesma trava da DetalhesGestor: tarefa finalizada, ou de projeto finalizado, abre só pra leitura
+        // usa o tarefa.IdProjeto (vem do banco), porque o idProjeto da url chega 0 quando a tela abre por /Tarefa/DetalhesFuncionario/5
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(tarefa.IdProjeto);
+        projetoSqlRepository.Dispose();
+
+        // a view usa esse valor pra montar o bool editavel
+        ViewBag.StatusProjeto = statusProjeto?.Descricao;
+
+        if (statusProjeto?.Descricao == "Finalizado")
+        {
+            ViewBag.Aviso = "Não é possível editar tarefa com projeto finalizado.";
+        }
+
+        if (tarefa.Status == "Finalizado")
+        {
+            ViewBag.Aviso = "Não é possível editar tarefa finalizada.";
+        }
 
         return View("DetalhesFuncionario", tarefa);
     }
@@ -290,6 +326,26 @@ public class TarefaController : Controller
 
             tarefa.Funcionarios = atual.Funcionarios;
         }
+
+        // trava da regra de negócio: tarefa finalizada, ou de projeto finalizado, não pode ser alterada
+        // a tela já esconde o botão Salvar nesses casos, mas a conferência aqui impede que o formulário seja enviado mesmo assim
+        // o status conferido é o que está NO BANCO (tarefaBanco), e não o que veio do formulário (tarefa):
+        // senão o próprio ato de mudar a tarefa pra "Finalizado" e clicar em Salvar seria bloqueado
+        Tarefa? tarefaBanco = repository.Read(tarefa.Codigo);
+
+        if (tarefaBanco == null)
+        {
+            return Detalhes(tarefa.Codigo, tarefa.IdProjeto);
+        }
+
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(tarefaBanco.IdProjeto);
+        projetoSqlRepository.Dispose();
+
+        if (statusProjeto?.Descricao == "Finalizado") { ViewBag.Erro = "Não é possível alterar tarefa de projeto finalizado."; }
+        if (tarefaBanco.Status == "Finalizado")       { ViewBag.Erro = "Não é possível alterar uma tarefa finalizada.";        }
+        // não dá Dispose antes de voltar: quem fecha a conexão é a tela de detalhes do papel (ela usa o mesmo repository)
+        if (ViewBag.Erro is not null) { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
 
         try
         {

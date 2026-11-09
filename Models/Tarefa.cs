@@ -15,7 +15,7 @@ public class Tarefa
     // texto do status: "A fazer", "Em andamento" ou "Finalizado"
     // tem que ser escrito exatamente assim (maiúsculas e minúsculas), porque o select da tela,
     // as colunas do kanban e o js comparam letra por letra
-    // 'Cancelada' é usado como exclusão lógica: a view V_Tarefas esconde essas tarefas
+    // 'Cancelada' é usado como exclusão lógica: a view V_TarefasJoin esconde essas tarefas
     public string Status {get; set; }
     // no banco é só a coluna categoria_codigo, aqui é o objeto inteiro (código, descrição e cor)
     // no formulário só vai o código (campo Categoria.Codigo)

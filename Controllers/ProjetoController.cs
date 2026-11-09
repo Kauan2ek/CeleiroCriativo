@@ -67,6 +67,18 @@ public class ProjetoController : Controller
                 return NotFound();
             }
 
+            // trava da regra de negócio: projeto finalizado ou em análise abre só pra leitura
+            // (em análise ainda dá pra Aprovar, Negar ou Excluir, que ficam fora do formulário)
+            if (projeto.Status.Descricao == "Finalizado")
+            {
+                ViewBag.Aviso = "Não é possível editar projeto finalizado.";
+            }
+
+            if (projeto.Status.Descricao == "Em análise")
+            {
+                ViewBag.Aviso = "Aprove o projeto antes de editá-lo.";
+            }
+
         }
         else
         {
@@ -150,6 +162,15 @@ public class ProjetoController : Controller
         if (projeto.Titulo == "Aguardando aprovação..." || projeto.Titulo == "") { ViewBag.Erro = "Altere o título do projeto!"; }
         if (projeto.DataInicio > projeto.DataFim)      { ViewBag.Erro = "A data de término não pode ser maior que a de início";  }
         if (projeto.DataInicio > projeto.DataPrevista) { ViewBag.Erro = "A data prevista não pode ser maior que a de início";    }
+
+        // trava da regra de negócio: projeto finalizado ou em análise não pode ser alterado
+        // confere o status que está NO BANCO (projetoBanco), e não o que veio do formulário (projeto):
+        // senão o próprio ato de mudar o projeto pra "Finalizado" e clicar em Salvar seria bloqueado
+        Projeto? projetoBanco = repository.Read(projeto.Codigo);
+        if (projetoBanco != null && projetoBanco.Status.Descricao == "Finalizado") { ViewBag.Erro = "Não é possível alterar um projeto finalizado."; }
+        if (projetoBanco != null && projetoBanco.Status.Descricao == "Em análise") { ViewBag.Erro = "Aprove o projeto antes de alterá-lo.";         }
+
+        if (ViewBag.Erro is not null) { return DetalhesGestor(projeto.Codigo); }
 
         try
         {

@@ -89,11 +89,12 @@ public class TarefaSqlRepository: DataConnection
     // retorna null se não encontrar (por isso o ? em Tarefa?)
     public Tarefa? Read(int id)
     {
-        // a consulta é feita na view V_Tarefas, e não direto na tabela
+        // a consulta é feita na view V_TarefasJoin, e não direto na tabela
         // a view já traz os dados da categoria juntos e esconde as tarefas com status 'Cancelada'
+        // (não confundir com a v_tarefas, que é só a tabela Tarefas pura, sem categoria e sem esse filtro)
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = "SELECT * FROM V_Tarefas WHERE codigo = @id";
+        cmd.CommandText = "SELECT * FROM V_TarefasJoin WHERE codigo = @id";
         cmd.Parameters.AddWithValue("@id", id);
 
         Tarefa? tarefa = null;
@@ -161,7 +162,7 @@ public class TarefaSqlRepository: DataConnection
     {
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = "SELECT * FROM V_Tarefas WHERE projeto_codigo = @IdProjeto";
+        cmd.CommandText = "SELECT * FROM V_TarefasJoin WHERE projeto_codigo = @IdProjeto";
         cmd.Parameters.AddWithValue("@IdProjeto", idProjeto);
 
         List<Tarefa>? tarefas = new List<Tarefa>();
@@ -250,7 +251,7 @@ public class TarefaSqlRepository: DataConnection
     }
 
     // "apaga" uma tarefa sem tirar a linha do banco (exclusão lógica)
-    // só troca o status pra 'Cancelada', e como a view V_Tarefas esconde esse status,
+    // só troca o status pra 'Cancelada', e como a view V_TarefasJoin esconde esse status,
     // a tarefa some do Read e do ReadAll, mas os comentários, documentos e a equipe dela continuam guardados
     // retorna false se não existir tarefa com o código informado
     public bool Delete(int id)

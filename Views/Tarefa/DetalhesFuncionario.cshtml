@@ -10,6 +10,11 @@
     // usado só pra habilitar ou não o envio de comentário; o resto da tarefa ele edita de qualquer jeito
     int? codigoLogado = Context.Session.GetInt32("codigo");
     bool naEquipe = Model.Funcionarios != null && Model.Funcionarios.Any(f => f.Codigo == codigoLogado);
+
+    // trava da regra de negócio: tarefa finalizada, ou de projeto finalizado, não pode ser alterada
+    // o ViewBag.StatusProjeto vem da DetalhesFuncionario do TarefaController (descrição do status do projeto)
+    // usado no disabled dos campos e pra esconder os botões que alteram a tarefa
+    bool editavel = Model.Status != "Finalizado" && ViewBag.StatusProjeto != "Finalizado";
 }
 
 <!DOCTYPE html>
@@ -72,6 +77,12 @@
         <div class="mensagem-crud erro">@ViewBag.Erro</div>
     }
 
+    <!-- aviso de tarefa travada (azul): o ViewBag.Aviso vem da DetalhesFuncionario do TarefaController -->
+    @if (ViewBag.Aviso != null)
+    {
+        <div class="mensagem-crud aviso">@ViewBag.Aviso</div>
+    }
+
 
     <!-- ======================================================
          FORMULÁRIO DA TAREFA
@@ -130,7 +141,8 @@
                     <input type="checkbox"
                            name="Visibilidade"
                            value="true"
-                           checked="@Model.Visibilidade">
+                           checked="@Model.Visibilidade"
+                           disabled="@(!editavel)">
 
                     <span class="slider-visibilidade"></span>
                 </label>
@@ -149,7 +161,8 @@
                     </span>
 
                     <select id="situacaoTarefa"
-                            name="Status">
+                            name="Status"
+                            disabled="@(!editavel)">
                         <option value="A fazer" selected="@(Model.Status == "A fazer" || Model.Status == "" || Model.Status == null)">
                             A Fazer
                         </option>
@@ -197,7 +210,8 @@
                                id="tituloTarefa"
                                name="Titulo"
                                placeholder="Título da Tarefa"
-                               value="@Model.Titulo">
+                               value="@Model.Titulo"
+                               disabled="@(!editavel)">
 
                         <img src="/imagens/editar.png"
                              alt="Editar">
@@ -219,7 +233,8 @@
 
                         <!-- as opções vêm da ViewBag.Categorias; na tarefa existente, a categoria dela já vem selecionada -->
                         <select id="categoriaTarefa"
-                                name="Categoria.Codigo">
+                                name="Categoria.Codigo"
+                                disabled="@(!editavel)">
                             <option value=""
                                     selected
                                     disabled>
@@ -257,6 +272,7 @@
                         <textarea id="descricaoTarefa"
                                   name="Descricao"
                                   placeholder="Texto.."
+                                  disabled="@(!editavel)"
                         >@Model.Descricao</textarea>
 
                         <img src="/imagens/editar.png"
@@ -319,7 +335,8 @@
                         <input type="date"
                                id="dataInicio"
                                name="DataHoraInicio"
-                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")">
+                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")"
+                               disabled="@(!editavel)">
 
                     </div>
 
@@ -339,7 +356,8 @@
                         <input type="date"
                                id="previsaoTermino"
                                name="DataHoraPrevista"
-                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")">
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")"
+                               disabled="@(!editavel)">
 
                     </div>
 
@@ -359,7 +377,8 @@
                         <input type="date"
                                id="dataEntrega"
                                name="DataHoraFim"
-                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")">
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")"
+                               disabled="@(!editavel)">
 
                     </div>
 
@@ -437,13 +456,17 @@
                                 </a>
 
                                 <!-- botão que exclui o arquivo (envia o form de exclusão desse documento, lá embaixo) -->
-                                <button type="submit"
-                                        form="formExcluirDocumento-@documento.Codigo"
-                                        class="botao-excluir-arquivo"
-                                        title="Excluir arquivo"
-                                        onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
-                                    <img src="/imagens/excluir_arquivo.png" alt="Excluir">
-                                </button>
+                                <!-- tarefa travada: some a lixeira (o botão Abrir continua) -->
+                                @if (editavel)
+                                {
+                                    <button type="submit"
+                                            form="formExcluirDocumento-@documento.Codigo"
+                                            class="botao-excluir-arquivo"
+                                            title="Excluir arquivo"
+                                            onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
+                                        <img src="/imagens/excluir_arquivo.png" alt="Excluir">
+                                    </button>
+                                }
                             </div>
                         }
                     }
@@ -455,8 +478,8 @@
                 </div>
 
 
-                <!-- botão de adicionar arquivo: só em tarefa já salva (precisa do código da tarefa) -->
-                @if (!novaTarefa)
+                <!-- botão de adicionar arquivo: só em tarefa já salva (precisa do código da tarefa) e que não esteja travada -->
+                @if (!novaTarefa && editavel)
                 {
                     <div class="acoes-arquivos">
                         <input type="file"
@@ -493,7 +516,7 @@
                 </button>
             </div>
         }
-        else // Update e Delete
+        else if (editavel) // Update e Delete: tarefa travada não mostra Salvar nem Excluir
         {
             <div class="acoes-exibicao-tarefa">
                 <button type="button"
@@ -610,12 +633,13 @@
             <input type="hidden" name="Funcionario.Codigo" value="@codigoLogado">
 
             <!-- o banco só aceita comentário de quem está na equipe: fora dela, o campo e o botão ficam desabilitados -->
+            <!-- o !editavel bloqueia também quando a tarefa está travada (tarefa ou projeto finalizado) -->
             <input type="text" id="novoComentario"
                    name="Descricao"
                    placeholder="@(naEquipe ? "Digite seu comentário..." : "Só quem está na equipe da tarefa pode comentar")"
                    autocomplete="off" maxlength="500" required
-                   disabled="@(!naEquipe)">
-            <button type="submit" class="enviar-comentario" disabled="@(!naEquipe)">Enviar</button>
+                   disabled="@(!naEquipe || !editavel)">
+            <button type="submit" class="enviar-comentario" disabled="@(!naEquipe || !editavel)">Enviar</button>
         </form>
 
     </div>

@@ -302,4 +302,32 @@ public class ProjetoSqlRepository : DataConnection
 
         return projeto;
     }
+
+    public Status? GetStatus(int codigo)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = @"
+            SELECT status_codigo, status_descricao
+            FROM V_ProjetosClientes
+            WHERE projeto_codigo = @codigo
+        ";
+        cmd.Parameters.AddWithValue("codigo", codigo);
+
+        SqlDataReader reader = cmd.ExecuteReader();
+        
+        Status? status = null;
+        if (reader.Read())
+        {
+            // Puxar codigo e status -- Deve ter alguma view pra isso
+            status = new Status
+            {
+                Codigo = reader.GetInt32("status_codigo"),
+                Descricao = reader.GetString("status_descricao")
+            };
+        }
+        reader.Close();
+        
+        return status;
+    }
 }
