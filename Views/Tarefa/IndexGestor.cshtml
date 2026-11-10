@@ -41,7 +41,7 @@
     <!-- informações do gestor logado -->
     <div class="informacoes-gestor">
 
-        <span>Nome do Gestor</span>
+        <span>@(Context.Session.GetString("nome"))</span>
 
         <!-- link pro perfil do gestor -->
         <a href="/Perfil/GestorPerfil"
