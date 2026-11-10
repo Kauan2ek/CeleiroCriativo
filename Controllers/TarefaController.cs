@@ -58,6 +58,14 @@ public class TarefaController : Controller
         // então o código do projeto vai pelo ViewBag pros links da tela (voltar e criar tarefa)
         ViewBag.IdProjeto = id;
 
+        // trava da regra de negócio: projeto finalizado não recebe tarefa nova
+        // a view usa esse valor pra esconder o botão "+ Criar Tarefa" (aqui o id já é o código do projeto)
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(id);
+        projetoSqlRepository.Dispose();
+
+        ViewBag.StatusProjeto = statusProjeto?.Descricao;
+
         // o nome da view vai escrito porque essa action também é chamada pela Index:
         // sem o nome, o asp.net procuraria uma view com o nome da action que chamou (Index.cshtml)
         return View("IndexGestor", tarefas);
@@ -73,6 +81,13 @@ public class TarefaController : Controller
         repository.Dispose();
 
         ViewBag.IdProjeto = id;
+
+        // mesma trava da IndexGestor: projeto finalizado não mostra o botão "+ Criar Tarefa"
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(id);
+        projetoSqlRepository.Dispose();
+
+        ViewBag.StatusProjeto = statusProjeto?.Descricao;
 
         return View("IndexFuncionario", tarefas);
     }
@@ -157,14 +172,16 @@ public class TarefaController : Controller
 
         ViewBag.StatusProjeto = statusProjeto?.Descricao;
 
+        // tarefa finalizada: só o status pode ser alterado (igual ao projeto finalizado)
+        if (tarefa.Status == "Finalizado")
+        {
+            ViewBag.Aviso = "Tarefa já finalizada. Para editá-la, altere o status.";
+        }
+
+        // vem por último de propósito: se o projeto também estiver finalizado, vale esse aviso (aí nem o status pode mudar)
         if (statusProjeto?.Descricao == "Finalizado")
         {
             ViewBag.Aviso = "Não é possível editar tarefa com projeto finalizado.";
-        } 
-        
-        if (tarefa.Status == "Finalizado")
-        {
-            ViewBag.Aviso = "Não é possível editar tarefa finalizada.";
         }
 
         // entrega a tarefa pra view, que acessa ela pelo @Model (por isso o "@model Tarefa" no topo do cshtml)
@@ -219,14 +236,16 @@ public class TarefaController : Controller
         // a view usa esse valor pra montar o bool editavel
         ViewBag.StatusProjeto = statusProjeto?.Descricao;
 
+        // tarefa finalizada: só o status pode ser alterado (igual ao projeto finalizado)
+        if (tarefa.Status == "Finalizado")
+        {
+            ViewBag.Aviso = "Tarefa já finalizada. Para editá-la, altere o status.";
+        }
+
+        // vem por último de propósito: se o projeto também estiver finalizado, vale esse aviso (aí nem o status pode mudar)
         if (statusProjeto?.Descricao == "Finalizado")
         {
             ViewBag.Aviso = "Não é possível editar tarefa com projeto finalizado.";
-        }
-
-        if (tarefa.Status == "Finalizado")
-        {
-            ViewBag.Aviso = "Não é possível editar tarefa finalizada.";
         }
 
         return View("DetalhesFuncionario", tarefa);
@@ -278,6 +297,36 @@ public class TarefaController : Controller
         // a tarefa criada pelo funcionário nasce sem equipe: quem monta a equipe é o gestor
         if (papel != "gestor" && papel != "funcionario") { return Index(tarefa.IdProjeto); }
 
+
+        // trava da regra de negócio: projeto finalizado não recebe tarefa nova
+        // a tela já esconde o botão de adicionar tarefa nesse caso, mas a conferência aqui impede que o formulário seja enviado mesmo assim
+        ProjetoSqlRepository projetoSqlRepository = new ProjetoSqlRepository();
+        Status? statusProjeto = projetoSqlRepository.GetStatus(tarefa.IdProjeto);
+        projetoSqlRepository.Dispose();
+
+        if (statusProjeto?.Descricao == "Finalizado") { ViewBag.Erro = "Não é possível criar tarefa em projeto finalizado."; }
+        // mesma regra da tela do projeto do gestor: tarefa só depois que o projeto é aprovado
+        if (statusProjeto?.Descricao == "Em análise") { ViewBag.Erro = "Aprove o projeto antes de cadastrar tarefas.";        }
+        // não dá Dispose antes de voltar: quem fecha a conexão é a tela de detalhes do papel (ela usa o mesmo repository)
+        if (ViewBag.Erro is not null) { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
+
+        // a data de início é a hora em que a tarefa é criada (o clique em Salvar), e não a hora em que a tela foi aberta
+        // por isso ela é preenchida aqui no servidor: o valor que veio do campo readonly da tela é só uma prévia e é ignorado
+        tarefa.DataHoraInicio = DateTime.Now;
+
+        // validação de data (mesma regra do projeto): a previsão não pode ser antes do início
+        // fica depois da linha de cima pra comparar com a hora de início de verdade (a do servidor)
+        if (tarefa.DataHoraPrevista < tarefa.DataHoraInicio) { ViewBag.Erro = "A data prevista não pode ser antes da data de início."; }
+        if (ViewBag.Erro is not null) { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
+
+        // tarefa criada já como "Finalizado" (o select da tarefa nova permite): a entrega também é agora
+        // mesma regra do Update: a data de entrega é preenchida no momento em que a tarefa passa pra "Finalizado"
+        if (tarefa.Status == "Finalizado")
+        {
+            tarefa.DataHoraFim = DateTime.Now;
+        }
+
+
         try
         {
             int codigoTarefa = repository.Create(tarefa);
@@ -327,10 +376,11 @@ public class TarefaController : Controller
             tarefa.Funcionarios = atual.Funcionarios;
         }
 
-        // trava da regra de negócio: tarefa finalizada, ou de projeto finalizado, não pode ser alterada
-        // a tela já esconde o botão Salvar nesses casos, mas a conferência aqui impede que o formulário seja enviado mesmo assim
+        // trava da regra de negócio: tarefa de projeto finalizado não pode ser alterada (nem o status)
+        // e tarefa finalizada só pode ter o STATUS alterado (mesma trava do projeto finalizado, mais embaixo)
+        // a tela já esconde/trava os campos nesses casos, mas a conferência aqui impede que o formulário seja enviado mesmo assim
         // o status conferido é o que está NO BANCO (tarefaBanco), e não o que veio do formulário (tarefa):
-        // senão o próprio ato de mudar a tarefa pra "Finalizado" e clicar em Salvar seria bloqueado
+        // senão o próprio ato de mudar a tarefa pra "Finalizado" e clicar em Salvar já travaria os outros campos
         Tarefa? tarefaBanco = repository.Read(tarefa.Codigo);
 
         if (tarefaBanco == null)
@@ -343,9 +393,43 @@ public class TarefaController : Controller
         projetoSqlRepository.Dispose();
 
         if (statusProjeto?.Descricao == "Finalizado") { ViewBag.Erro = "Não é possível alterar tarefa de projeto finalizado."; }
-        if (tarefaBanco.Status == "Finalizado")       { ViewBag.Erro = "Não é possível alterar uma tarefa finalizada.";        }
         // não dá Dispose antes de voltar: quem fecha a conexão é a tela de detalhes do papel (ela usa o mesmo repository)
         if (ViewBag.Erro is not null) { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
+
+        if (tarefaBanco.Status == "Finalizado")
+        {
+            // tarefa finalizada: na tela só o select de status fica liberado, os outros campos estão disabled
+            // e campo disabled não é enviado (chegariam vazios e o repository.Update apagaria título, datas e equipe)
+            // por isso o que vai pro banco é a tarefa do banco, trocando só o status pelo que veio da tela
+            // (isso também impede que alguém altere os outros campos enviando o formulário por fora da tela)
+            tarefaBanco.Status = tarefa.Status;
+            tarefa = tarefaBanco;
+
+            // tarefa REABERTA (saiu de "Finalizado"): a data de entrega volta a ficar vazia
+            // quando ela for finalizada de novo, cai no "else" de baixo e ganha a data nova
+            if (tarefa.Status != "Finalizado")
+            {
+                tarefa.DataHoraFim = null;
+            }
+        }
+        else
+        {
+            // data de início bloqueada: vale a que já está no banco (o valor que veio da tela é ignorado)
+            // tarefa antiga que ainda não tem data de início: grava a hora de agora (a do clique em Salvar)
+            tarefa.DataHoraInicio = tarefaBanco.DataHoraInicio == null ? DateTime.Now : tarefaBanco.DataHoraInicio;
+
+            // validação de data (mesma regra do projeto): a previsão não pode ser antes do início
+            // só aqui no else: na troca só de status (if de cima) as datas são as do banco e não foram mexidas
+            if (tarefa.DataHoraPrevista < tarefa.DataHoraInicio) { ViewBag.Erro = "A data prevista não pode ser antes da data de início."; }
+            if (ViewBag.Erro is not null) { return Detalhes(tarefa.Codigo, tarefa.IdProjeto); }
+
+            // tarefa que ACABOU de ser finalizada (no banco ainda não estava): a data de entrega é a data e hora de agora
+            // aqui dá pra comparar o texto direto, porque o select de status da tarefa envia a descrição ("Finalizado"), e não um código
+            if (tarefa.Status == "Finalizado")
+            {
+                tarefa.DataHoraFim = DateTime.Now;
+            }
+        }
 
         try
         {

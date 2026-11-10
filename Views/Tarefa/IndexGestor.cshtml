@@ -99,12 +99,16 @@
                 <h2>Tarefas a Fazer</h2>
 
                 <!-- botão que leva pra tela de criação de tarefa, já ligada a esse projeto -->
-                <a href="/Tarefa/DetalhesGestor?idProjeto=@ViewBag.IdProjeto"
-                   class="botao-criar-tarefa">
+                <!-- projeto finalizado: o botão nem aparece (o ViewBag.StatusProjeto vem da IndexGestor do TarefaController) -->
+                @if (ViewBag.StatusProjeto != "Finalizado")
+                {
+                    <a href="/Tarefa/DetalhesGestor?idProjeto=@ViewBag.IdProjeto"
+                       class="botao-criar-tarefa">
 
-                    + Criar Tarefa
+                        + Criar Tarefa
 
-                </a>
+                    </a>
+                }
 
             </div>
 

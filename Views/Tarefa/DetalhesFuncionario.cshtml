@@ -15,6 +15,15 @@
     // o ViewBag.StatusProjeto vem da DetalhesFuncionario do TarefaController (descrição do status do projeto)
     // usado no disabled dos campos e pra esconder os botões que alteram a tarefa
     bool editavel = Model.Status != "Finalizado" && ViewBag.StatusProjeto != "Finalizado";
+
+    // o status da tarefa finalizada ainda pode ser alterado (pra reabrir), igual ao projeto finalizado
+    // só trava o status quando o PROJETO está finalizado: aí nada da tarefa pode mudar
+    // usado no disabled do select de status e pra mostrar o botão "Salvar Status"
+    bool statusEditavel = ViewBag.StatusProjeto != "Finalizado";
+
+    // data e hora de agora, pra preencher a Data de Início da tarefa que ainda não tem (mesma ideia da tela do gestor)
+    // Now (e não Today) porque as colunas da tarefa são datetime: a hora é gravada
+    DateTime dataHoraAtual = DateTime.Now;
 }
 
 <!DOCTYPE html>
@@ -160,9 +169,10 @@
                         Status:
                     </span>
 
+                    <!-- statusEditavel (e não editavel): na tarefa finalizada o status continua liberado, pra dar pra reabrir -->
                     <select id="situacaoTarefa"
                             name="Status"
-                            disabled="@(!editavel)">
+                            disabled="@(!statusEditavel)">
                         <option value="A fazer" selected="@(Model.Status == "A fazer" || Model.Status == "" || Model.Status == null)">
                             A Fazer
                         </option>
@@ -332,11 +342,15 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <!-- preenchida automaticamente: a do banco, ou a de agora se a tarefa ainda não tem -->
+                        <!-- readonly: não dá pra digitar. A hora de agora aqui é só uma prévia: quem grava a data de verdade -->
+                        <!-- é o Create/Update do TarefaController, com a hora do clique em Salvar -->
+                        <!-- o type="datetime-local" só aceita o formato yyyy-MM-ddTHH:mm (o 'T' entre aspas simples sai como letra T mesmo) -->
+                        <input type="datetime-local"
                                id="dataInicio"
                                name="DataHoraInicio"
-                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")"
-                               disabled="@(!editavel)">
+                               value="@(Model.DataHoraInicio.HasValue ? Model.DataHoraInicio.Value.ToString("yyyy-MM-dd'T'HH:mm") : dataHoraAtual.ToString("yyyy-MM-dd'T'HH:mm"))"
+                               readonly>
 
                     </div>
 
@@ -353,10 +367,10 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <input type="datetime-local"
                                id="previsaoTermino"
                                name="DataHoraPrevista"
-                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")"
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd'T'HH:mm")"
                                disabled="@(!editavel)">
 
                     </div>
@@ -374,11 +388,12 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <!-- ninguém digita a entrega: o Update do TarefaController preenche quando a tarefa passa pra "Finalizado" -->
+                        <input type="datetime-local"
                                id="dataEntrega"
                                name="DataHoraFim"
-                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")"
-                               disabled="@(!editavel)">
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd'T'HH:mm")"
+                               readonly>
 
                     </div>
 
@@ -507,7 +522,7 @@
              BOTÕES
              ================================================== -->
 
-        @if (novaTarefa) // Create
+        @if (novaTarefa && editavel) // Create
         {
             <div class="acoes-exibicao-tarefa">
                 <button type="submit"
@@ -528,6 +543,15 @@
                 <button type="submit"
                         class="botao-salvar-tarefa">
                     Salvar
+                </button>
+            </div>
+        }
+        else if (statusEditavel) // tarefa finalizada (projeto não): só o status pode mudar, então só o "Salvar Status" (sem Excluir)
+        {
+            <div class="acoes-exibicao-tarefa">
+                <button type="submit"
+                        class="botao-salvar-tarefa">
+                    Salvar Status
                 </button>
             </div>
         }

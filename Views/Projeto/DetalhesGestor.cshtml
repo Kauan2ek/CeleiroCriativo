@@ -5,10 +5,10 @@
     bool novoProjeto = Model.Codigo == 0;
     bool emAnalise = !novoProjeto && Model.Status.Descricao == "Em análise";
 
-    // trava da regra de negócio: projeto finalizado ou em análise não pode ser alterado
+    // trava da regra de negócio: projeto finalizado ou em análise só pode ter o STATUS alterado
     // (projeto novo nasce "Em andamento", então fica editável)
-    // usado no disabled dos campos e pra esconder o botão Salvar
-    bool editavel = !emAnalise && Model.Status.Descricao != "Finalizado";
+    // usado no disabled de todos os campos, menos o select de status, que fica sempre liberado
+    bool editavel = Model.Status.Descricao != "Finalizado";
 
     string statusClasse = "analise";
     if (Model.Status.Descricao == "Em andamento")
@@ -19,6 +19,10 @@
     {
         statusClasse = "finalizado";
     }
+
+    // data de hoje, pra preencher a Data de Início do projeto que ainda não tem
+    // Today (e não Now) porque a coluna data_inicio é date: a hora não seria gravada
+    DateTime dataAtual = DateTime.Today;
 }
 
 <!DOCTYPE html>
@@ -28,7 +32,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@(novoProjeto ? "Novo Projeto" : "Projeto") - Celeiro Criativo</title>
     <link rel="icon" type="image/png" href="/imagens/logo.png">
-    <link rel="stylesheet" href="/css/exibicao_projeto.css" />
+    <!-- o ?v=2 obriga o navegador a baixar o css de novo (sem ele, pode continuar usando a versão antiga guardada em cache) -->
+    <!-- sempre que alterar o exibicao_projeto.css, aumente esse número -->
+    <link rel="stylesheet" href="/css/exibicao_projeto.css?v=2" />
 </head>
 <body>
     <!-- ==================== CABEÇALHO ==================== -->
@@ -89,7 +95,8 @@
                 <div class="situacao @statusClasse" id="containerSituacao">
                     <span>Situação:</span>
                     <!-- name="Status.Codigo" preenche o projeto.Status.Codigo no Create/Update -->
-                    <select id="situacaoProjeto" name="Status.Codigo" disabled="@(!editavel)">
+                    <!-- único campo sem o disabled: mesmo com o projeto travado, o status pode ser alterado -->
+                    <select id="situacaoProjeto" name="Status.Codigo">
                         @foreach (Status status in ViewBag.StatusList)
                         {
                             if (Model.Status.Codigo == status.Codigo)
@@ -119,7 +126,7 @@
                                    maxlength="50"
                                    required
                                    placeholder="Título do Projeto"
-                                   disabled="@(!editavel)">
+                                   @(!editavel ? "readonly" : "")>
                             <img src="/imagens/editar.png" alt="Editar">
                         </div>
                     </div>
@@ -158,6 +165,7 @@
                 </section>
 
                 <!-- Datas do Projeto. -->
+                <!-- o type="date" só aceita o formato yyyy-MM-dd: com qualquer outro, o navegador limpa o campo (e ele seria enviado vazio) -->
                 <section class="coluna-meio">
                     <div class="campo-projeto">
                         <label for="dataInicio">Data de Início</label>
@@ -165,10 +173,8 @@
                             <input type="date"
                                    id="dataInicio"
                                    name="DataInicio"
-                                   value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")"
-                                   @(Model.Codigo == 0 ? "disable" : "")
-                                   disabled="@(!editavel)"
-                                   >
+                                   value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : dataAtual.ToString("yyyy-MM-dd"))"
+                                   readonly>
                         </div>
                     </div>
 
@@ -190,7 +196,8 @@
                                    id="dataEntrega"
                                    name="DataFim"
                                    value="@(Model.DataFim.HasValue ? Model.DataFim.Value.ToString("yyyy-MM-dd") : "")"
-                                   disabled="@(!editavel)">
+                                   readonly
+                                   >
                         </div>
                     </div>
                 </section>
@@ -239,11 +246,14 @@
                                 Ver todas
                             </a>
 
-                            <a href="/Tarefa/DetalhesGestor?idProjeto=@Model.Codigo"
-                               class="botao-documento"
-                               title="Adicionar tarefa">
-                                <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
-                            </a>
+                            @if (editavel) {
+                                <a href="/Tarefa/DetalhesGestor?idProjeto=@Model.Codigo"
+                                class="botao-documento"
+                                title="Adicionar tarefa">
+                                    <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
+                                </a>
+                            }
+
                         </div>
                     }
                     else if (emAnalise)
@@ -257,15 +267,24 @@
                 O botão está dentro do próprio formulário, por isso basta usar
                 type="submit". Não é necessário informar o atributo form.
             -->
-            <!-- projeto travado (editavel = false): o botão Salvar nem aparece -->
-            @if (editavel)
-            {
-                <div class="acoes-projeto">
-                    <button type="submit" class="botao-salvar">
-                        @(novoProjeto ? "Criar Projeto" : "Salvar Alterações")
-                    </button>
-                </div>
-            }
+            <!-- o botão aparece sempre, porque o status pode ser alterado até com o projeto travado -->
+            <!-- projeto travado (editavel = false): o texto vira "Salvar Status", já que só o status é gravado -->
+            <div class="acoes-projeto">
+                <button type="submit" class="botao-salvar">
+                    @if (novoProjeto)
+                    {
+                        <text>Criar Projeto</text>
+                    }
+                    else if (editavel)
+                    {
+                        <text>Salvar Alterações</text>
+                    }
+                    else
+                    {
+                        <text>Salvar Status</text>
+                    }
+                </button>
+            </div>
         </form>
 
         <!-- ==================== AÇÕES FORA DO FORM PRINCIPAL ==================== -->
@@ -274,11 +293,15 @@
             <div class="acoes-secundarias-projeto">
                 <!-- exclusão lógica: o status vira "Excluído" -->
                 <!-- o código vem do @Model e vai pro parâmetro id da action Delete -->
-                <form method="post" action="/Projeto/Delete"
-                      onsubmit="return confirm('Tem certeza que deseja excluir este projeto?');">
-                    <input type="hidden" name="id" value="@Model.Codigo">
-                    <button type="submit" class="botao-excluir">Excluir Projeto</button>
-                </form>
+                <!-- projeto finalizado (editavel = false) não pode ser excluído: o botão nem aparece -->
+                @if (editavel)
+                {
+                    <form method="post" action="/Projeto/Delete"
+                          onsubmit="return confirm('Tem certeza que deseja excluir este projeto?');">
+                        <input type="hidden" name="id" value="@Model.Codigo">
+                        <button type="submit" class="botao-excluir">Excluir Projeto</button>
+                    </form>
+                }
 
                 @if (emAnalise)
                 {

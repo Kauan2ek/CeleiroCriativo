@@ -2,6 +2,11 @@
 
 @{
     // Só o gestor altera o projeto: aqui os campos são apenas de leitura.
+
+    // trava da regra de negócio: projeto finalizado não recebe tarefa nova
+    // usado pra esconder o botão de adicionar tarefa (o "Ver todas" continua aparecendo)
+    bool editavel = Model.Status.Descricao != "Finalizado";
+
     string statusClasse = "analise";
     if (Model.Status.Descricao == "Em andamento")
     {
@@ -93,6 +98,8 @@
                 <div class="campo-projeto">
                     <label for="dataInicio">Data de Início</label>
                     <div class="campo-com-icone">
+                        <!-- tela só de leitura: as três datas ficam readonly e mostram só o que está no banco -->
+                        <!-- (sem name, porque não tem formulário: os campos não são enviados pra lugar nenhum) -->
                         <input type="date"
                                id="dataInicio"
                                value="@(Model.DataInicio.HasValue ? Model.DataInicio.Value.ToString("yyyy-MM-dd") : "")"
@@ -159,12 +166,22 @@
                         Ver todas
                     </a>
 
-                    <a href="/Tarefa/DetalhesFuncionario?idProjeto=@Model.Codigo"
-                       class="botao-documento"
-                       title="Adicionar tarefa">
-                        <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
-                    </a>
+                    <!-- projeto finalizado (editavel = false): o botão de adicionar tarefa nem aparece -->
+                    @if (editavel)
+                    {
+                        <a href="/Tarefa/DetalhesFuncionario?idProjeto=@Model.Codigo"
+                           class="botao-documento"
+                           title="Adicionar tarefa">
+                            <img src="/imagens/adicionar_tarefa.png" alt="Adicionar tarefa">
+                        </a>
+                    }
                 </div>
+
+                <!-- mesmo aviso cinza da tela do gestor ("Aprove o projeto antes de cadastrar tarefas") -->
+                @if (!editavel)
+                {
+                    <p class="aviso-tarefas-projeto">Projeto finalizado: não é possível cadastrar tarefas.</p>
+                }
             </section>
         </div>
     </main>

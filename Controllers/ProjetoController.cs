@@ -71,13 +71,9 @@ public class ProjetoController : Controller
             // (em análise ainda dá pra Aprovar, Negar ou Excluir, que ficam fora do formulário)
             if (projeto.Status.Descricao == "Finalizado")
             {
-                ViewBag.Aviso = "Não é possível editar projeto finalizado.";
+                ViewBag.Aviso = "Projeto já finalizado. Para editá-lo, altere o status.";
             }
 
-            if (projeto.Status.Descricao == "Em análise")
-            {
-                ViewBag.Aviso = "Aprove o projeto antes de editá-lo.";
-            }
 
         }
         else
@@ -126,6 +122,28 @@ public class ProjetoController : Controller
     {
         if (HttpContext.Session.GetString("papel") != "gestor") { return Index();}
 
+        // a data de início é o dia em que o projeto é criado: preenchida aqui no servidor
+        // (o valor que veio do campo readonly da tela é só uma prévia e é ignorado, igual ao Create da tarefa)
+        projeto.DataInicio = DateTime.Today;
+
+        // Validações (as mesmas do Update, menos a da data de término, que no Create nunca vem da tela)
+        if (string.IsNullOrWhiteSpace(projeto.Titulo))   { ViewBag.Erro = "Informe o título do projeto!";                          }
+        if (projeto.DataInicio > projeto.DataPrevista)   { ViewBag.Erro = "A data prevista não pode ser antes da data de início."; }
+
+        // o Codigo do projeto novo é 0, então a DetalhesGestor reabre o formulário de projeto novo mostrando o erro
+        if (ViewBag.Erro is not null) { return DetalhesGestor(projeto.Codigo); }
+
+        // projeto criado já como "Finalizado" (o select do projeto novo permite): a entrega é a data de hoje
+        // mesma regra do Update: o select só envia o Status.Codigo, então o código do "Finalizado" é buscado pela descrição
+        StatusSqlRepository statusSqlRepository = new StatusSqlRepository();
+        Status? statusFinalizado = statusSqlRepository.ReadByDescricao("Finalizado");
+        statusSqlRepository.Dispose();
+
+        if (statusFinalizado != null && projeto.Status.Codigo == statusFinalizado.Codigo)
+        {
+            projeto.DataFim = DateTime.Today;
+        }
+
         try
         {
             int codigoProjeto = repository.Create(projeto);
@@ -158,19 +176,58 @@ public class ProjetoController : Controller
             return Index();
         }
 
-        // Validações
-        if (projeto.Titulo == "Aguardando aprovação..." || projeto.Titulo == "") { ViewBag.Erro = "Altere o título do projeto!"; }
-        if (projeto.DataInicio > projeto.DataFim)      { ViewBag.Erro = "A data de término não pode ser maior que a de início";  }
-        if (projeto.DataInicio > projeto.DataPrevista) { ViewBag.Erro = "A data prevista não pode ser maior que a de início";    }
-
-        // trava da regra de negócio: projeto finalizado ou em análise não pode ser alterado
-        // confere o status que está NO BANCO (projetoBanco), e não o que veio do formulário (projeto):
-        // senão o próprio ato de mudar o projeto pra "Finalizado" e clicar em Salvar seria bloqueado
+        // busca o projeto como está NO BANCO: serve pra data de início (logo abaixo) e pra trava do projeto finalizado (mais embaixo)
         Projeto? projetoBanco = repository.Read(projeto.Codigo);
-        if (projetoBanco != null && projetoBanco.Status.Descricao == "Finalizado") { ViewBag.Erro = "Não é possível alterar um projeto finalizado."; }
-        if (projetoBanco != null && projetoBanco.Status.Descricao == "Em análise") { ViewBag.Erro = "Aprove o projeto antes de alterá-lo.";         }
+
+        // data de início bloqueada: vale a que já está no banco (o valor que veio do campo readonly da tela é ignorado)
+        // projeto que ainda não tem data de início (ex.: veio da landing page): grava a data de hoje
+        // fica antes das validações pra elas compararem com a data de início de verdade
+        if (projetoBanco != null)
+        {
+            projeto.DataInicio = projetoBanco.DataInicio == null ? DateTime.Today : projetoBanco.DataInicio;
+        }
+
+        // Validações
+        // DataInicio > DataFim quer dizer que o término ficou ANTES do início (por isso as mensagens dizem "antes")
+        if (projeto.Titulo == "Aguardando aprovação..." || string.IsNullOrWhiteSpace(projeto.Titulo)) { ViewBag.Erro = "Altere o título do projeto!"; }
+        if (projeto.DataInicio > projeto.DataFim)      { ViewBag.Erro = "A data de término não pode ser antes da data de início."; }
+        if (projeto.DataInicio > projeto.DataPrevista) { ViewBag.Erro = "A data prevista não pode ser antes da data de início.";   }
 
         if (ViewBag.Erro is not null) { return DetalhesGestor(projeto.Codigo); }
+
+        // código do status "Finalizado", buscado pela descrição (mesma ideia do statusInicial da DetalhesGestor)
+        // precisa disso porque o select de status só envia o Status.Codigo: o projeto.Status.Descricao chega vazio
+        StatusSqlRepository statusSqlRepository = new StatusSqlRepository();
+        Status? statusFinalizado = statusSqlRepository.ReadByDescricao("Finalizado");
+        statusSqlRepository.Dispose();
+
+        // trava da regra de negócio: projeto finalizado só pode ter o STATUS alterado
+        // (projeto em andamento ou em análise não entra nesse if: todos os campos são gravados normalmente)
+        // confere o status que está NO BANCO (projetoBanco), e não o que veio do formulário (projeto):
+        // senão o próprio ato de mudar o projeto pra "Finalizado" e clicar em Salvar já travaria os outros campos
+        // (o projetoBanco já foi lido lá em cima, antes das validações)
+        if (projetoBanco != null && projetoBanco.Status.Descricao == "Finalizado")
+        {
+            // na tela travada só o select de status fica liberado: os outros campos estão disabled,
+            // e campo disabled não é enviado no formulário (chegariam vazios e o repository.Update apagaria título, cliente e datas)
+            // por isso o que vai pro banco é o projeto do banco, trocando só o status pelo que veio da tela
+            // (isso também impede que alguém altere os outros campos enviando o formulário por fora da tela)
+            projetoBanco.Status = projeto.Status;
+            projeto = projetoBanco;
+
+            // projeto REABERTO (saiu de "Finalizado"): a data de entrega volta a ficar vazia
+            // quando ele for finalizado de novo, cai no "else if" de baixo e ganha a data nova
+            if (statusFinalizado != null && projeto.Status.Codigo != statusFinalizado.Codigo)
+            {
+                projeto.DataFim = null;
+            }
+        }
+        // projeto que ACABOU de ser finalizado (no banco ainda não estava): a data de entrega é a data atual
+        // como é "else if", um projeto que já estava finalizado não tem a data trocada a cada "Salvar Status"
+        else if (statusFinalizado != null && projeto.Status.Codigo == statusFinalizado.Codigo)
+        {
+            projeto.DataFim = DateTime.Today;
+        }
 
         try
         {
@@ -201,6 +258,17 @@ public class ProjetoController : Controller
     public ActionResult Delete(int id)
     {
         if (HttpContext.Session.GetString("papel") != "gestor") { return Index();}
+
+        // trava da regra de negócio: projeto finalizado não pode ser excluído
+        // a tela já esconde o botão Excluir nesse caso, mas a conferência aqui impede que o formulário seja enviado mesmo assim
+        // não dá Dispose antes de voltar: quem fecha a conexão é a DetalhesGestor (ela usa o mesmo repository)
+        Projeto? projetoBanco = repository.Read(id);
+        if (projetoBanco != null && projetoBanco.Status.Descricao == "Finalizado")
+        {
+            ViewBag.Erro = "Não é possível excluir um projeto finalizado.";
+            return DetalhesGestor(id);
+        }
+
         try
         {
             bool resultado = repository.Delete(id);

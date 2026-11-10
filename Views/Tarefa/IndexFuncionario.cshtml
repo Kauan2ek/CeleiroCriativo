@@ -88,12 +88,16 @@
                 <h2>Tarefas a Fazer</h2>
 
                 <!-- o funcionário também cria tarefa; ela nasce sem equipe (quem monta a equipe é o gestor) -->
-                <a href="/Tarefa/DetalhesFuncionario?idProjeto=@ViewBag.IdProjeto"
-                   class="botao-criar-tarefa">
+                <!-- projeto finalizado: o botão nem aparece (o ViewBag.StatusProjeto vem da IndexFuncionario do TarefaController) -->
+                @if (ViewBag.StatusProjeto != "Finalizado")
+                {
+                    <a href="/Tarefa/DetalhesFuncionario?idProjeto=@ViewBag.IdProjeto"
+                       class="botao-criar-tarefa">
 
-                    + Criar Tarefa
+                        + Criar Tarefa
 
-                </a>
+                    </a>
+                }
 
             </div>
 

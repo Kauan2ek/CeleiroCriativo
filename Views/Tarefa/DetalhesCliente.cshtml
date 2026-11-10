@@ -239,9 +239,10 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <!-- só leitura: mostra data e hora do banco (o type="datetime-local" exige o formato yyyy-MM-ddTHH:mm) -->
+                        <input type="datetime-local"
                                id="dataInicio"
-                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd")"
+                               value="@Model.DataHoraInicio?.ToString("yyyy-MM-dd'T'HH:mm")"
                                disabled>
 
                     </div>
@@ -259,9 +260,9 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <input type="datetime-local"
                                id="previsaoTermino"
-                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd")"
+                               value="@Model.DataHoraPrevista?.ToString("yyyy-MM-dd'T'HH:mm")"
                                disabled>
 
                     </div>
@@ -279,9 +280,9 @@
 
                     <div class="campo-com-icone-tarefa">
 
-                        <input type="date"
+                        <input type="datetime-local"
                                id="dataEntrega"
-                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd")"
+                               value="@Model.DataHoraFim?.ToString("yyyy-MM-dd'T'HH:mm")"
                                disabled>
 
                     </div>
