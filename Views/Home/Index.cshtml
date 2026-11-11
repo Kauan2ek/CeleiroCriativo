@@ -367,7 +367,8 @@
                     <input type="tel"
                         id="telefone"
                         name="Telefone"
-                        placeholder="(99) 99999-9999">
+                        placeholder="(99) 99999-9999"
+                        data-telefone>
 
 
                     <!-- email -->
@@ -380,11 +381,15 @@
 
 
                     <!-- cpf ou cnpj -->
+                    <!-- data-mascara="cpf-cnpj": o mascara.js formata enquanto digita (CPF até 11 números, CNPJ a partir do 12º) -->
+                    <!-- inputmode="numeric": no celular abre o teclado de números -->
                     <label for="documento">CPF ou CNPJ:</label>
                     <input type="text"
                         id="documento"
                         name="Documento"
                         placeholder="Digite seu CPF ou CNPJ"
+                        data-mascara="cpf-cnpj"
+                        inputmode="numeric"
                         required>
 
 
@@ -432,6 +437,8 @@
 
     <!-- js que cuida dos comportamentos da página (tipo o texto digitando) -->
     <script src="/js/script.js"></script>
+    <!-- máscara de CPF/CNPJ do campo de documento do cadastro -->
+    <script src="/js/mascara.js"></script>
 
 </body>
 

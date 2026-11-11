@@ -78,7 +78,8 @@
                     <!-- o documento não pode ser alterado pelo perfil: fica sempre bloqueado (disabled nem é enviado no formulário) -->
                     <div class="campo-perfil">
                         <label for="documento">@Model.TipoDocumento.ToUpper()</label>
-                        <input type="text" id="documento" value="@Model.Documento" disabled>
+                        <!-- data-mascara: o mascara.js mostra o documento formatado (o banco guarda só os números) -->
+                        <input type="text" id="documento" value="@Model.Documento" data-mascara="cpf-cnpj" disabled>
                     </div>
 
                 </div>
@@ -90,7 +91,7 @@
 
                     <div class="campo-perfil">
                         <label for="telefone">Telefone</label>
-                        <input type="text" id="telefone" name="Telefone" value="@Model.Telefone" placeholder="Digite seu telefone" readonly>
+                        <input type="text" id="telefone" name="Telefone" value="@Model.Telefone" placeholder="(99) 99999-9999" data-telefone readonly>
                     </div>
 
                     <!-- a senha nunca vem preenchida: em branco mantém a senha atual -->
@@ -132,6 +133,9 @@
 
     </div>
 
+
+    <!-- máscara de CPF/CNPJ do campo de documento -->
+    <script src="/js/mascara.js"></script>
 
     <script>
 

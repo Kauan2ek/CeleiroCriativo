@@ -264,4 +264,16 @@ public class TarefaSqlRepository: DataConnection
 
         return cmd.ExecuteNonQuery() > 0;
     }
+
+
+    public bool Compartilhar(int id)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = conn;
+        cmd.CommandText = "UPDATE Tarefas SET visibilidade = 1 WHERE codigo = @codigo";
+
+        cmd.Parameters.AddWithValue("@codigo", id);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
 }

@@ -118,6 +118,13 @@ public class PerfilController : Controller
             return Index();
         }
 
+        // telefone é opcional, mas se vier preenchido precisa ter DDD + número: 10 (fixo) ou 11 (celular) números
+        if (!string.IsNullOrWhiteSpace(funcionario.Telefone) && funcionario.Telefone.Count(char.IsDigit) != 10 && funcionario.Telefone.Count(char.IsDigit) != 11)
+        {
+            ViewBag.Erro = "Digite o telefone com DDD: 10 números (fixo) ou 11 números (celular).";
+            return Index();
+        }
+
         if (!string.IsNullOrWhiteSpace(funcionario.Senha) && funcionario.Senha != ConfirmarSenha)
         {
             ViewBag.Erro = "A confirmação de senha não corresponde à senha informada.";
@@ -190,6 +197,13 @@ public class PerfilController : Controller
         if (string.IsNullOrWhiteSpace(cliente.Nome) || string.IsNullOrWhiteSpace(cliente.Email))
         {
             ViewBag.Erro = "Preencha nome e e-mail.";
+            return Index();
+        }
+
+        // telefone é opcional, mas se vier preenchido precisa ter DDD + número: 10 (fixo) ou 11 (celular) números
+        if (!string.IsNullOrWhiteSpace(cliente.Telefone) && cliente.Telefone.Count(char.IsDigit) != 10 && cliente.Telefone.Count(char.IsDigit) != 11)
+        {
+            ViewBag.Erro = "Digite o telefone com DDD: 10 números (fixo) ou 11 números (celular).";
             return Index();
         }
 

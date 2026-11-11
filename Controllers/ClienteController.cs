@@ -37,9 +37,29 @@ public class ClienteController : Controller
                 return View("~/Views/Usuario/Entrar.cshtml");
             }
 
+            // documento nulo (formulário enviado sem o campo) vira texto vazio, senão o Replace abaixo daria erro
+            if (cliente.Documento == null) { cliente.Documento = ""; }
+
             // Limpar o documento (deixar só números)
             cliente.Documento = cliente.Documento.Replace(".", "").Replace("-", "")
                                                  .Replace("/", "").Replace(" ", "");
+
+            // validação feita DEPOIS da limpeza, pra contar só os números: CPF tem 11 e CNPJ tem 14
+            if (cliente.Documento.Length != 11 && cliente.Documento.Length != 14)
+            {
+                repository.Dispose();
+                ViewBag.Erro = "Digite o CPF (11 números) ou o CNPJ (14 números) corretamente!";
+                return View("~/Views/Home/Index.chtml#cadastro");
+            }
+
+            // telefone é opcional, mas se vier preenchido precisa ter DDD + número: 10 (fixo) ou 11 (celular) números
+            if (!string.IsNullOrWhiteSpace(cliente.Telefone) && cliente.Telefone.Count(char.IsDigit) != 10 && cliente.Telefone.Count(char.IsDigit) != 11)
+            {
+                repository.Dispose();
+                ViewBag.Erro = "Digite o telefone com DDD: 10 números (fixo) ou 11 números (celular).";
+                return View("~/Views/Usuario/Entrar.cshtml");
+            }
+
             cliente.TipoDocumento = cliente.Documento.Length > 11 ? "cnpj" : "cpf";
 
             // Montando o projeto

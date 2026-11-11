@@ -80,6 +80,17 @@
     </div>
 
 
+    <!-- mensagem do Compartilhar (sucesso ou erro) -->
+    @if (ViewBag.Sucesso != null)
+    {
+        <div class="mensagem-crud sucesso">@ViewBag.Sucesso</div>
+    }
+    @if (ViewBag.Erro != null)
+    {
+        <div class="mensagem-crud erro">@ViewBag.Erro</div>
+    }
+
+
 
     <!-- ==================== KANBAN ==================== -->
 
@@ -121,55 +132,58 @@
                 <!-- (inclui status fora do padrão, pra nenhuma tarefa sumir do quadro) -->
                 @foreach (Tarefa tarefa in Model.Where(t => t.Status != "Em andamento" && t.Status != "Finalizado"))
                 {
-                    <!-- draggable=false: arrastar entre colunas está desativado, porque não salvava no banco -->
-                    <!-- o status muda pela tela da tarefa (select + Salvar) -->
-                    <div class="card-tarefa"
-                         draggable="false"
-                         data-codigo="@tarefa.Codigo"
-                         data-tarefa="@tarefa.Titulo">
+                    <form method="post" action="@($"/Tarefa/Compartilhar/{tarefa.Codigo}")">
+                        <input type="hidden" name="idProjeto" value="@ViewBag.IdProjeto">
+                        <!-- draggable=false: arrastar entre colunas está desativado, porque não salvava no banco -->
+                        <!-- o status muda pela tela da tarefa (select + Salvar) -->
+                        <div class="card-tarefa"
+                            draggable="false"
+                            data-codigo="@tarefa.Codigo"
+                            data-tarefa="@tarefa.Titulo">
 
-                        <!-- conteúdo do card -->
+                            <!-- conteúdo do card -->
 
-                        <div class="conteudo-card">
+                            <div class="conteudo-card">
 
-                            <p>
-                                @tarefa.Titulo
-                            </p>
+                                <p>
+                                    @tarefa.Titulo
+                                </p>
 
 
-                            <!-- botão pra abrir a tarefa -->
-                            <!-- tem um button envolvendo o link, meio redundante mas ok -->
+                                <!-- botão pra abrir a tarefa -->
+                                <!-- tem um button envolvendo o link, meio redundante mas ok -->
 
-                            <button type="button"
+                                <button type="button"
+                                        class="botao-expandir-tarefa">
+
+                                    <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
                                     class="botao-expandir-tarefa">
 
-                                <a href="/Tarefa/DetalhesGestor/@tarefa.Codigo"
-                                   class="botao-expandir-tarefa">
+                                        <img src="/imagens/abrir.png"
+                                            alt="Abrir tarefa">
 
-                                    <img src="/imagens/abrir.png"
-                                         alt="Abrir tarefa">
+                                    </a>
 
-                                </a>
+                                </button>
 
-                            </button>
+                            </div>
+
+
+                            <!-- ação de compartilhar -->
+                            @if (!tarefa.Visibilidade) 
+                            {
+                                <div class="acoes-card">
+
+                                    <button type="submit"
+                                            class="botao-compartilhar">
+                                        Compartilhar
+                                    </button>
+
+                                </div>
+                            }
 
                         </div>
-
-
-                        <!-- ação de compartilhar -->
-
-                        <div class="acoes-card">
-
-                            <button type="button"
-                                    class="botao-compartilhar">
-
-                                Compartilhar
-
-                            </button>
-
-                        </div>
-
-                    </div>
+                    </form>
                 }
 
             </div>
@@ -198,6 +212,8 @@
                 <!-- um card pra cada tarefa em andamento -->
                 @foreach (Tarefa tarefa in Model.Where(t => t.Status == "Em andamento"))
                 {
+                    <form method="post" action="@($"/Tarefa/Compartilhar/{tarefa.Codigo}")">
+                    <input type="hidden" name="idProjeto" value="@ViewBag.IdProjeto">
                     <div class="card-tarefa"
                          draggable="false"
                          data-codigo="@tarefa.Codigo"
@@ -232,18 +248,22 @@
 
                         <!-- ação de compartilhar -->
 
-                        <div class="acoes-card">
+                        @if (!tarefa.Visibilidade)
+                        {
+                            <div class="acoes-card">
 
-                            <button type="button"
-                                    class="botao-compartilhar">
+                                <button type="submit"
+                                        class="botao-compartilhar">
 
-                                Compartilhar
+                                    Compartilhar
 
-                            </button>
+                                </button>
 
-                        </div>
+                            </div>
+                        }
 
                     </div>
+                    </form>
                 }
 
             </div>
@@ -298,20 +318,6 @@
                                          alt="Abrir tarefa">
 
                                 </a>
-
-                            </button>
-
-                        </div>
-
-
-                        <!-- ação de compartilhar -->
-
-                        <div class="acoes-card">
-
-                            <button type="button"
-                                    class="botao-compartilhar">
-
-                                Compartilhar
 
                             </button>
 

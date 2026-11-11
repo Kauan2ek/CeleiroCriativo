@@ -114,6 +114,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // decide quais botões aparecem dentro do card
     function atualizarBotoes(card) {
 
+        // com dados do banco, o botão já vem certo do C# (type="submit" dentro do form)
+        // se o js trocasse o html da área de ações, o botão voltaria a ser type="button" e não enviaria nada
+        if (dadosDoBanco) {
+            return;
+        }
+
         // procura a área de ações do card
         const acoes =
             card.querySelector(".acoes-card");
@@ -684,17 +690,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-            // se confirmou, só loga no console por enquanto
-            if (confirmar) {
-
-                console.log(
-                    "Tarefa compartilhada:",
-                    card.dataset.tarefa
-                );
+            // se cancelou, impede o envio do formulário
+            // (se confirmou, o botão submit segue o fluxo normal e envia o form)
+            if (!confirmar) {
+                event.preventDefault();
             }
-
-
-            // se cancelou, não faz nada
         }
     );
 

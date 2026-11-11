@@ -482,6 +482,36 @@ public class TarefaController : Controller
         }
     }
 
+    [HttpPost]
+    public ActionResult Compartilhar(int id, int idProjeto)
+    {
+        if (HttpContext.Session.GetString("papel") != "gestor") { return Index(idProjeto); }
+
+        try
+        {
+            bool resultado = repository.Compartilhar(id);
+
+            if (resultado)
+            {
+                ViewBag.Sucesso = "Tarefa compartilhada com o cliente.";
+            }
+            else
+            {
+                ViewBag.Erro = "Tarefa não encontrada.";
+            }
+
+            // não fecha a conexão aqui: o Index chega na IndexGestor, que lê as tarefas e fecha
+            return Index(idProjeto);
+        }
+        catch (SqlException e)
+        {
+            // volta pro kanban mostrando o erro (o ViewBag chega porque não tem redirecionamento)
+            ViewBag.Erro = e.Message;
+            return Index(idProjeto);
+            // return Json(new {sucesso = false, erro = e.Message});
+        }
+    }
+
     // ==================== MÉTODOS AUXILIARES ====================
 
     // confere se o projeto é do cliente logado (mesma regra da DetalhesCliente do ProjetoController)

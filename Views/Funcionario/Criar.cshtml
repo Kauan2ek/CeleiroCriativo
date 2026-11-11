@@ -41,9 +41,9 @@
             </a>
         </div>
 
-        @if (TempData["Erro"] != null)
+        @if (ViewBag.Erro != null)
         {
-            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+            <div class="mensagem-crud erro">@ViewBag.Erro</div>
         }
 
         <div class="caixa-cadastro">
@@ -66,13 +66,16 @@
                 <div class="linha-campos">
                     <div class="campo">
                         <label for="Documento">CPF</label>
+                        <!-- data-mascara="cpf": o mascara.js formata (000.000.000-00) e, ao salvar, envia só os números -->
                         <input type="text"
                                id="Documento"
                                name="Documento"
                                value="@Model.Documento"
                                maxlength="20"
                                required
-                               placeholder="Digite o CPF">
+                               placeholder="Digite o CPF"
+                               data-mascara="cpf"
+                               inputmode="numeric">
                     </div>
 
                     <div class="campo">
@@ -82,7 +85,8 @@
                                name="Telefone"
                                value="@Model.Telefone"
                                maxlength="20"
-                               placeholder="Digite o telefone">
+                               placeholder="(99) 99999-9999"
+                               data-telefone>
                     </div>
                 </div>
 
@@ -145,5 +149,8 @@
             </form>
         </div>
     </main>
+
+    <!-- máscara de CPF do campo de documento -->
+    <script src="/js/mascara.js"></script>
 </body>
 </html>

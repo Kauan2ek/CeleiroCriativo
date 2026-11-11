@@ -63,27 +63,54 @@ public class FuncionarioController : Controller
             string.IsNullOrWhiteSpace(funcionario.Documento) ||
             string.IsNullOrWhiteSpace(funcionario.Email))
         {
-            TempData["Erro"] = "Preencha nome, CPF e e-mail.";
-            return RedirectToAction(editando ? "Editar" : "Criar", editando ? new { id = funcionario.Codigo } : null);
+            ViewBag.Erro = "Preencha nome, CPF e e-mail.";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
+        }
+
+        // o CPF tem 11 números (o mascara.js já manda só os números)
+        // fica depois da checagem acima porque ali o documento nulo já foi tratado
+        if (funcionario.Documento.Length != 11)
+        {
+            ViewBag.Erro = "Digite o CPF (11 números) corretamente!";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
+        }
+
+        // telefone é opcional, mas se vier preenchido precisa ter DDD + número: 10 (fixo) ou 11 (celular) números
+        if (!string.IsNullOrWhiteSpace(funcionario.Telefone) && funcionario.Telefone.Count(char.IsDigit) != 10 && funcionario.Telefone.Count(char.IsDigit) != 11)
+        {
+            ViewBag.Erro = "Digite o telefone com DDD: 10 números (fixo) ou 11 números (celular).";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
         }
 
         if (CargoCodigo <= 0)
         {
-            TempData["Erro"] = "Selecione um cargo.";
-            return RedirectToAction(editando ? "Editar" : "Criar", editando ? new { id = funcionario.Codigo } : null);
+            ViewBag.Erro = "Selecione um cargo.";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
         }
 
         // Na criação a senha é obrigatória. Na edição, deixar em branco mantém a senha atual.
         if (!editando && string.IsNullOrWhiteSpace(funcionario.Senha))
         {
-            TempData["Erro"] = "Informe uma senha para o funcionário.";
-            return RedirectToAction("Criar");
+            ViewBag.Erro = "Informe uma senha para o funcionário.";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
         }
 
         if (!string.IsNullOrWhiteSpace(funcionario.Senha) && funcionario.Senha != ConfirmarSenha)
         {
-            TempData["Erro"] = "A confirmação de senha não corresponde à senha informada.";
-            return RedirectToAction(editando ? "Editar" : "Criar", editando ? new { id = funcionario.Codigo } : null);
+            ViewBag.Erro = "A confirmação de senha não corresponde à senha informada.";
+            CarregarCargos();
+            ViewBag.ModoEdicao = editando;
+            return View("Criar", funcionario);
         }
 
         funcionario.TipoDocumento = string.IsNullOrWhiteSpace(funcionario.TipoDocumento) ? "cpf" : funcionario.TipoDocumento.ToLower();
@@ -99,26 +126,40 @@ public class FuncionarioController : Controller
                 bool atualizado = repository.Update(funcionario);
                 repository.Dispose();
 
-                TempData[atualizado ? "Sucesso" : "Erro"] = atualizado
-                    ? "Funcionário atualizado com sucesso."
-                    : "Funcionário não encontrado.";
+                if (atualizado)
+                {
+                    ViewBag.Sucesso = "Funcionário atualizado com sucesso.";
+                }
+                else
+                {
+                    ViewBag.Erro = "Funcionário não encontrado.";
+                }
             }
             else
             {
                 int codigo = repository.Create(funcionario);
                 repository.Dispose();
 
-                TempData[codigo > 0 ? "Sucesso" : "Erro"] = codigo > 0
-                    ? "Funcionário cadastrado com sucesso."
-                    : "O funcionário não pôde ser cadastrado.";
+                if (codigo > 0)
+                {
+                    ViewBag.Sucesso = "Funcionário cadastrado com sucesso.";
+                }
+                else
+                {
+                    ViewBag.Erro = "O funcionário não pôde ser cadastrado.";
+                }
             }
         }
         catch (SqlException e)
         {
-            TempData["Erro"] = "Não foi possível salvar o funcionário: " + e.Message;
+            ViewBag.Erro = "Não foi possível salvar o funcionário: " + e.Message;
         }
 
-        return RedirectToAction("IndexGestor");
+        FuncionarioSqlRepository repositoryLista = new FuncionarioSqlRepository();
+        List<Funcionario> funcionarios = repositoryLista.ReadAll();
+        repositoryLista.Dispose();
+
+        return View("IndexGestor", funcionarios);
     }
 
     // Exclusão lógica. A coluna Ativo já existia justamente para permitir
@@ -130,13 +171,20 @@ public class FuncionarioController : Controller
 
         FuncionarioSqlRepository repository = new FuncionarioSqlRepository();
         bool resultado = repository.Delete(id);
+
+        if (resultado)
+        {
+            ViewBag.Sucesso = "Funcionário desativado com sucesso.";
+        }
+        else
+        {
+            ViewBag.Erro = "O funcionário não pôde ser desativado.";
+        }
+
+        List<Funcionario> funcionarios = repository.ReadAll();
         repository.Dispose();
 
-        TempData[resultado ? "Sucesso" : "Erro"] = resultado
-            ? "Funcionário desativado com sucesso."
-            : "O funcionário não pôde ser desativado.";
-
-        return RedirectToAction("IndexGestor");
+        return View("IndexGestor", funcionarios);
     }
 
     // Carrega os cargos cadastrados via INSERT para o select do formulário.

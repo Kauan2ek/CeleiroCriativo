@@ -36,13 +36,13 @@
             </a>
         </div>
 
-        @if (TempData["Sucesso"] != null)
+        @if (ViewBag.Sucesso != null)
         {
-            <div class="mensagem-crud sucesso">@TempData["Sucesso"]</div>
+            <div class="mensagem-crud sucesso">@ViewBag.Sucesso</div>
         }
-        @if (TempData["Erro"] != null)
+        @if (ViewBag.Erro != null)
         {
-            <div class="mensagem-crud erro">@TempData["Erro"]</div>
+            <div class="mensagem-crud erro">@ViewBag.Erro</div>
         }
 
         <!-- Lista real vinda do banco; substitui o localStorage usado no protótipo. -->
