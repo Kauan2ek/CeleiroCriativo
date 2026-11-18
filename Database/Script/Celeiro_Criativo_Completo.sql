@@ -1089,11 +1089,11 @@ INSERT INTO Funcionarios (pessoa_codigo, cargo_codigo, ativo, email, senha) VALU
     (5, 5, 1, 'tiago@celeirocriativo.com',   '123456');   -- Redator
 
 INSERT INTO Clientes (pessoa_codigo, codigo_verificacao, email, senha) VALUES
-    (6,  'A1B2C3', 'cliente@gmail.com',    '123456'),
-    (7,  'D4E5F6', 'contato@ecoverde.exemplo.com',      '123456'),
-    (8,  'G7H8I9', 'contato@tecnova.exemplo.com',       '123456'),
-    (9,  'J1K2L3', 'contato@floresdocampo.exemplo.com', '123456'),
-    (10, 'M4N5O6', 'marina@exemplo.com',                '123456');
+    (6,  NULL, 'cliente@gmail.com',    '123456'),
+    (7,  NULL, 'contato@ecoverde.exemplo.com',      '123456'),
+    (8,  NULL, 'contato@tecnova.exemplo.com',       '123456'),
+    (9,  NULL, 'contato@floresdocampo.exemplo.com', '123456'),
+    (10, NULL, 'marina@exemplo.com',                '123456');
 
 INSERT INTO Projetos (cliente_codigo, titulo, descricao, data_inicio, data_fim, data_prevista, status_codigo) VALUES
     (6,  'Identidade visual Café Aurora',   'Criação do logotipo e do manual da marca da cafeteria.',       '20260803', '20260828', '20260831', 3),  -- 1
